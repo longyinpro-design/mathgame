@@ -131,7 +131,7 @@ func run() -> void:
 		game.queue_free(); await process_frame
 		Bridge.origin = "mk01"; HarborSample.entry = "camp"
 		game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame
-		check(game.from_harbour and Bridge.origin.is_empty() and HarborSample.entry == "camp","the harbour hand-off is consumed once")
+		check(game.origin == "mk01" and Bridge.origin.is_empty() and HarborSample.entry == "camp","the harbour hand-off is consumed once")
 		check(game.buttons.has("back_camp") and not game.buttons.back_camp.disabled,"the finished order offers the way back to camp")
 		if not small: await capture("09-return-to-camp")
 		game.queue_free(); await process_frame

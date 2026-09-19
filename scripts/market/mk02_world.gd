@@ -1,51 +1,18 @@
-extends Node2D
+extends "res://scripts/market/kit_world.gd"
 # MK02 育苗铺交换台：底景与货物全部来自 kit-v1 拆件包，数量与约定由引擎绘制。
 const Rules = preload("res://scripts/market/mk02_rules.gd")
-const UIStyle = preload("res://scripts/cargo/skin.gd")
-const MANIFEST_PATH = "res://art/market-kit-v1/manifest.json"
 const BACKDROP = preload("res://assets/runtime/market/kit-v1/backgrounds/nursery-exchange-clean-v1.png")
 const KOUKOU_TIE = preload("res://assets/runtime/market/characters/koukou-v1/tie-parcel.png")
 const KOUKOU_WAVE = preload("res://assets/runtime/market/characters/koukou-v1/waving.png")
 const TRAY_WIDTH = 174.0
-const RESIDENT = Vector2(659, 424)
-const BENCH = [Vector2(1096, 492), Vector2(1160, 492)]
-const FRUIT_SPOTS = [Vector2(371, 492), Vector2(407, 492), Vector2(443, 492), Vector2(479, 492),
-	Vector2(371, 458), Vector2(407, 458), Vector2(443, 458), Vector2(479, 458)]
-const TABLE_SPOTS = [Vector2(591, 488), Vector2(627, 488), Vector2(663, 488), Vector2(699, 488),
-	Vector2(591, 460), Vector2(627, 460), Vector2(663, 460), Vector2(699, 460),
-	Vector2(591, 432), Vector2(627, 432), Vector2(663, 432), Vector2(699, 432)]
-const RACK_SPOTS = [Vector2(830, 496), Vector2(878, 496), Vector2(926, 496), Vector2(854, 444), Vector2(902, 444)]
 const GOODS = {"fruit": ["copper_fruit", 34], "spool": ["rope_spool", 38], "wick": ["wick_bundle", 34]}
-var state = Rules.fresh()
-var progress = 0.0
-var clock = 0.0
-var land_place = ""
-var land_slot = -1
-var land_progress = 1.0
-var parts: Dictionary = {}
-var atlases: Dictionary = {}
-var font: Font
+static var FRUIT_SPOTS := grid(Vector2(371, 492), Vector2(36, -34), 4, 8)
+static var TABLE_SPOTS := grid(Vector2(591, 488), Vector2(36, -28), 4, 12)
+const RACK_SPOTS = [Vector2(830, 496), Vector2(878, 496), Vector2(926, 496), Vector2(854, 444), Vector2(902, 444)]
+const BENCH = [Vector2(1096, 492), Vector2(1160, 492)]
 
-func _ready() -> void:
-	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	font = UIStyle.face()
-	var parsed = JSON.parse_string(FileAccess.get_file_as_string(MANIFEST_PATH))
-	for item in parsed.sprites:
-		parts[item.id] = item
-		atlases[item.id] = load("res://" + item.atlas)
-
-func _process(delta: float) -> void:
-	clock += delta
-
-# The pending exchange lands at the half-way mark, so the flying goods and the
-# counts on the plaques always describe the same moment.
-func shown_state() -> Dictionary:
-	var shown = state.duplicate(true)
-	if state.stage == "exchanging" and progress >= 0.5:
-		if state.exchange[0] == 0: shown.a += state.exchange[1]
-		else: shown.b += state.exchange[1]
-		shown.exchange = []
-	return shown
+func ready_level() -> void:
+	scene_id = "nursery"; backdrop = BACKDROP
 
 # A good only changes hands one at a time, so the newest arrival is the single place
 # that needs the drop-in animation. Taking it back simply returns it to the shared stack.
@@ -57,15 +24,18 @@ func begin_land(previous: Dictionary) -> void:
 	for slot in range(Rules.HOOK_SLOTS):
 		if previous.hook[slot] != state.hook[slot] and state.hook[slot] == 1: land_place = "hook"; land_slot = slot
 
-func landing(place: String, slot: int) -> float:
-	return 1.0 - land_progress if land_place == place and land_slot == slot else 0.0
+func rack_rect(slot: int) -> Rect2: return target(RACK_SPOTS[slot], 52, 46)
+func hook_rect(slot: int) -> Rect2: return target(BENCH[slot], 52, 48)
 
-# Drop targets are logical squares around the good's foot, never the raw alpha bounds.
-func rack_rect(slot: int) -> Rect2:
-	return Rect2(RACK_SPOTS[slot] + Vector2(-26, -46), Vector2(52, 52))
-
-func hook_rect(slot: int) -> Rect2:
-	return Rect2(BENCH[slot] + Vector2(-26, -48), Vector2(52, 52))
+# The pending exchange lands at the half-way mark, so the flying goods and the
+# counts on the plaques always describe the same moment.
+func shown_state() -> Dictionary:
+	var shown = state.duplicate(true)
+	if state.stage == "exchanging" and progress >= 0.5:
+		if state.exchange[0] == 0: shown.a += state.exchange[1]
+		else: shown.b += state.exchange[1]
+		shown.exchange = []
+	return shown
 
 func goods_layout(placed: Dictionary) -> Dictionary:
 	# Every good has exactly one owner: basket, table, rack or bench.
@@ -84,38 +54,6 @@ func goods_layout(placed: Dictionary) -> Dictionary:
 		if placed.hook[slot] == 1: hook.append([BENCH[slot], slot])
 	return {"fruit": fruits, "table": table, "rack": rack, "hook": hook}
 
-func kit(id: String, foot: Vector2, width: float, alpha: float = 1.0, drop: float = 0.0) -> void:
-	var texture: Texture2D = atlases[id]
-	var item: Dictionary = parts[id]
-	var scale = width / texture.get_width()
-	var dims = Vector2(texture.get_width(), texture.get_height()) * scale
-	var origin = foot + Vector2(0, drop) - Vector2(item.anchor_px[0], item.anchor_px[1]) * scale
-	draw_texture_rect(texture, Rect2(origin, dims), false, Color(1, 1, 1, alpha))
-
-func contact(foot: Vector2, radius: float, alpha: float = 0.26) -> void:
-	draw_set_transform(foot + Vector2(0, 2), 0, Vector2(1, 0.26))
-	draw_circle(Vector2.ZERO, radius, Color(0.1, 0.06, 0.03, alpha))
-	draw_set_transform(Vector2.ZERO)
-
-func words(text: String, at: Vector2, size_px: int = 17, color: Color = Color("fff0d1")) -> void:
-	draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, 3, Color("382515"))
-	draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, color)
-
-func plaque(text: String, rect: Rect2, size_px: int = 16, color: Color = Color("fff0d1")) -> void:
-	var style = UIStyle.sign_style(); style.shadow_size = 0; style.bg_color.a = 1.0
-	draw_style_box(style, rect)
-	words(text, rect.position + Vector2(10, rect.size.y - 9), size_px, color)
-
-func socket(centre: Vector2, radii: Vector2, strength: float) -> void:
-	var pts = PackedVector2Array()
-	for i in range(25):
-		var angle = TAU * i / 24.0
-		pts.append(centre + Vector2(cos(angle) * radii.x, sin(angle) * radii.y))
-	pts.append(pts[0])
-	draw_colored_polygon(pts, Color(1.0, 0.87, 0.58, 0.28 * strength))
-	draw_polyline(pts, Color("8f6420", 0.9 * strength), 4, true)
-	draw_polyline(pts, Color("ffe297", 1.0 * strength), 2, true)
-
 func carry_plan(p: float) -> Array:
 	var plan: Array = []
 	if state.stage != "exchanging": return plan
@@ -129,7 +67,7 @@ func carry_plan(p: float) -> Array:
 		homes.append(spots[pool - 1 - step])
 		centre += homes[step]
 	centre /= count
-	var hands = RESIDENT + Vector2(0, -40)
+	var hands = station("resident") + Vector2(0, -40)
 	var phase = clampf(p / 0.5, 0, 1)
 	var lift = sin(phase * PI) * 34
 	for step in range(count):
@@ -146,30 +84,23 @@ func in_flight_homes() -> Array:
 	for entry in carry_plan(progress): homes.append(entry["home"])
 	return homes
 
-func _draw() -> void:
-	if font == null or parts.is_empty(): return
-	draw_texture_rect(BACKDROP, Rect2(0, 0, 1280, 720), false)
+func draw_level() -> void:
 	# 扣扣 stands at the nursery's resident station; goods in front of it belong to the table.
 	var happy = state.stage == "complete" or (state.stage == "delivery" and progress > 0.6)
-	var pose = KOUKOU_WAVE if happy else KOUKOU_TIE
-	var feet = RESIDENT
-	var pose_size = Vector2(pose.get_width(), pose.get_height()) * 0.5
+	var feet = station("resident")
 	if state.stage == "delivery": feet += Vector2(lerpf(0, 34, smoothstep(0.45, 1, progress)), 0)
-	contact(feet, 34, 0.2)
-	draw_texture_rect(pose, Rect2(feet - Vector2(pose_size.x / 2, pose_size.y), pose_size), false)
+	figure(KOUKOU_WAVE if happy else KOUKOU_TIE, feet, 0.5)
 	var placed = shown_state()
 	var layout = goods_layout(placed)
 	var carried = carry_plan(progress)
-	var flying: Array = []
-	for entry in carried: flying.append(entry["home"])
-	var hidden = flying if (state.stage == "exchanging" and progress < 0.5) else []
-	for foot in [Vector2(425, 499), Vector2(645, 499), Vector2(877, 499)]: kit("receiving_tray", foot, TRAY_WIDTH)
+	var hidden = hide_while_moving(carried)
+	for name in ["counter_left","counter_middle","counter_right"]: kit("receiving_tray", station(name), TRAY_WIDTH)
 	for foot in layout.fruit:
 		if foot in hidden: continue
 		contact(foot, GOODS["fruit"][1] * 0.42, 0.2)
 		kit("copper_fruit", foot, GOODS["fruit"][1])
 	# Empty drop targets pulse only while there is something that may go there.
-	var beat = 0.5 + 0.5 * sin(clock * 4.6)
+	var beat = pulse()
 	if state.stage == "puzzle":
 		if Rules.wicks_loose(state) > 0:
 			for slot in range(Rules.RACK_SLOTS):
@@ -213,6 +144,6 @@ func draw_signs(placed: Dictionary) -> void:
 	plaque("约定一 · 2 铜果 → 3 线卷", Rect2(330, 514, 192, 28))
 	plaque("约定二 · 2 线卷 → 1 灯芯", Rect2(550, 514, 192, 28))
 	plaque("码头交付架 · %d / %d 根灯芯" % [placed.rack.count(1), Rules.WICK_ORDER], Rect2(776, 514, 206, 28),
-		16, Color("ffe297") if placed.rack.count(1) == Rules.WICK_ORDER else Color("fff0d1"))
+		16, INK_GOLD if placed.rack.count(1) == Rules.WICK_ORDER else INK_LIGHT)
 	plaque("扣扣的修补台 · %d / %d 卷线" % [placed.hook.count(1), Rules.SPOOL_ORDER], Rect2(1004, 514, 206, 28),
-		16, Color("ffe297") if placed.hook.count(1) == Rules.SPOOL_ORDER else Color("fff0d1"))
+		16, INK_GOLD if placed.hook.count(1) == Rules.SPOOL_ORDER else INK_LIGHT)

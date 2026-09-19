@@ -142,7 +142,7 @@ func run() -> void:
 		game.undo(); await create_timer(0.4).timeout
 	check(game.state.a == 4 and game.state.b == 0 and game.state.rack.count(1) == 0,"undo walks the trap back to twelve spools")
 	check(game.history.is_empty(),"the rewind consumes every recorded step")
-	game.reset_goods()
+	game.do_reset()
 	check(game.state.rack == [0,0,0,0,0] and game.state.a == 4,"clearing the rack keeps the exchanges")
 	game.do_exchange(1,5); game.skip_animation()
 	for slot in range(Rules.RACK_SLOTS):
@@ -161,11 +161,11 @@ func run() -> void:
 	game.queue_free(); await process_frame
 	Bridge.origin = "mk01"
 	game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame
-	check(game.from_harbour and Bridge.origin.is_empty(),"the harbour hand-off is consumed once")
+	check(game.origin == "mk01" and Bridge.origin.is_empty(),"the harbour hand-off is consumed once")
 	check(game.buttons.has("back_camp"),"arriving from the harbour offers the way back to camp")
 	game.queue_free(); await process_frame
 	game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame
-	check(not game.from_harbour and not game.buttons.has("back_camp"),"a standalone sample keeps its own exit")
+	check(game.origin != "mk01" and not game.buttons.has("back_camp"),"a standalone sample keeps its own exit")
 	game.queue_free(); await process_frame
 	var file = FileAccess.open(path,FileAccess.WRITE); file.store_string("{broken"); file.close()
 	game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame
