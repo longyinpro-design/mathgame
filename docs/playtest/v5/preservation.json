@@ -1,0 +1,37 @@
+{
+  "v4_code_and_scenes": {
+    "game/journey.tscn": true,
+    "scripts/chapter.gd": true,
+    "scripts/encounter/encounter.gd": true,
+    "scripts/journey/camp.gd": true,
+    "scripts/journey/journey.gd": true,
+    "scripts/journey/store.gd": true,
+    "tests/journey/playtest.gd": true,
+    "tests/journey/layout.gd": true,
+    "tests/journey/audio_lifecycle.gd": true
+  },
+  "v4_assets": {
+    "assets/source/world-map-v1.png": true,
+    "assets/source/explorer-sprites-v2.png": true,
+    "assets/runtime/fox-v2.png": true,
+    "assets/runtime/forest-ravine-v2.png": true,
+    "assets/runtime/v3/arena.png": true,
+    "assets/runtime/v3/objects.png": true,
+    "assets/runtime/v3/cast.png": true,
+    "assets/runtime/v3/fox-cast.png": true,
+    "assets/runtime/v3/victory.png": true,
+    "assets/audio/v3/awaken.wav": true,
+    "assets/audio/v3/cast.wav": true,
+    "assets/audio/v3/charge.wav": true,
+    "assets/audio/v3/footstep.wav": true,
+    "assets/audio/v3/forest_air.wav": true,
+    "assets/audio/v3/forest_theme.wav": true,
+    "assets/audio/v3/fox.wav": true,
+    "assets/audio/v3/impact.wav": true,
+    "assets/audio/v3/pickup.wav": true,
+    "assets/audio/v3/place.wav": true,
+    "assets/audio/v3/reward.wav": true,
+    "assets/audio/v3/unbalanced.wav": true,
+    "assets/audio/v3/unlock.wav": true
+  }
+}

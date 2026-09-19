@@ -1,0 +1,796 @@
+{
+  "version": 1,
+  "coordinate_contract": {
+    "scene_size": [
+      1280,
+      720
+    ],
+    "background_fit": "stretch to scene_size; do not independently use native pixels for placement",
+    "sprite_anchor": "anchor_px is in cropped PNG pixels, not source sheet pixels. Position is world anchor. centered=false; offset=-anchor_px; apply scale once.",
+    "attachments": "attachment world = sprite_position + (attachment_px-anchor_px)*scale; rotate vector for rotating beam",
+    "interaction": "logical hit target at least 48x48; not raw alpha bounds",
+    "scale_example_factor": 0.42
+  },
+  "sprites": [
+    {
+      "id": "copper_fruit",
+      "title": "铜果",
+      "source": "assets/source/market/exchange-goods-source-v1.png",
+      "source_rect": [
+        61,
+        60,
+        266,
+        255
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/copper_fruit.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/copper_fruit.tres",
+      "anchor_px": [
+        133.0,
+        247
+      ],
+      "attachments_px": {},
+      "suggested_width": 52,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "rope_spool",
+      "title": "线卷",
+      "source": "assets/source/market/exchange-goods-source-v1.png",
+      "source_rect": [
+        422,
+        43,
+        315,
+        283
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/rope_spool.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/rope_spool.tres",
+      "anchor_px": [
+        157.5,
+        275
+      ],
+      "attachments_px": {},
+      "suggested_width": 64,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "wick_bundle",
+      "title": "灯芯束",
+      "source": "assets/source/market/exchange-goods-source-v1.png",
+      "source_rect": [
+        798,
+        50,
+        264,
+        291
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/wick_bundle.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/wick_bundle.tres",
+      "anchor_px": [
+        132.0,
+        283
+      ],
+      "attachments_px": {},
+      "suggested_width": 54,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "cloth_bolt",
+      "title": "布匹",
+      "source": "assets/source/market/exchange-goods-source-v1.png",
+      "source_rect": [
+        1129,
+        64,
+        383,
+        280
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/cloth_bolt.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/cloth_bolt.tres",
+      "anchor_px": [
+        191.5,
+        272
+      ],
+      "attachments_px": {},
+      "suggested_width": 80,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "crate_red",
+      "title": "红封箱",
+      "source": "assets/source/market/exchange-goods-source-v1.png",
+      "source_rect": [
+        35,
+        356,
+        318,
+        302
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/crate_red.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/crate_red.tres",
+      "anchor_px": [
+        159.0,
+        294
+      ],
+      "attachments_px": {},
+      "suggested_width": 85,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "crate_blue",
+      "title": "蓝封箱",
+      "source": "assets/source/market/exchange-goods-source-v1.png",
+      "source_rect": [
+        415,
+        364,
+        316,
+        295
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/crate_blue.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/crate_blue.tres",
+      "anchor_px": [
+        158.0,
+        287
+      ],
+      "attachments_px": {},
+      "suggested_width": 85,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "oil_bottle",
+      "title": "灯油瓶",
+      "source": "assets/source/market/exchange-goods-source-v1.png",
+      "source_rect": [
+        820,
+        356,
+        232,
+        309
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/oil_bottle.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/oil_bottle.tres",
+      "anchor_px": [
+        116.0,
+        301
+      ],
+      "attachments_px": {},
+      "suggested_width": 52,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "brass_bell",
+      "title": "铜铃",
+      "source": "assets/source/market/exchange-goods-source-v1.png",
+      "source_rect": [
+        1197,
+        353,
+        256,
+        324
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/brass_bell.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/brass_bell.tres",
+      "anchor_px": [
+        128.0,
+        316
+      ],
+      "attachments_px": {},
+      "suggested_width": 52,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "paper_roll",
+      "title": "纸卷",
+      "source": "assets/source/market/exchange-goods-source-v1.png",
+      "source_rect": [
+        27,
+        703,
+        338,
+        274
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/paper_roll.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/paper_roll.tres",
+      "anchor_px": [
+        169.0,
+        266
+      ],
+      "attachments_px": {},
+      "suggested_width": 64,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "nail_pouch",
+      "title": "钉袋",
+      "source": "assets/source/market/exchange-goods-source-v1.png",
+      "source_rect": [
+        401,
+        683,
+        337,
+        295
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/nail_pouch.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/nail_pouch.tres",
+      "anchor_px": [
+        168.5,
+        287
+      ],
+      "attachments_px": {},
+      "suggested_width": 60,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "receipt_blank",
+      "title": "空白回执",
+      "source": "assets/source/market/exchange-goods-source-v1.png",
+      "source_rect": [
+        792,
+        668,
+        237,
+        316
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/receipt_blank.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/receipt_blank.tres",
+      "anchor_px": [
+        118.5,
+        308
+      ],
+      "attachments_px": {},
+      "suggested_width": 104,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "receiving_tray",
+      "title": "接货托盘",
+      "source": "assets/source/market/exchange-goods-source-v1.png",
+      "source_rect": [
+        1091,
+        723,
+        433,
+        249
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/receiving_tray.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/receiving_tray.tres",
+      "anchor_px": [
+        216.5,
+        241
+      ],
+      "attachments_px": {},
+      "suggested_width": 174,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "oil_jug_round",
+      "title": "圆封油壶",
+      "source": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "source_rect": [
+        58,
+        121,
+        263,
+        255
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/oil_jug_round.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/oil_jug_round.tres",
+      "anchor_px": [
+        131.5,
+        247
+      ],
+      "attachments_px": {},
+      "suggested_width": 66,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "oil_jug_tall",
+      "title": "长封油壶",
+      "source": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "source_rect": [
+        488,
+        16,
+        174,
+        360
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/oil_jug_tall.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/oil_jug_tall.tres",
+      "anchor_px": [
+        87.0,
+        352
+      ],
+      "attachments_px": {},
+      "suggested_width": 48,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "weight_small",
+      "title": "小砝码",
+      "source": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "source_rect": [
+        885,
+        189,
+        129,
+        184
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/weight_small.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/weight_small.tres",
+      "anchor_px": [
+        64.5,
+        176
+      ],
+      "attachments_px": {},
+      "suggested_width": 36,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "weight_hex",
+      "title": "六角砝码",
+      "source": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "source_rect": [
+        1254,
+        162,
+        191,
+        199
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/weight_hex.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/weight_hex.tres",
+      "anchor_px": [
+        95.5,
+        191
+      ],
+      "attachments_px": {},
+      "suggested_width": 48,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "weight_stepped",
+      "title": "阶梯砝码",
+      "source": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "source_rect": [
+        113,
+        438,
+        149,
+        241
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/weight_stepped.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/weight_stepped.tres",
+      "anchor_px": [
+        74.5,
+        233
+      ],
+      "attachments_px": {},
+      "suggested_width": 42,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "scale_pan",
+      "title": "秤盘含悬索",
+      "source": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "source_rect": [
+        435,
+        398,
+        239,
+        291
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/scale_pan.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/scale_pan.tres",
+      "anchor_px": [
+        120,
+        32
+      ],
+      "attachments_px": {
+        "suspension": [
+          120,
+          32
+        ],
+        "cargo": [
+          119,
+          237
+        ]
+      },
+      "suggested_width": 100,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "scale_beam",
+      "title": "秤梁",
+      "source": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "source_rect": [
+        732,
+        516,
+        431,
+        89
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/scale_beam.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/scale_beam.tres",
+      "anchor_px": [
+        216,
+        44
+      ],
+      "attachments_px": {
+        "pivot": [
+          216,
+          44
+        ],
+        "left_hook": [
+          30,
+          44
+        ],
+        "right_hook": [
+          399,
+          44
+        ]
+      },
+      "suggested_width": 180,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "scale_stand",
+      "title": "秤座",
+      "source": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "source_rect": [
+        1236,
+        376,
+        224,
+        334
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/scale_stand.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/scale_stand.tres",
+      "anchor_px": [
+        112.0,
+        326
+      ],
+      "attachments_px": {
+        "pivot": [
+          111,
+          24
+        ]
+      },
+      "suggested_width": 94,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "parcel_large",
+      "title": "大封包",
+      "source": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "source_rect": [
+        32,
+        701,
+        324,
+        296
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/parcel_large.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/parcel_large.tres",
+      "anchor_px": [
+        162.0,
+        288
+      ],
+      "attachments_px": {},
+      "suggested_width": 84,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "parcel_medium",
+      "title": "中封包",
+      "source": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "source_rect": [
+        401,
+        762,
+        328,
+        218
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/parcel_medium.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/parcel_medium.tres",
+      "anchor_px": [
+        164.0,
+        210
+      ],
+      "attachments_px": {},
+      "suggested_width": 72,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "parcel_small",
+      "title": "小封包",
+      "source": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "source_rect": [
+        778,
+        778,
+        241,
+        198
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/parcel_small.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/parcel_small.tres",
+      "anchor_px": [
+        120.5,
+        190
+      ],
+      "attachments_px": {},
+      "suggested_width": 54,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "lantern_string",
+      "title": "未点亮灯串",
+      "source": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "source_rect": [
+        1047,
+        726,
+        471,
+        263
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/lantern_string.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/lantern_string.tres",
+      "anchor_px": [
+        235.5,
+        255
+      ],
+      "attachments_px": {},
+      "suggested_width": 240,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "original sheet exact crop"
+    },
+    {
+      "id": "delivery_cart",
+      "title": "空接货车",
+      "source": "assets/source/market/transport-parts-source-v1.png",
+      "source_rect": [
+        124,
+        76,
+        647,
+        368
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/delivery_cart.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/delivery_cart.tres",
+      "anchor_px": [
+        323.5,
+        366
+      ],
+      "attachments_px": {
+        "cargo_left": [
+          176,
+          132
+        ],
+        "cargo_right": [
+          453,
+          132
+        ]
+      },
+      "suggested_width": 206,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "generated replacement"
+    },
+    {
+      "id": "navigation_lantern",
+      "title": "领航灯壳",
+      "source": "assets/source/market/transport-parts-source-v1.png",
+      "source_rect": [
+        1009,
+        25,
+        258,
+        428
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/navigation_lantern.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/navigation_lantern.tres",
+      "anchor_px": [
+        129.0,
+        426
+      ],
+      "attachments_px": {
+        "light_center": [
+          129,
+          248
+        ]
+      },
+      "suggested_width": 100,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "generated replacement"
+    },
+    {
+      "id": "transport_boat_red",
+      "title": "红运输船",
+      "source": "assets/source/market/transport-parts-source-v1.png",
+      "source_rect": [
+        134,
+        447,
+        569,
+        537
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/transport_boat_red.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/transport_boat_red.tres",
+      "anchor_px": [
+        284.5,
+        535
+      ],
+      "attachments_px": {},
+      "suggested_width": 175,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "generated replacement"
+    },
+    {
+      "id": "transport_boat_blue",
+      "title": "蓝运输船",
+      "source": "assets/source/market/transport-parts-source-v1.png",
+      "source_rect": [
+        852,
+        471,
+        565,
+        517
+      ],
+      "png": "assets/runtime/market/kit-v1/sprites/transport_boat_blue.png",
+      "atlas": "assets/runtime/market/kit-v1/atlas/transport_boat_blue.tres",
+      "anchor_px": [
+        282.5,
+        515
+      ],
+      "attachments_px": {},
+      "suggested_width": 175,
+      "units": "source-image pixels; display scale applied once",
+      "origin": "generated replacement"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "nursery",
+      "background": "assets/runtime/market/kit-v1/backgrounds/nursery-exchange-clean-v1.png",
+      "levels": [
+        "MK02",
+        "MK03",
+        "MK04",
+        "MK13"
+      ],
+      "stations": {
+        "counter_left": [
+          425,
+          499
+        ],
+        "counter_middle": [
+          645,
+          499
+        ],
+        "counter_right": [
+          877,
+          499
+        ],
+        "resident": [
+          659,
+          424
+        ]
+      },
+      "cleared": [
+        "brass mounting pillar"
+      ]
+    },
+    {
+      "id": "street",
+      "background": "assets/source/market/lantern-street-stage-v1.png",
+      "levels": [
+        "MK05",
+        "MK06",
+        "MK07",
+        "MK08",
+        "MK09",
+        "MK15"
+      ],
+      "stations": {
+        "counter": [
+          640,
+          541
+        ],
+        "stall_left": [
+          216,
+          395
+        ],
+        "stall_midleft": [
+          466,
+          345
+        ],
+        "stall_middle": [
+          618,
+          345
+        ],
+        "stall_midright": [
+          815,
+          345
+        ],
+        "stall_right": [
+          1065,
+          435
+        ]
+      },
+      "cleared": []
+    },
+    {
+      "id": "oil",
+      "background": "assets/runtime/market/kit-v1/backgrounds/oil-courtyard-clean-v1.png",
+      "levels": [
+        "MK11",
+        "MK12",
+        "MK14"
+      ],
+      "stations": {
+        "cart_left": [
+          348,
+          384
+        ],
+        "cart_middle": [
+          607,
+          384
+        ],
+        "cart_right": [
+          859,
+          384
+        ],
+        "scale_foot": [
+          640,
+          527
+        ]
+      },
+      "cleared": [
+        "three carts",
+        "brass mounting socket"
+      ]
+    },
+    {
+      "id": "dock",
+      "background": "assets/runtime/market/kit-v1/backgrounds/grand-dock-clean-v1.png",
+      "levels": [
+        "MK10",
+        "MK16",
+        "MK17",
+        "MK18"
+      ],
+      "stations": {
+        "boat_red": [
+          460,
+          227
+        ],
+        "boat_blue": [
+          650,
+          240
+        ],
+        "lantern": [
+          1198,
+          464
+        ],
+        "boss_foot": [
+          767,
+          603
+        ],
+        "packing": [
+          216,
+          509
+        ]
+      },
+      "cleared": [
+        "red transport boat",
+        "blue transport boat",
+        "navigation lantern housing"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "assets/source/market/exchange-goods-source-v1.png": "4b72f950b8dc96316bf45c355c5ad8c948ad2ebd2b0fb723f58acbc46321a4e5",
+    "assets/source/market/oil-scale-cargo-source-v1.png": "7d1b4572b2ed775fa2728e364d215d4e283b9a000c821a77a2fe06214c5df1f5",
+    "assets/source/market/transport-parts-source-v1.png": "40ec2cfa2847fb7bfbbf81709abb5b3703cdc8eaa2ba1d494fc17a4d6f3a79e3"
+  },
+  "limits": [
+    "Moving sprites are imagegen-derived replacements, not pixel-identical extraction from original background.",
+    "Single-piece carts/boats translate only; no articulated wheels/sails animation.",
+    "Lantern glass opacity retained from generated source; glow is a separate engine layer.",
+    "No character/boss rig or new level logic included."
+  ]
+}

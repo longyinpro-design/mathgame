@@ -1,0 +1,202 @@
+{
+  "version": 4,
+  "date": "2026-09-09",
+  "scope": "Existing artwork/audio reused; no generated or rewritten source media. Engine draws route, seedling, overlays and all gameplay numbers.",
+  "previous_image_files_verified": 17,
+  "assets": [
+    {
+      "path": "assets/source/world-map-v1.png",
+      "role": "营地、路线、伙伴手记与设置背景",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "8b48049e30dba7c49c2c5ce3b85c998ee939c8d51b3570fdaa38d3ce586ceeea",
+      "matches_prior_manifest": true
+    },
+    {
+      "path": "assets/source/explorer-sprites-v2.png",
+      "role": "营地与两场景中的小岚",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "5725a54ff0f530a618776b1c79d7074308996e3a1e99df516a459686a07c512c",
+      "matches_prior_manifest": true
+    },
+    {
+      "path": "assets/runtime/fox-v2.png",
+      "role": "阿橙的同行、营地反馈与手记肖像",
+      "dimensions": [
+        1303,
+        1207
+      ],
+      "sha256": "17a52b1cb04e00c4fc322c313db42ae0dc6ebcb976eba15889d209e3e707155c",
+      "matches_prior_manifest": true
+    },
+    {
+      "path": "assets/runtime/forest-ravine-v2.png",
+      "role": "森林断桥探索背景",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "393c7fe1aef026b30bcb2cb14c9bce250bc7d9a9f2f49b07db2d6a12c1d9c262",
+      "matches_prior_manifest": true
+    },
+    {
+      "path": "assets/runtime/v3/arena.png",
+      "role": "古林遗迹遭遇背景",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "65ad6a522e851d95d0d127d23e3027226db09627d75acf98737ee3003d7b7ec2",
+      "matches_prior_manifest": true
+    },
+    {
+      "path": "assets/runtime/v3/objects.png",
+      "role": "石灵、护盾、晶体、信物与伙伴徽记",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "sha256": "02c95b26c2e61866e57dd4147f34b626854430ddd3dbbdcb0fd1dfdcd6086ff0",
+      "matches_prior_manifest": true
+    },
+    {
+      "path": "assets/runtime/v3/cast.png",
+      "role": "主角施法立绘",
+      "dimensions": [
+        1374,
+        1145
+      ],
+      "sha256": "8bd44329564e0b64d9ab0cb07d33f919a60b4e4515258b8f4da4e2eae3318f80",
+      "matches_prior_manifest": true
+    },
+    {
+      "path": "assets/runtime/v3/fox-cast.png",
+      "role": "伙伴施法立绘",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "sha256": "3def26338f67205833dacf85dacd307ff73ab68c85fc798680a78db98e47b766",
+      "matches_prior_manifest": true
+    },
+    {
+      "path": "assets/runtime/v3/victory.png",
+      "role": "奖励演出立绘",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "sha256": "9e10856b47758c81a9f57ea56bd8d14eab6ce6ba716d8cd78f7d4bef0f84af46",
+      "matches_prior_manifest": true
+    },
+    {
+      "path": "assets/audio/v3/awaken.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "299211dc20eac37e6cf2cfef6a4a703dbb17b61a9b7cd64af7993efe230135f0",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 28665
+    },
+    {
+      "path": "assets/audio/v3/cast.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "24d6ea166508d184ef40303808bdf05d5cbda12d3630bd7c8040a0f0ba92478f",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 12128
+    },
+    {
+      "path": "assets/audio/v3/charge.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "aa2630686e5d1fcb0987fc926f567bb70f4e9525ee518c491267b34116378d5e",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 24255
+    },
+    {
+      "path": "assets/audio/v3/footstep.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "8c8b6fdff584516117b3e3aad1fac4ff23fdb1fdd2baa5a3697d16b3d35e7282",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 2866
+    },
+    {
+      "path": "assets/audio/v3/forest_air.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "1688961999ffc3a5dee9f44113ac7ca5fc307f122ae2c57337c7fdacf004e0c7",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 264600
+    },
+    {
+      "path": "assets/audio/v3/forest_theme.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "3a5f41e2ef05668f3cb636c9cb46703ddbbd62086a6a4c53cb37551ea90b651b",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 352800
+    },
+    {
+      "path": "assets/audio/v3/fox.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "bcc103a20d4c88fbf61c1447dfc8bf346a778add73daaee2333a1cf31479c28e",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 7717
+    },
+    {
+      "path": "assets/audio/v3/impact.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "14adabd4e06bce9abd2f2ff4c9dab71da3c7d5f70d20cce422164690db39368b",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 8820
+    },
+    {
+      "path": "assets/audio/v3/pickup.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "315d6002e91f16457512403ffc16b50454cac4ce67d2359a0df65fb0f4d7f5d0",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 4851
+    },
+    {
+      "path": "assets/audio/v3/place.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "e7ddf22a6f0e7c5d20f2225c672e1a1418098e0adeb6b8c480cdb954afaa717e",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 7717
+    },
+    {
+      "path": "assets/audio/v3/reward.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "e017650a3dfd1a8dbd073a11e88a3d448166a227cc8c77eec7c83ca22b703e45",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 37485
+    },
+    {
+      "path": "assets/audio/v3/unbalanced.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "094cb3e0ad6ada41eabc4ecaec95c9ef0ce8497380c1b3261b1c304bf539feb1",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 17640
+    },
+    {
+      "path": "assets/audio/v3/unlock.wav",
+      "role": "复用已有环境声或动作音效",
+      "sha256": "81bc08dc3fc6b0d1f243d54605116f86269faad3b8e30899ac20c379c37cf64c",
+      "sample_rate": 22050,
+      "channels": 1,
+      "frames": 48510
+    }
+  ]
+}

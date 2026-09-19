@@ -1,0 +1,25 @@
+{
+  "version": "0.5.2",
+  "date": "2026-09-09T15:35:00.604797+08:00",
+  "base": ".scratch/v052-before",
+  "files": {
+    "scripts/cargo/skin.gd": "6d41986ff3f70af4cba874709c406208a61624de10b7f5a79a4461d8d2417c54",
+    "scripts/cargo/journey.gd": "1e20ee96a32ea86d6acc551f3b60fc1ab2740eab1f366e0f7f9aff837812ce8d",
+    "scripts/cargo/world.gd": "3c6b4c56c29b8423b9c3973848168055b5da4d230a9b9c48f944c1bece716259",
+    "tests/cargo/playtest.gd": "4dbe32c4859d5c47915b6af3ee8e55c73f91e21a2b73a7a43c3634db957bb9f6",
+    "tests/cargo/typography.gd": "a7cf8b2736bf3a622ed2fcc31c08660db1574619837e8b21b57ebb83c10bf473",
+    "assets/fonts/ZCOOLKuaiLe-Regular.ttf": "b3ed6f358cb69f9232eb7e794267767e51d8aeeeeeb612a81a24efb52f0b6bae",
+    "assets/fonts/OFL-ZCOOLKuaiLe.txt": "ee0caff41a4dea011af35ed70c5f3b8225b9acea7e5786cccbd11400b9b8ada5"
+  },
+  "checks": {
+    "window": 53,
+    "typography": "PASS",
+    "rules_reused": 18,
+    "unchanged": {
+      "scripts/cargo/rules.gd": true,
+      "scripts/cargo/store.gd": true,
+      "tests/cargo/rules_test.gd": true
+    },
+    "review": "bounded candidate self-review plus rendered QA"
+  }
+}

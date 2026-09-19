@@ -1,0 +1,564 @@
+{
+  "schema_version": 1,
+  "status": "design_data_not_godot_runtime",
+  "date": "2026-09-08",
+  "chapter": "森林遗迹",
+  "scope": "首章18关，核心浅奥推理；验算只证明数学规则与答案",
+  "coordinates": "起点 (0,0)，向右 x+1、向上 y+1；路径不回退",
+  "levels": [
+    {
+      "id": "F01",
+      "title": "点亮三颗星",
+      "tier": "intro",
+      "family": "subset_sum",
+      "brief": "从 1、2、3、4、5 中选三个不同数，使和为 10，找齐所有组合。",
+      "params": {
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "choose": 3,
+        "target": 10
+      },
+      "expected": {
+        "solutions": [
+          [
+            1,
+            4,
+            5
+          ],
+          [
+            2,
+            3,
+            5
+          ]
+        ]
+      },
+      "hints": [
+        "先固定最小的数。",
+        "可以用 5，另两个数的和是多少？",
+        "分别检查最小数为 1、2、3 的情况。"
+      ],
+      "mastery_evidence": "提交无重复的完整组合集合，换顺序不算新组合。"
+    },
+    {
+      "id": "F02",
+      "title": "三盏能量灯",
+      "tier": "intro",
+      "family": "subset_sum",
+      "brief": "从 1～6 中选三个不同数，使和为 12，找齐所有组合。",
+      "params": {
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "choose": 3,
+        "target": 12
+      },
+      "expected": {
+        "solutions": [
+          [
+            1,
+            5,
+            6
+          ],
+          [
+            2,
+            4,
+            6
+          ],
+          [
+            3,
+            4,
+            5
+          ]
+        ]
+      },
+      "hints": [
+        "按最小数分类。",
+        "最小数是 1 时，另两个数的和要是 11。",
+        "逐类标记已找到和不可能的情况。"
+      ],
+      "mastery_evidence": "找到三个组合，并能用分类板展示未漏掉情况。"
+    },
+    {
+      "id": "F03",
+      "title": "矿石密码",
+      "tier": "core",
+      "family": "subset_sum",
+      "brief": "从 1～7 中选三个不同数，总和为 12，最大数比最小数大 4。",
+      "params": {
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "choose": 3,
+        "target": 12,
+        "span": 4
+      },
+      "expected": {
+        "solutions": [
+          [
+            2,
+            4,
+            6
+          ]
+        ]
+      },
+      "hints": [
+        "先配出相差 4 的两个数。",
+        "检查 (1,5)、(2,6)、(3,7)。",
+        "对每一对，计算距离总和 12 还差多少。"
+      ],
+      "mastery_evidence": "构造唯一组合，同时核对总和与差两个条件。"
+    },
+    {
+      "id": "F04",
+      "title": "两仓平衡",
+      "tier": "core",
+      "family": "transfer_balance",
+      "brief": "甲乙两仓共 14 件；从甲搬 2 件到乙后，两仓一样多。求原来的数量。",
+      "params": {
+        "total": 14,
+        "transfer": 2
+      },
+      "expected": {
+        "left": 9,
+        "right": 5
+      },
+      "hints": [
+        "先看搬完以后。",
+        "14 件平分，两仓各有多少？",
+        "把 2 件从乙搬回甲，恢复原状。"
+      ],
+      "mastery_evidence": "先构造平衡状态，再逆向还原并正向验证。"
+    },
+    {
+      "id": "F05",
+      "title": "更重的货箱",
+      "tier": "core",
+      "family": "transfer_balance",
+      "brief": "甲乙两仓共 18 件；从甲搬 3 件到乙后，两仓一样多。求原来的数量。",
+      "params": {
+        "total": 18,
+        "transfer": 3
+      },
+      "expected": {
+        "left": 12,
+        "right": 6
+      },
+      "hints": [
+        "保持总数不变。",
+        "搬后两仓各有 9 件。",
+        "倒着搬回 3 件。"
+      ],
+      "mastery_evidence": "在新数据下独立逆推，解释为什么两仓原先相差 6。"
+    },
+    {
+      "id": "F06",
+      "title": "三种砝码",
+      "tier": "core",
+      "family": "pair_weights",
+      "brief": "太阳与月亮合重 11，月亮与星星合重 13，太阳与星星合重 12。求每种重量。",
+      "params": {
+        "ab": 11,
+        "bc": 13,
+        "ac": 12,
+        "weight_min": 1,
+        "weight_max": 20
+      },
+      "expected": {
+        "a": 5,
+        "b": 6,
+        "c": 7
+      },
+      "hints": [
+        "比较含有同一砝码的两次称重。",
+        "星星比太阳重 2。",
+        "太阳与星星总重 12，又相差 2。"
+      ],
+      "mastery_evidence": "放入三个重量后，同时通过三次称重；能展示一次等量替换。"
+    },
+    {
+      "id": "F07",
+      "title": "倒流机器",
+      "tier": "core",
+      "family": "reverse_machine",
+      "brief": "输入依次加 5、翻倍、减 4，最后为 18。求输入。",
+      "params": {
+        "operations": [
+          [
+            "add",
+            5
+          ],
+          [
+            "mul",
+            2
+          ],
+          [
+            "sub",
+            4
+          ]
+        ],
+        "output": 18,
+        "input_min": 0,
+        "input_max": 20
+      },
+      "expected": {
+        "input": 6,
+        "forward": [
+          6,
+          11,
+          22,
+          18
+        ]
+      },
+      "hints": [
+        "从最后一个操作开始。",
+        "撤销减 4，先把 18 变回 22。",
+        "再平分为两份，最后撤销加 5。"
+      ],
+      "mastery_evidence": "逆序拖动还原卡片，并用求得输入完成正向核对。"
+    },
+    {
+      "id": "F08",
+      "title": "双流机器",
+      "tier": "core",
+      "family": "reverse_machine",
+      "brief": "输入先翻倍、再加 6、最后平分两份，每份是 11。求输入。",
+      "params": {
+        "operations": [
+          [
+            "mul",
+            2
+          ],
+          [
+            "add",
+            6
+          ],
+          [
+            "div",
+            2
+          ]
+        ],
+        "output": 11,
+        "input_min": 0,
+        "input_max": 20
+      },
+      "expected": {
+        "input": 8,
+        "forward": [
+          8,
+          16,
+          22,
+          11
+        ]
+      },
+      "hints": [
+        "先还原平分前的总量。",
+        "两份 11 合起来是 22。",
+        "撤销加 6，再撤销翻倍。"
+      ],
+      "mastery_evidence": "独立完成逆推，并逐步说明还原对应哪一个操作。"
+    },
+    {
+      "id": "F09",
+      "title": "六条隐秘路线",
+      "tier": "core",
+      "family": "grid_paths",
+      "brief": "从 (0,0) 到 (2,2)，只向右或向上，找齐所有不同路线。",
+      "params": {
+        "right": 2,
+        "up": 2,
+        "avoid": [],
+        "via": []
+      },
+      "expected": {
+        "count": 6
+      },
+      "hints": [
+        "按第一步向右还是向上分类。",
+        "保存每条路线，重复路线不再计数。",
+        "每条路线恰好含两次右移与两次上移。"
+      ],
+      "mastery_evidence": "完整构造 6 条路线，系统核对重复与遗漏。"
+    },
+    {
+      "id": "F10",
+      "title": "封锁的路口",
+      "tier": "core",
+      "family": "grid_paths",
+      "brief": "从 (0,0) 到 (3,2)，只向右或向上，不能经过 (1,1)，找齐路线。",
+      "params": {
+        "right": 3,
+        "up": 2,
+        "avoid": [
+          [
+            1,
+            1
+          ]
+        ],
+        "via": []
+      },
+      "expected": {
+        "count": 4
+      },
+      "hints": [
+        "标出不能碰到的路口。",
+        "按开始连续向右或向上的路线分类。",
+        "三次右移与两次上移的每种排列都可以检查。"
+      ],
+      "mastery_evidence": "构造完整的四条合法路线，每条均不经过封锁点。"
+    },
+    {
+      "id": "F11",
+      "title": "必须送达的信",
+      "tier": "core",
+      "family": "grid_paths",
+      "brief": "从 (0,0) 到 (3,2)，只向右或向上，必须经过 (1,1)，找齐路线。",
+      "params": {
+        "right": 3,
+        "up": 2,
+        "avoid": [],
+        "via": [
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "expected": {
+        "count": 6
+      },
+      "hints": [
+        "把路线分成到邮站前和离开邮站后。",
+        "到邮站有两种走法。",
+        "每种前半程分别接上三种后半程。"
+      ],
+      "mastery_evidence": "用配对板展示前后半程的六种组合。"
+    },
+    {
+      "id": "F12",
+      "title": "六石三角阵",
+      "tier": "core",
+      "family": "triangle_sum",
+      "brief": "把 1～6 各用一次放在三角形三个顶点与三个边中点，每边三个数的和都是 10。",
+      "params": {
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "side_sum": 10,
+        "position_order": [
+          "A",
+          "AB",
+          "B",
+          "BC",
+          "C",
+          "CA"
+        ]
+      },
+      "expected": {
+        "raw_solution_count": 6,
+        "vertex_sum": 9,
+        "example": [
+          1,
+          6,
+          3,
+          2,
+          5,
+          4
+        ]
+      },
+      "hints": [
+        "顶点同时属于两条边。",
+        "把三个边和相加，再与 1～6 的总和比较。",
+        "试着把 1、3、5 放在三个顶点。"
+      ],
+      "mastery_evidence": "任意正确摆放即可通关；挑战证据是解释顶点和为 9。旋转或镜像的六个数组属于同一种本质布局。"
+    },
+    {
+      "id": "F13",
+      "title": "到不了的石台",
+      "tier": "challenge",
+      "family": "reachability",
+      "brief": "从 0 出发，恰好 5 次，每次向左或右移动 2 格，不能越过 0～10 边界，能到 9 吗？",
+      "params": {
+        "start": 0,
+        "moves": [
+          -2,
+          2
+        ],
+        "steps": 5,
+        "minimum": 0,
+        "maximum": 10,
+        "target": 9
+      },
+      "expected": {
+        "reachable": false,
+        "final_positions": [
+          2,
+          6,
+          10
+        ]
+      },
+      "hints": [
+        "把每次可能落脚的格子涂色。",
+        "从偶数格跳两格，落点有什么共同点？",
+        "9 所在的格子与所有可达落点有什么区别？"
+      ],
+      "mastery_evidence": "选择不能到达，并用偶数落点或成对单位构造理由。"
+    },
+    {
+      "id": "F14",
+      "title": "保证成双",
+      "tier": "challenge",
+      "family": "pigeonhole",
+      "brief": "袋里三种颜色各有 4 颗球，不看颜色取球，至少取几颗才能保证有两颗同色？",
+      "params": {
+        "capacities": [
+          4,
+          4,
+          4
+        ],
+        "matching": 2
+      },
+      "expected": {
+        "guaranteed_draws": 4
+      },
+      "hints": [
+        "考虑最不利的一次抽取。",
+        "取三颗，是否可能每种颜色恰好一颗？",
+        "第四颗无论是什么颜色，会与谁成对？"
+      ],
+      "mastery_evidence": "展示三颗时仍无同色对的反例，并构造第四颗所有颜色的情形。"
+    },
+    {
+      "id": "F15",
+      "title": "双周期灯带",
+      "tier": "challenge",
+      "family": "cycles",
+      "brief": "颜色按金、青、紫循环，形状按星、月循环；第 1 项为金色星星。第 29 项是什么，整体最小周期是多少？",
+      "params": {
+        "colors": [
+          "gold",
+          "teal",
+          "lavender"
+        ],
+        "shapes": [
+          "star",
+          "moon"
+        ],
+        "index": 29
+      },
+      "expected": {
+        "color": "teal",
+        "shape": "star",
+        "period": 6
+      },
+      "hints": [
+        "把颜色和形状分两行看。",
+        "找出两行同时回到第一项的最短重复块。",
+        "完整块有六项；先排出前六项再定位第 29 项。"
+      ],
+      "mastery_evidence": "构造长度六的重复块，定位第 29 项并说明没有更短整体周期。"
+    },
+    {
+      "id": "F16",
+      "title": "最短围栏",
+      "tier": "challenge",
+      "family": "rectangle_perimeter",
+      "brief": "用 12 块单位正方形地砖无缝铺满一个长方形，只沿外边界围栏，最短需要多少单位围栏？",
+      "params": {
+        "area": 12
+      },
+      "expected": {
+        "minimum_perimeter": 14,
+        "dimensions": [
+          3,
+          4
+        ]
+      },
+      "hints": [
+        "按较短的一边分类，旋转后相同的方案只算一次。",
+        "比较 1×12、2×6、3×4。",
+        "沿每个长方形的外边缘逐段计数。"
+      ],
+      "mastery_evidence": "摆出 3×4，比较三种不同长方形，说明最优性。"
+    },
+    {
+      "id": "F17",
+      "title": "守门人的水晶",
+      "tier": "boss",
+      "family": "takeaway",
+      "brief": "21 颗水晶，轮流每次取 1～3 颗，取最后一颗获胜，玩家先手。",
+      "params": {
+        "stones": 21,
+        "max_take": 3
+      },
+      "expected": {
+        "winning_first_moves": [
+          1
+        ],
+        "block_size": 4
+      },
+      "hints": [
+        "先想只剩 4 颗时先手会怎样。",
+        "让对手每次面对 4 的倍数。",
+        "第一步留下 20，之后两人每轮总共取 4。"
+      ],
+      "mastery_evidence": "对最优对手获胜，并在多个关键局面独立选出正确回应。"
+    },
+    {
+      "id": "F18",
+      "title": "遗迹核心",
+      "tier": "boss",
+      "family": "combined_boss",
+      "brief": "先把 1～6 摆成三边和为 9 的三角阵，取三个顶点的和加 10 作为水晶总数。轮流取 1～4 颗，取最后者胜，玩家先手。",
+      "params": {
+        "numbers": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "side_sum": 9,
+        "offset": 10,
+        "max_take": 4
+      },
+      "expected": {
+        "triangle_raw_solution_count": 6,
+        "vertex_sum": 6,
+        "stones": 16,
+        "winning_first_moves": [
+          1
+        ],
+        "block_size": 5
+      },
+      "hints": [
+        "新的三边和改变了顶点和。",
+        "把三边和相加后减去六个数的总和。",
+        "每次最多取四颗，现在应该让对手面对几的倍数？"
+      ],
+      "mastery_evidence": "通过三角阵、构造 16 颗水晶并迁移到每轮总共取 5 的策略。"
+    }
+  ]
+}

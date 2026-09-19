@@ -1,0 +1,77 @@
+{
+  "generator": "built-in image_gen",
+  "date": "2026-09-08",
+  "reference": "assets/source/style-master-v1.png",
+  "assets": [
+    {
+      "id": "style-master-v1",
+      "path": "assets/source/style-master-v1.png",
+      "source": "/Users/long/.codex/generated_images/01a07e76-5206-7b42-a108-15091c5e1718/exec-010b69ad-d23f-474a-9434-9a96a960aaa0.png",
+      "purpose": "统一美术参考；不是运行时图集",
+      "prompt": "art/prompts/01-style-master.txt"
+    },
+    {
+      "id": "world-map-v1",
+      "path": "assets/source/world-map-v1.png",
+      "source": "/Users/long/.codex/generated_images/01a07e76-5206-7b42-a108-15091c5e1718/exec-c67cedc3-e821-4acd-bc3a-187513084114.png",
+      "purpose": "六岛世界地图背景",
+      "prompt": "art/prompts/02-world-map.txt"
+    },
+    {
+      "id": "explorer-sprites-v1",
+      "path": "assets/source/explorer-sprites-v1.png",
+      "source": "/Users/long/.codex/generated_images/01a07e76-5206-7b42-a108-15091c5e1718/exec-4bfaf3c4-9aac-426e-bc39-0a62dd5d46ca.png",
+      "purpose": "主角四方向站立与两步行走源图",
+      "prompt": "art/prompts/03-explorer-sprites.txt"
+    },
+    {
+      "id": "explorer-sprites-v2",
+      "path": "assets/source/explorer-sprites-v2.png",
+      "source": "/Users/long/.codex/generated_images/01a07e76-5206-7b42-a108-15091c5e1718/exec-87ce0322-3f8d-4214-a1ab-ce9b3f8faeba.png",
+      "purpose": "主角四方向修订源图",
+      "prompt": "art/prompts/04-explorer-alpha-repair.txt"
+    },
+    {
+      "id": "companions-npcs-v1",
+      "path": "assets/source/companions-npcs-v1.png",
+      "source": "/Users/long/.codex/generated_images/01a07e76-5206-7b42-a108-15091c5e1718/exec-992f76e6-5bed-46f3-8460-645162929702.png",
+      "purpose": "狐狸伙伴四方向与六岛居民源图",
+      "prompt": "art/prompts/05-companions-npcs.txt"
+    },
+    {
+      "id": "mechanisms-props-v1",
+      "path": "assets/source/mechanisms-props-v1.png",
+      "source": "/Users/long/.codex/generated_images/01a07e76-5206-7b42-a108-15091c5e1718/exec-20a05e90-466a-496d-91b1-79d8bff79002.png",
+      "purpose": "24种可复用数学机关部件与道具源图",
+      "prompt": "art/prompts/06-mechanisms-props.txt"
+    },
+    {
+      "id": "terrain-textures-v1",
+      "path": "assets/source/terrain-textures-v1.png",
+      "source": "/Users/long/.codex/generated_images/01a07e76-5206-7b42-a108-15091c5e1718/exec-fbc3c7cb-8d80-42d2-92a4-8d4b18529310.png",
+      "purpose": "六主题24种地表纹理源图",
+      "prompt": "art/prompts/07-terrain-textures.txt"
+    },
+    {
+      "id": "ui-kit-v1",
+      "path": "assets/source/ui-kit-v1.png",
+      "source": "/Users/long/.codex/generated_images/01a07e76-5206-7b42-a108-15091c5e1718/exec-4be1ed18-f9f4-4d2b-a609-3fe1127bfafd.png",
+      "purpose": "界面面板按钮状态及功能图标源图",
+      "prompt": "art/prompts/08-ui-kit.txt"
+    },
+    {
+      "id": "effects-rewards-v1",
+      "path": "assets/source/effects-rewards-v1.png",
+      "source": "/Users/long/.codex/generated_images/01a07e76-5206-7b42-a108-15091c5e1718/exec-cc47521c-3e6c-4782-a33b-a7139f31d894.png",
+      "purpose": "四组特效分镜与奖励反馈源图",
+      "prompt": "art/prompts/09-effects-rewards.txt"
+    },
+    {
+      "id": "chapter-rooms-v1",
+      "path": "assets/source/chapter-rooms-v1.png",
+      "source": "/Users/long/.codex/generated_images/01a07e76-5206-7b42-a108-15091c5e1718/exec-aced4cf2-de7b-4026-a3d0-13cec55f9936.png",
+      "purpose": "六章机关房间背景源图",
+      "prompt": "art/prompts/10-chapter-rooms.txt"
+    }
+  ]
+}

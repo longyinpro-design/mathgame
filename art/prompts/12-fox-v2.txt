@@ -1,0 +1,3 @@
+Reference: assets/source/companions-npcs-v1.png
+
+Reference image provided only for character identity. Create ONE clean transparent-background RGBA game sprite: the orange fox companion with cream muzzle, cream chest and cream tail-tip and teal scarf from the reference. Full body, facing RIGHT in side view, standing on four paws, cheerful adventurous eyes, compact proportions. Crisp 16-bit pixel art, solid opaque character with hard pixel edges. No grid, no paper background, no cast shadow, no glow, no other characters, no text, no frame. Center sprite with small transparent margin. Retain the exact character design and palette. This will be scaled to about 70x65 on a forest adventure game scene.

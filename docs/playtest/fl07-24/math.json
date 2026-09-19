@@ -1,0 +1,1269 @@
+{
+  "status": "PASS",
+  "passed": 18,
+  "total": 18,
+  "command": "python3 tests/verify_forest_design.py --output docs/production/math_verification.json",
+  "source_sha256": {
+    "docs/production/forest_levels.json": "0914ffcca097d5db845d481fe6dab93c02afef6a3191b8f75f067a5c8eba99ed",
+    "tests/verify_forest_design.py": "bda126efdc9667af64cf6e7bafa94c9f1d5ea8d800983fd7343c2d3327d51ba0",
+    "art/verify_puzzles.py": "8ae859bf2bdac813a932eb277c4e0cc2052fc8b90a7e7b133ca950da2dd0634a"
+  },
+  "scope": "V2 ordinary levels and V3 boss mathematics, enemy-response/hidden-form policies with explicit no-undo versus refunded-replanning scopes, specified counterexamples, dependency DAG and economy. No Godot combat feel, runtime transcript validation or measured difficulty evidence.",
+  "progression": {
+    "topological_order": [
+      "FL01",
+      "FL02",
+      "FL13",
+      "FL03",
+      "FL04",
+      "FL05",
+      "FL06",
+      "FL07",
+      "FL15",
+      "FL08",
+      "FL09",
+      "FL10",
+      "FL14",
+      "FL11",
+      "FL16",
+      "FL12",
+      "FL17",
+      "FL18"
+    ],
+    "tier_counts": {
+      "intro": 2,
+      "main": 10,
+      "side": 4,
+      "boss": 2
+    },
+    "mainline_exp": 300,
+    "mainline_wood": 120,
+    "all_buildings_cost": 120,
+    "side_required_for_story": false
+  },
+  "results": [
+    {
+      "id": "FL01",
+      "status": "PASS",
+      "computed": {
+        "solvable": true,
+        "reachable_layouts": 4430,
+        "terminal_layouts": 14,
+        "minimum_trips": 1,
+        "optimal_actions": [
+          [
+            "move",
+            3,
+            2
+          ],
+          [
+            "move",
+            4,
+            2
+          ],
+          [
+            "move",
+            5,
+            2
+          ],
+          [
+            "move",
+            2,
+            1
+          ],
+          [
+            "move",
+            1,
+            1
+          ],
+          [
+            "move",
+            0,
+            1
+          ],
+          [
+            "travel"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "FL02",
+      "status": "PASS",
+      "computed": {
+        "initial": [
+          11,
+          7,
+          6
+        ],
+        "trace": [
+          [
+            11,
+            7,
+            6
+          ],
+          [
+            4,
+            14,
+            6
+          ],
+          [
+            4,
+            8,
+            12
+          ],
+          [
+            8,
+            8,
+            8
+          ]
+        ],
+        "solution_count": 1,
+        "reverse_trace": [
+          [
+            8,
+            8,
+            8
+          ],
+          [
+            4,
+            8,
+            12
+          ],
+          [
+            4,
+            14,
+            6
+          ],
+          [
+            11,
+            7,
+            6
+          ]
+        ],
+        "final_layout_as_initial_rejected": true
+      }
+    },
+    {
+      "id": "FL03",
+      "status": "PASS",
+      "computed": {
+        "initial": [
+          16,
+          8,
+          6
+        ],
+        "trace": [
+          [
+            16,
+            8,
+            6
+          ],
+          [
+            12,
+            12,
+            6
+          ],
+          [
+            12,
+            9,
+            9
+          ]
+        ],
+        "solution_count": 1,
+        "first_condition_only_candidates": 10
+      }
+    },
+    {
+      "id": "FL04",
+      "status": "PASS",
+      "computed": {
+        "a": 5,
+        "b": 6,
+        "c": 7
+      }
+    },
+    {
+      "id": "FL05",
+      "status": "PASS",
+      "computed": {
+        "orders": [
+          [
+            "triple",
+            "plus2"
+          ]
+        ],
+        "single_record_counts": [
+          2,
+          4
+        ],
+        "predicted_output": 20
+      }
+    },
+    {
+      "id": "FL06",
+      "status": "PASS",
+      "computed": {
+        "distinguishing_inputs": [
+          6
+        ],
+        "outputs_at_solution": {
+          "A": 16,
+          "B": 20,
+          "C": 18
+        },
+        "ambiguous_inputs": [
+          2,
+          5
+        ],
+        "all_prediction_columns": {
+          "2": {
+            "A": 8,
+            "B": 8,
+            "C": 14
+          },
+          "5": {
+            "A": 14,
+            "B": 17,
+            "C": 17
+          },
+          "6": {
+            "A": 16,
+            "B": 20,
+            "C": 18
+          }
+        }
+      }
+    },
+    {
+      "id": "FL07",
+      "status": "PASS",
+      "computed": {
+        "solvable": true,
+        "reference_value": 24
+      }
+    },
+    {
+      "id": "FL08",
+      "status": "PASS",
+      "computed": {
+        "count": 10,
+        "group_counts": {
+          "0": 6,
+          "1": 3,
+          "2": 1
+        },
+        "groups": {
+          "0": [
+            "RRRUU",
+            "RRURU",
+            "RRUUR",
+            "RURRU",
+            "RURUR",
+            "RUURR"
+          ],
+          "1": [
+            "URRRU",
+            "URRUR",
+            "URURR"
+          ],
+          "2": [
+            "UURRR"
+          ]
+        }
+      }
+    },
+    {
+      "id": "FL09",
+      "status": "PASS",
+      "computed": {
+        "total_paths": 20,
+        "survivors": [
+          8,
+          11,
+          11,
+          8
+        ],
+        "maximum_paths": 11,
+        "best_blocks": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "id": "FL10",
+      "status": "PASS",
+      "computed": {
+        "route_count": 10,
+        "pair_count": 6,
+        "pairs": [
+          [
+            "RRRUU",
+            "URRUR"
+          ],
+          [
+            "RRRUU",
+            "URURR"
+          ],
+          [
+            "RRRUU",
+            "UURRR"
+          ],
+          [
+            "RRURU",
+            "URURR"
+          ],
+          [
+            "RRURU",
+            "UURRR"
+          ],
+          [
+            "RURRU",
+            "UURRR"
+          ]
+        ],
+        "individually_legal_but_colliding_example": [
+          "RRRUU",
+          "RRURU"
+        ]
+      }
+    },
+    {
+      "id": "FL11",
+      "status": "PASS",
+      "computed": {
+        "solvable": true,
+        "reachable_layouts": 764,
+        "terminal_layouts": 3,
+        "minimum_trips": 3,
+        "optimal_actions": [
+          [
+            "move",
+            3,
+            2
+          ],
+          [
+            "move",
+            2,
+            1
+          ],
+          [
+            "travel"
+          ],
+          [
+            "move",
+            3,
+            0
+          ],
+          [
+            "move",
+            4,
+            1
+          ],
+          [
+            "move",
+            0,
+            2
+          ],
+          [
+            "travel"
+          ],
+          [
+            "move",
+            4,
+            0
+          ],
+          [
+            "move",
+            5,
+            2
+          ],
+          [
+            "move",
+            1,
+            1
+          ],
+          [
+            "travel"
+          ]
+        ],
+        "lower_bound_trips": 2,
+        "greedy_can_finish": false
+      }
+    },
+    {
+      "id": "FL12",
+      "status": "PASS",
+      "computed": {
+        "winning_openings": [
+          [
+            1
+          ],
+          [
+            2
+          ],
+          [
+            3
+          ]
+        ],
+        "response_moves": [
+          [
+            3
+          ],
+          [
+            2
+          ],
+          [
+            1
+          ]
+        ],
+        "constant_shortcut_guaranteed": false,
+        "shortcut_counterexamples": [
+          [
+            [
+              "player",
+              1,
+              12
+            ],
+            [
+              "opponent",
+              1,
+              11
+            ],
+            [
+              "player",
+              3,
+              8
+            ],
+            [
+              "opponent",
+              1,
+              7
+            ],
+            [
+              "player",
+              3,
+              4
+            ],
+            [
+              "opponent",
+              2,
+              2
+            ],
+            [
+              "illegal_player_take",
+              3,
+              2
+            ]
+          ],
+          [
+            [
+              "player",
+              1,
+              13
+            ],
+            [
+              "opponent",
+              1,
+              12
+            ],
+            [
+              "player",
+              3,
+              9
+            ],
+            [
+              "opponent",
+              1,
+              8
+            ],
+            [
+              "player",
+              3,
+              5
+            ],
+            [
+              "opponent",
+              1,
+              4
+            ],
+            [
+              "player",
+              3,
+              1
+            ],
+            [
+              "opponent",
+              1,
+              0
+            ]
+          ],
+          [
+            [
+              "player",
+              1,
+              14
+            ],
+            [
+              "opponent",
+              2,
+              12
+            ],
+            [
+              "player",
+              3,
+              9
+            ],
+            [
+              "opponent",
+              1,
+              8
+            ],
+            [
+              "player",
+              3,
+              5
+            ],
+            [
+              "opponent",
+              1,
+              4
+            ],
+            [
+              "player",
+              3,
+              1
+            ],
+            [
+              "opponent",
+              1,
+              0
+            ]
+          ]
+        ],
+        "all_opponent_replies_checked": true
+      }
+    },
+    {
+      "id": "FL13",
+      "status": "PASS",
+      "computed": {
+        "solvable": true,
+        "reachable_layouts": 2979,
+        "terminal_layouts": 11,
+        "minimum_trips": 2,
+        "optimal_actions": [
+          [
+            "move",
+            3,
+            2
+          ],
+          [
+            "move",
+            4,
+            2
+          ],
+          [
+            "move",
+            1,
+            1
+          ],
+          [
+            "travel"
+          ],
+          [
+            "move",
+            1,
+            1
+          ],
+          [
+            "move",
+            3,
+            0
+          ],
+          [
+            "move",
+            4,
+            0
+          ],
+          [
+            "move",
+            5,
+            1
+          ],
+          [
+            "move",
+            2,
+            2
+          ],
+          [
+            "move",
+            1,
+            3
+          ],
+          [
+            "move",
+            0,
+            2
+          ],
+          [
+            "travel"
+          ]
+        ],
+        "lower_bound_trips": 2
+      }
+    },
+    {
+      "id": "FL14",
+      "status": "PASS",
+      "computed": {
+        "reachable_targets": [
+          false,
+          false,
+          true
+        ],
+        "final_positions": [
+          2,
+          6,
+          10
+        ],
+        "minimum_replacements": 1,
+        "repair_witness": {
+          "moves": [
+            1,
+            2,
+            2,
+            2,
+            2
+          ],
+          "trace": [
+            0,
+            1,
+            3,
+            5,
+            7,
+            9
+          ]
+        },
+        "even_unreachable_targets": [
+          8
+        ]
+      }
+    },
+    {
+      "id": "FL15",
+      "status": "PASS",
+      "computed": {
+        "identified_cases": 9,
+        "maximum_depth": 2,
+        "one_weighing_sufficient": false,
+        "single_weighing_outcome_bound": 3
+      }
+    },
+    {
+      "id": "FL16",
+      "status": "PASS",
+      "computed": {
+        "maximum_area": 18,
+        "best_dimensions": [
+          [
+            3,
+            6
+          ]
+        ],
+        "candidate_count": 5,
+        "all_cases": [
+          {
+            "width": 1,
+            "length": 10,
+            "area": 10
+          },
+          {
+            "width": 2,
+            "length": 8,
+            "area": 16
+          },
+          {
+            "width": 3,
+            "length": 6,
+            "area": 18
+          },
+          {
+            "width": 4,
+            "length": 4,
+            "area": 16
+          },
+          {
+            "width": 5,
+            "length": 2,
+            "area": 10
+          }
+        ]
+      }
+    },
+    {
+      "id": "FL17",
+      "status": "PASS",
+      "computed": {
+        "robust_openings": [
+          [
+            1,
+            2,
+            1
+          ]
+        ],
+        "winning_tail_by_response": {
+          "stomp": [
+            [
+              3,
+              2,
+              0
+            ],
+            [
+              2,
+              1,
+              0
+            ]
+          ],
+          "leaf_swap": [
+            [
+              2,
+              2,
+              0
+            ],
+            [
+              3,
+              1,
+              0
+            ]
+          ]
+        },
+        "greedy_opening_can_win": false,
+        "fixed_stomp_tail_survives_swap": false,
+        "legal_opening_count": 6,
+        "all_openings_and_responses": [
+          {
+            "opening": [
+              1,
+              1,
+              2
+            ],
+            "branches": {
+              "stomp": [],
+              "leaf_swap": []
+            }
+          },
+          {
+            "opening": [
+              1,
+              2,
+              1
+            ],
+            "branches": {
+              "stomp": [
+                [
+                  [
+                    3,
+                    2,
+                    0
+                  ],
+                  [
+                    2,
+                    1,
+                    0
+                  ]
+                ]
+              ],
+              "leaf_swap": [
+                [
+                  [
+                    2,
+                    2,
+                    0
+                  ],
+                  [
+                    3,
+                    1,
+                    0
+                  ]
+                ]
+              ]
+            }
+          },
+          {
+            "opening": [
+              2,
+              1,
+              2
+            ],
+            "branches": {
+              "stomp": [],
+              "leaf_swap": []
+            }
+          },
+          {
+            "opening": [
+              2,
+              2,
+              1
+            ],
+            "branches": {
+              "stomp": [],
+              "leaf_swap": []
+            }
+          },
+          {
+            "opening": [
+              3,
+              1,
+              2
+            ],
+            "branches": {
+              "stomp": [],
+              "leaf_swap": []
+            }
+          },
+          {
+            "opening": [
+              3,
+              2,
+              1
+            ],
+            "branches": {
+              "stomp": [],
+              "leaf_swap": []
+            }
+          }
+        ],
+        "witness_traces": {
+          "stomp": [
+            [
+              2,
+              8,
+              11
+            ],
+            [
+              2,
+              9,
+              10
+            ],
+            [
+              2,
+              9,
+              10
+            ],
+            [
+              5,
+              9,
+              7
+            ],
+            [
+              7,
+              7,
+              7
+            ]
+          ],
+          "leaf_swap": [
+            [
+              2,
+              8,
+              11
+            ],
+            [
+              2,
+              9,
+              10
+            ],
+            [
+              2,
+              10,
+              9
+            ],
+            [
+              4,
+              10,
+              7
+            ],
+            [
+              7,
+              7,
+              7
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "FL18",
+      "status": "PASS",
+      "computed": {
+        "guaranteed_first_probes_without_undo": [
+          2,
+          5
+        ],
+        "finisher_costs": {
+          "A": 8,
+          "B": 6,
+          "C": 8,
+          "D": 7
+        },
+        "minimum_guaranteed_budget_without_undo": 15,
+        "greedy_probe_guaranteed_without_undo": false,
+        "minimum_budget_with_probe_refund_and_prior_observations": 13,
+        "known_case_active_evidence_costs": {
+          "A": {
+            "cost": 13,
+            "probes": [
+              5
+            ]
+          },
+          "B": {
+            "cost": 12,
+            "probes": [
+              6
+            ]
+          },
+          "C": {
+            "cost": 10,
+            "probes": [
+              2
+            ]
+          },
+          "D": {
+            "cost": 9,
+            "probes": [
+              2
+            ]
+          }
+        },
+        "refund_replanning_witnesses": {
+          "A": [
+            [
+              "probe",
+              6
+            ],
+            [
+              "probe",
+              2
+            ],
+            [
+              "undo_probe",
+              0
+            ],
+            [
+              "undo_probe",
+              0
+            ],
+            [
+              "probe",
+              5
+            ],
+            [
+              "finish",
+              8
+            ]
+          ],
+          "B": [
+            [
+              "probe",
+              6
+            ],
+            [
+              "finish",
+              6
+            ]
+          ],
+          "C": [
+            [
+              "probe",
+              6
+            ],
+            [
+              "undo_probe",
+              0
+            ],
+            [
+              "probe",
+              2
+            ],
+            [
+              "finish",
+              8
+            ]
+          ],
+          "D": [
+            [
+              "probe",
+              6
+            ],
+            [
+              "probe",
+              2
+            ],
+            [
+              "undo_probe",
+              0
+            ],
+            [
+              "undo_probe",
+              0
+            ],
+            [
+              "probe",
+              2
+            ],
+            [
+              "finish",
+              7
+            ]
+          ]
+        },
+        "analysis_scopes": {
+          "continuous_plan": {
+            "prior_case_observations": false,
+            "undo": false
+          },
+          "replanning": {
+            "full_probe_refund": true,
+            "prior_observations_available": true
+          }
+        },
+        "probe_columns": {
+          "2": {
+            "A": 8,
+            "B": 8,
+            "C": 14,
+            "D": 0
+          },
+          "5": {
+            "A": 14,
+            "B": 17,
+            "C": 17,
+            "D": 12
+          },
+          "6": {
+            "A": 16,
+            "B": 20,
+            "C": 18,
+            "D": 16
+          }
+        },
+        "witness_policies_without_undo": {
+          "2": {
+            "kind": "probe",
+            "input": 2,
+            "branches": {
+              "8": {
+                "kind": "probe",
+                "input": 5,
+                "branches": {
+                  "14": {
+                    "kind": "finish",
+                    "input": 8,
+                    "form": "A"
+                  },
+                  "17": {
+                    "kind": "finish",
+                    "input": 6,
+                    "form": "B"
+                  }
+                }
+              },
+              "14": {
+                "kind": "finish",
+                "input": 8,
+                "form": "C"
+              },
+              "0": {
+                "kind": "finish",
+                "input": 7,
+                "form": "D"
+              }
+            }
+          },
+          "5": {
+            "kind": "probe",
+            "input": 5,
+            "branches": {
+              "14": {
+                "kind": "finish",
+                "input": 8,
+                "form": "A"
+              },
+              "17": {
+                "kind": "probe",
+                "input": 2,
+                "branches": {
+                  "8": {
+                    "kind": "finish",
+                    "input": 6,
+                    "form": "B"
+                  },
+                  "14": {
+                    "kind": "finish",
+                    "input": 8,
+                    "form": "C"
+                  }
+                }
+              },
+              "12": {
+                "kind": "finish",
+                "input": 7,
+                "form": "D"
+              }
+            }
+          }
+        },
+        "case_ledgers_without_undo": {
+          "2": {
+            "A": {
+              "actions": [
+                [
+                  "probe",
+                  2
+                ],
+                [
+                  "probe",
+                  5
+                ],
+                [
+                  "finish",
+                  8
+                ]
+              ],
+              "seed_spent": 15,
+              "seed_left": 0
+            },
+            "B": {
+              "actions": [
+                [
+                  "probe",
+                  2
+                ],
+                [
+                  "probe",
+                  5
+                ],
+                [
+                  "finish",
+                  6
+                ]
+              ],
+              "seed_spent": 13,
+              "seed_left": 2
+            },
+            "C": {
+              "actions": [
+                [
+                  "probe",
+                  2
+                ],
+                [
+                  "finish",
+                  8
+                ]
+              ],
+              "seed_spent": 10,
+              "seed_left": 5
+            },
+            "D": {
+              "actions": [
+                [
+                  "probe",
+                  2
+                ],
+                [
+                  "finish",
+                  7
+                ]
+              ],
+              "seed_spent": 9,
+              "seed_left": 6
+            }
+          },
+          "5": {
+            "A": {
+              "actions": [
+                [
+                  "probe",
+                  5
+                ],
+                [
+                  "finish",
+                  8
+                ]
+              ],
+              "seed_spent": 13,
+              "seed_left": 2
+            },
+            "B": {
+              "actions": [
+                [
+                  "probe",
+                  5
+                ],
+                [
+                  "probe",
+                  2
+                ],
+                [
+                  "finish",
+                  6
+                ]
+              ],
+              "seed_spent": 13,
+              "seed_left": 2
+            },
+            "C": {
+              "actions": [
+                [
+                  "probe",
+                  5
+                ],
+                [
+                  "probe",
+                  2
+                ],
+                [
+                  "finish",
+                  8
+                ]
+              ],
+              "seed_spent": 15,
+              "seed_left": 0
+            },
+            "D": {
+              "actions": [
+                [
+                  "probe",
+                  5
+                ],
+                [
+                  "finish",
+                  7
+                ]
+              ],
+              "seed_spent": 12,
+              "seed_left": 3
+            }
+          }
+        },
+        "greedy_failing_groups_without_undo": [
+          [
+            "A",
+            "D"
+          ]
+        ],
+        "probe_response_is_not_victory": true,
+        "unidentified_finisher_rejected": true
+      }
+    }
+  ]
+}

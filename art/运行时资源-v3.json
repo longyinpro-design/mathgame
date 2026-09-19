@@ -1,0 +1,72 @@
+{
+  "version": 3,
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "path": "assets/runtime/v3/arena.png",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "alpha_extrema": null,
+      "sha256": "65ad6a522e851d95d0d127d23e3027226db09627d75acf98737ee3003d7b7ec2"
+    },
+    {
+      "path": "assets/runtime/v3/cast.png",
+      "size": [
+        1374,
+        1145
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "sha256": "8bd44329564e0b64d9ab0cb07d33f919a60b4e4515258b8f4da4e2eae3318f80"
+    },
+    {
+      "path": "assets/runtime/v3/fox-cast.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "sha256": "3def26338f67205833dacf85dacd307ff73ab68c85fc798680a78db98e47b766"
+    },
+    {
+      "path": "assets/runtime/v3/objects.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "sha256": "02c95b26c2e61866e57dd4147f34b626854430ddd3dbbdcb0fd1dfdcd6086ff0"
+    },
+    {
+      "path": "assets/runtime/v3/victory.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "sha256": "9e10856b47758c81a9f57ea56bd8d14eab6ce6ba716d8cd78f7d4bef0f84af46"
+    }
+  ],
+  "rejected": "art/rejected/v3 contains RGB pose sheets with baked checkerboards; never used by encounter",
+  "audio": "13 original synthesized PCM WAV files; reproducible with python3 art/build_audio_v3.py",
+  "animation": "in-world explorer uses original alpha sprite atlas; action artwork is an intentional cut-in overlay; sprite movement and recoil are runtime tweens",
+  "source_pixels": "original pixels preserved; AtlasTexture regions selected from inspected alpha bounds"
+}

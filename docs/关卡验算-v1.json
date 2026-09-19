@@ -1,0 +1,435 @@
+{
+  "status": "PASS",
+  "passed": 18,
+  "total": 18,
+  "input_sha256": "344f209778874455ea725fbbe81070f2fd84e4c57a86421cbb5c315b238ea93a",
+  "command": "python3 art/verify_puzzles.py",
+  "scope": "Discrete rules and reference answers only; no Godot or child playtesting.",
+  "results": [
+    {
+      "id": "F01",
+      "status": "PASS",
+      "computed": {
+        "solutions": [
+          [
+            1,
+            4,
+            5
+          ],
+          [
+            2,
+            3,
+            5
+          ]
+        ]
+      }
+    },
+    {
+      "id": "F02",
+      "status": "PASS",
+      "computed": {
+        "solutions": [
+          [
+            1,
+            5,
+            6
+          ],
+          [
+            2,
+            4,
+            6
+          ],
+          [
+            3,
+            4,
+            5
+          ]
+        ]
+      }
+    },
+    {
+      "id": "F03",
+      "status": "PASS",
+      "computed": {
+        "solutions": [
+          [
+            2,
+            4,
+            6
+          ]
+        ]
+      }
+    },
+    {
+      "id": "F04",
+      "status": "PASS",
+      "computed": {
+        "left": 9,
+        "right": 5
+      }
+    },
+    {
+      "id": "F05",
+      "status": "PASS",
+      "computed": {
+        "left": 12,
+        "right": 6
+      }
+    },
+    {
+      "id": "F06",
+      "status": "PASS",
+      "computed": {
+        "a": 5,
+        "b": 6,
+        "c": 7
+      }
+    },
+    {
+      "id": "F07",
+      "status": "PASS",
+      "computed": {
+        "input": 6,
+        "forward": [
+          6,
+          11,
+          22,
+          18
+        ]
+      }
+    },
+    {
+      "id": "F08",
+      "status": "PASS",
+      "computed": {
+        "input": 8,
+        "forward": [
+          8,
+          16,
+          22,
+          11
+        ]
+      }
+    },
+    {
+      "id": "F09",
+      "status": "PASS",
+      "computed": {
+        "count": 6,
+        "paths": [
+          "RRUU",
+          "RURU",
+          "RUUR",
+          "URRU",
+          "URUR",
+          "UURR"
+        ]
+      }
+    },
+    {
+      "id": "F10",
+      "status": "PASS",
+      "computed": {
+        "count": 4,
+        "paths": [
+          "RRRUU",
+          "RRURU",
+          "RRUUR",
+          "UURRR"
+        ]
+      }
+    },
+    {
+      "id": "F11",
+      "status": "PASS",
+      "computed": {
+        "count": 6,
+        "paths": [
+          "RURRU",
+          "RURUR",
+          "RUURR",
+          "URRRU",
+          "URRUR",
+          "URURR"
+        ]
+      }
+    },
+    {
+      "id": "F12",
+      "status": "PASS",
+      "computed": {
+        "raw_solution_count": 6,
+        "vertex_sum": 9,
+        "example": [
+          1,
+          6,
+          3,
+          2,
+          5,
+          4
+        ],
+        "solutions": [
+          [
+            1,
+            4,
+            5,
+            2,
+            3,
+            6
+          ],
+          [
+            1,
+            6,
+            3,
+            2,
+            5,
+            4
+          ],
+          [
+            3,
+            2,
+            5,
+            4,
+            1,
+            6
+          ],
+          [
+            3,
+            6,
+            1,
+            4,
+            5,
+            2
+          ],
+          [
+            5,
+            2,
+            3,
+            6,
+            1,
+            4
+          ],
+          [
+            5,
+            4,
+            1,
+            6,
+            3,
+            2
+          ]
+        ]
+      }
+    },
+    {
+      "id": "F13",
+      "status": "PASS",
+      "computed": {
+        "reachable": false,
+        "final_positions": [
+          2,
+          6,
+          10
+        ],
+        "positions_by_step": [
+          [
+            0
+          ],
+          [
+            2
+          ],
+          [
+            0,
+            4
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            0,
+            4,
+            8
+          ],
+          [
+            2,
+            6,
+            10
+          ]
+        ]
+      }
+    },
+    {
+      "id": "F14",
+      "status": "PASS",
+      "computed": {
+        "guaranteed_draws": 4,
+        "counterexamples_with_one_fewer": [
+          [
+            1,
+            1,
+            1
+          ]
+        ],
+        "allocations_checked_at_threshold": 15
+      }
+    },
+    {
+      "id": "F15",
+      "status": "PASS",
+      "computed": {
+        "color": "teal",
+        "shape": "star",
+        "period": 6,
+        "repeat_block": [
+          [
+            "gold",
+            "star"
+          ],
+          [
+            "teal",
+            "moon"
+          ],
+          [
+            "lavender",
+            "star"
+          ],
+          [
+            "gold",
+            "moon"
+          ],
+          [
+            "teal",
+            "star"
+          ],
+          [
+            "lavender",
+            "moon"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "F16",
+      "status": "PASS",
+      "computed": {
+        "minimum_perimeter": 14,
+        "dimensions": [
+          3,
+          4
+        ],
+        "all_rectangles": [
+          {
+            "dimensions": [
+              1,
+              12
+            ],
+            "perimeter": 26
+          },
+          {
+            "dimensions": [
+              2,
+              6
+            ],
+            "perimeter": 16
+          },
+          {
+            "dimensions": [
+              3,
+              4
+            ],
+            "perimeter": 14
+          }
+        ]
+      }
+    },
+    {
+      "id": "F17",
+      "status": "PASS",
+      "computed": {
+        "winning_first_moves": [
+          1
+        ],
+        "losing_positions": [
+          0,
+          4,
+          8,
+          12,
+          16,
+          20
+        ],
+        "block_size": 4,
+        "strategy_covers_all_replies": true
+      }
+    },
+    {
+      "id": "F18",
+      "status": "PASS",
+      "computed": {
+        "triangle_raw_solution_count": 6,
+        "vertex_sum": 6,
+        "stones": 16,
+        "triangle_solutions": [
+          [
+            1,
+            5,
+            3,
+            4,
+            2,
+            6
+          ],
+          [
+            1,
+            6,
+            2,
+            4,
+            3,
+            5
+          ],
+          [
+            2,
+            4,
+            3,
+            5,
+            1,
+            6
+          ],
+          [
+            2,
+            6,
+            1,
+            5,
+            3,
+            4
+          ],
+          [
+            3,
+            4,
+            2,
+            6,
+            1,
+            5
+          ],
+          [
+            3,
+            5,
+            1,
+            6,
+            2,
+            4
+          ]
+        ],
+        "winning_first_moves": [
+          1
+        ],
+        "losing_positions": [
+          0,
+          5,
+          10,
+          15
+        ],
+        "block_size": 5,
+        "strategy_covers_all_replies": true
+      }
+    }
+  ]
+}

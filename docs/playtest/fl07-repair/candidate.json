@@ -1,0 +1,10 @@
+{
+  "scripts/ui/puzzle_boards.gd": "009f3536862872981c96aea6221f338f9de252b015452a2a7ab18f70d772c69f",
+  "scripts/mechanisms/machine_rules.gd": "34ff34a13375eb0b6550d03133be1f990375f783d7c58f190101a8835f901c31",
+  "tests/forest/fl07_playtest.gd": "c17c9bf1d809838313c3b3e262f92b782da6cd1594529748cc8097665da82fd0",
+  "tests/forest/run_checks.py": "6a2c7d023de78554342fc32e919fd338f53744ba33ba3b07d7f77b75040ed24e",
+  "README.md": "9c50a1aa3ff430266674e0a942aa6f79356449fe34f814088f5f7c3165cb20fa",
+  "docs/production/runtime.md": "7a5d379b4e5773c35c40c2ce57d126a239dcb1cf370b3483e639595c16b0400e",
+  "docs/试玩实现计划.md": "75922ab2100d8d1d83e525b2a97a0ea248b3d7026f162ea02ccd9283f8c2bbfe",
+  "docs/playtest/fl07-repair/review.md": "b9774715511805185f6ead800daec2ff8b2cb31ccfdb3f6bb45043fe0506ec66"
+}

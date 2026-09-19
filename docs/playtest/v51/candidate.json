@@ -1,0 +1,39 @@
+{
+  "version": "0.5.1",
+  "base": ".scratch/v051-before",
+  "date": "2026-09-09T14:58:45.269035+08:00",
+  "files": {
+    "scripts/cargo/journey.gd": "5e76da831150bfe8116075bb1727aa8d7c7121ace943bc1dc46bd55a7f142834",
+    "scripts/cargo/world.gd": "95076d19ab8c2dd16e4f6a050434ac7e53656ef473a05572294939882a764648",
+    "scripts/cargo/skin.gd": "da3ee1f6bfcc8bfbf693184f49b7ca2eb9f4dceff6bb631232daf7654cd247c2",
+    "tests/cargo/playtest.gd": "38209dfab514db6fe4a6a97b208b420b93ba3b97a6169ec77bfd7d950fb5a659",
+    "assets/fonts/NotoSerifSC-Medium.ttf": "5e792d889dd5c4c853cd5cee57e839ff97088287280a0efc88dab7b335be0fa9",
+    "assets/fonts/OFL-NotoSerifSC.txt": "5690d88535c85c447b8f02b0c67d02fe0c8ff61169d8b7dc3cd982f211768612"
+  },
+  "checks": {
+    "window": 51,
+    "rules_reused": 18,
+    "unchanged_rule_files": {
+      "scripts/cargo/rules.gd": true,
+      "scripts/cargo/store.gd": true,
+      "tests/cargo/rules_test.gd": true
+    },
+    "review": "bounded visual change, main-session self-review and rendered screenshot QA"
+  },
+  "screenshots": [
+    "docs/playtest/v51/camp-quiet.png",
+    "docs/playtest/v51/camp.png",
+    "docs/playtest/v51/cargo-complete.png",
+    "docs/playtest/v51/cargo-quiet.png",
+    "docs/playtest/v51/cargo-start.png",
+    "docs/playtest/v51/first-arrival.png",
+    "docs/playtest/v51/guardian.png",
+    "docs/playtest/v51/homecoming.png",
+    "docs/playtest/v51/journal.png",
+    "docs/playtest/v51/pickup-preview.png",
+    "docs/playtest/v51/settings.png",
+    "docs/playtest/v51/small-cargo.png",
+    "docs/playtest/v51/small-journal.png"
+  ],
+  "save": "v5 same schema; no migration/reset"
+}

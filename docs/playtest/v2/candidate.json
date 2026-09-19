@@ -1,0 +1,18 @@
+{
+  "version": "0.2",
+  "git": "not a git repository",
+  "engine": "4.7.stable.official.5b4e0cb0f",
+  "engine_checks": 33,
+  "result": "PASS",
+  "files": {
+    "project.godot": "dcb399d8f36ff171139790d2f59135615492ab78e050b6b21c22bcd52770177e",
+    "game/chapter.tscn": "45e4a058fb55768b554778ea718e728d6c28cf71e7ba5cb2b45892c01cccba2b",
+    "scripts/chapter.gd": "18e1698410a7f966e7f6834b8cadc1d8dc2203a487676148121326e030489872",
+    "scripts/chapter_rules.gd": "6ec496c6022c61850ad21e1fea25e656b890a913afc55699b5503acf6ee02c32",
+    "scripts/chapter_store.gd": "ed9f1a10117d562dcb46c3988763d6a7b9b67f4295e13d76467af3c3384e0a2d",
+    "scripts/forest_world.gd": "07d0d3a46c6a746dc2a628367c65b7b167ada43c9a68b79adc147f62d61c66e4",
+    "tests/chapter_test.gd": "224b60547739f525365fe38a5ac9ffee7990193da551a5e8386bbdf4506441c2",
+    "tests/verify_chapter_math.py": "faf9c9822414ae3c95e406ac0c854ee569143eae44614f1cdc1107c46b93384e",
+    "tests/chapter_demo.gd": "40c5a0f0bc6a5b55ce8769d6d02ecda9568752b741d1fcd25fa218ce7b71d447"
+  }
+}

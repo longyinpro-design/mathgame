@@ -1,0 +1,870 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "check": "source unchanged assets/source/market/exchange-goods-source-v1.png",
+      "pass": true
+    },
+    {
+      "check": "source unchanged assets/source/market/oil-scale-cargo-source-v1.png",
+      "pass": true
+    },
+    {
+      "check": "source unchanged assets/source/market/transport-parts-source-v1.png",
+      "pass": true
+    },
+    {
+      "check": "copper_fruit RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "copper_fruit exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "copper_fruit transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "copper_fruit region disjoint",
+      "pass": true
+    },
+    {
+      "check": "copper_fruit atlas exists",
+      "pass": true
+    },
+    {
+      "check": "copper_fruit anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "rope_spool RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "rope_spool exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "rope_spool transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "rope_spool region disjoint",
+      "pass": true
+    },
+    {
+      "check": "rope_spool atlas exists",
+      "pass": true
+    },
+    {
+      "check": "rope_spool anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "wick_bundle RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "wick_bundle exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "wick_bundle transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "wick_bundle region disjoint",
+      "pass": true
+    },
+    {
+      "check": "wick_bundle atlas exists",
+      "pass": true
+    },
+    {
+      "check": "wick_bundle anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "cloth_bolt RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "cloth_bolt exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "cloth_bolt transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "cloth_bolt region disjoint",
+      "pass": true
+    },
+    {
+      "check": "cloth_bolt atlas exists",
+      "pass": true
+    },
+    {
+      "check": "cloth_bolt anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "crate_red RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "crate_red exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "crate_red transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "crate_red region disjoint",
+      "pass": true
+    },
+    {
+      "check": "crate_red atlas exists",
+      "pass": true
+    },
+    {
+      "check": "crate_red anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "crate_blue RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "crate_blue exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "crate_blue transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "crate_blue region disjoint",
+      "pass": true
+    },
+    {
+      "check": "crate_blue atlas exists",
+      "pass": true
+    },
+    {
+      "check": "crate_blue anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "oil_bottle RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "oil_bottle exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "oil_bottle transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "oil_bottle region disjoint",
+      "pass": true
+    },
+    {
+      "check": "oil_bottle atlas exists",
+      "pass": true
+    },
+    {
+      "check": "oil_bottle anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "brass_bell RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "brass_bell exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "brass_bell transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "brass_bell region disjoint",
+      "pass": true
+    },
+    {
+      "check": "brass_bell atlas exists",
+      "pass": true
+    },
+    {
+      "check": "brass_bell anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "paper_roll RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "paper_roll exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "paper_roll transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "paper_roll region disjoint",
+      "pass": true
+    },
+    {
+      "check": "paper_roll atlas exists",
+      "pass": true
+    },
+    {
+      "check": "paper_roll anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "nail_pouch RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "nail_pouch exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "nail_pouch transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "nail_pouch region disjoint",
+      "pass": true
+    },
+    {
+      "check": "nail_pouch atlas exists",
+      "pass": true
+    },
+    {
+      "check": "nail_pouch anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "receipt_blank RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "receipt_blank exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "receipt_blank transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "receipt_blank region disjoint",
+      "pass": true
+    },
+    {
+      "check": "receipt_blank atlas exists",
+      "pass": true
+    },
+    {
+      "check": "receipt_blank anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "receiving_tray RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "receiving_tray exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "receiving_tray transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "receiving_tray region disjoint",
+      "pass": true
+    },
+    {
+      "check": "receiving_tray atlas exists",
+      "pass": true
+    },
+    {
+      "check": "receiving_tray anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "oil_jug_round RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "oil_jug_round exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "oil_jug_round transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "oil_jug_round region disjoint",
+      "pass": true
+    },
+    {
+      "check": "oil_jug_round atlas exists",
+      "pass": true
+    },
+    {
+      "check": "oil_jug_round anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "oil_jug_tall RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "oil_jug_tall exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "oil_jug_tall transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "oil_jug_tall region disjoint",
+      "pass": true
+    },
+    {
+      "check": "oil_jug_tall atlas exists",
+      "pass": true
+    },
+    {
+      "check": "oil_jug_tall anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "weight_small RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "weight_small exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "weight_small transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "weight_small region disjoint",
+      "pass": true
+    },
+    {
+      "check": "weight_small atlas exists",
+      "pass": true
+    },
+    {
+      "check": "weight_small anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "weight_hex RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "weight_hex exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "weight_hex transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "weight_hex region disjoint",
+      "pass": true
+    },
+    {
+      "check": "weight_hex atlas exists",
+      "pass": true
+    },
+    {
+      "check": "weight_hex anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "weight_stepped RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "weight_stepped exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "weight_stepped transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "weight_stepped region disjoint",
+      "pass": true
+    },
+    {
+      "check": "weight_stepped atlas exists",
+      "pass": true
+    },
+    {
+      "check": "weight_stepped anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "scale_pan RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "scale_pan exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "scale_pan transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "scale_pan region disjoint",
+      "pass": true
+    },
+    {
+      "check": "scale_pan atlas exists",
+      "pass": true
+    },
+    {
+      "check": "scale_pan anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "scale_pan suspension within crop",
+      "pass": true
+    },
+    {
+      "check": "scale_pan cargo within crop",
+      "pass": true
+    },
+    {
+      "check": "scale_beam RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "scale_beam exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "scale_beam transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "scale_beam region disjoint",
+      "pass": true
+    },
+    {
+      "check": "scale_beam atlas exists",
+      "pass": true
+    },
+    {
+      "check": "scale_beam anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "scale_beam pivot within crop",
+      "pass": true
+    },
+    {
+      "check": "scale_beam left_hook within crop",
+      "pass": true
+    },
+    {
+      "check": "scale_beam right_hook within crop",
+      "pass": true
+    },
+    {
+      "check": "scale_stand RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "scale_stand exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "scale_stand transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "scale_stand region disjoint",
+      "pass": true
+    },
+    {
+      "check": "scale_stand atlas exists",
+      "pass": true
+    },
+    {
+      "check": "scale_stand anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "scale_stand pivot within crop",
+      "pass": true
+    },
+    {
+      "check": "parcel_large RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "parcel_large exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "parcel_large transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "parcel_large region disjoint",
+      "pass": true
+    },
+    {
+      "check": "parcel_large atlas exists",
+      "pass": true
+    },
+    {
+      "check": "parcel_large anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "parcel_medium RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "parcel_medium exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "parcel_medium transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "parcel_medium region disjoint",
+      "pass": true
+    },
+    {
+      "check": "parcel_medium atlas exists",
+      "pass": true
+    },
+    {
+      "check": "parcel_medium anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "parcel_small RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "parcel_small exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "parcel_small transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "parcel_small region disjoint",
+      "pass": true
+    },
+    {
+      "check": "parcel_small atlas exists",
+      "pass": true
+    },
+    {
+      "check": "parcel_small anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "lantern_string RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "lantern_string exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "lantern_string transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "lantern_string region disjoint",
+      "pass": true
+    },
+    {
+      "check": "lantern_string atlas exists",
+      "pass": true
+    },
+    {
+      "check": "lantern_string anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "delivery_cart RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "delivery_cart exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "delivery_cart transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "delivery_cart region disjoint",
+      "pass": true
+    },
+    {
+      "check": "delivery_cart atlas exists",
+      "pass": true
+    },
+    {
+      "check": "delivery_cart anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "delivery_cart cargo_left within crop",
+      "pass": true
+    },
+    {
+      "check": "delivery_cart cargo_right within crop",
+      "pass": true
+    },
+    {
+      "check": "navigation_lantern RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "navigation_lantern exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "navigation_lantern transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "navigation_lantern region disjoint",
+      "pass": true
+    },
+    {
+      "check": "navigation_lantern atlas exists",
+      "pass": true
+    },
+    {
+      "check": "navigation_lantern anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "navigation_lantern light_center within crop",
+      "pass": true
+    },
+    {
+      "check": "transport_boat_red RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "transport_boat_red exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "transport_boat_red transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "transport_boat_red region disjoint",
+      "pass": true
+    },
+    {
+      "check": "transport_boat_red atlas exists",
+      "pass": true
+    },
+    {
+      "check": "transport_boat_red anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "transport_boat_blue RGBA dimensions",
+      "pass": true
+    },
+    {
+      "check": "transport_boat_blue exact source pixels and alpha",
+      "pass": true
+    },
+    {
+      "check": "transport_boat_blue transparency and visible body",
+      "pass": true
+    },
+    {
+      "check": "transport_boat_blue region disjoint",
+      "pass": true
+    },
+    {
+      "check": "transport_boat_blue atlas exists",
+      "pass": true
+    },
+    {
+      "check": "transport_boat_blue anchor within crop",
+      "pass": true
+    },
+    {
+      "check": "assets/source/market/exchange-goods-source-v1.png all visible source pixels covered (alpha > 8); missing=0",
+      "pass": true
+    },
+    {
+      "check": "assets/source/market/oil-scale-cargo-source-v1.png all visible source pixels covered (alpha > 8); missing=0",
+      "pass": true
+    },
+    {
+      "check": "assets/source/market/transport-parts-source-v1.png all visible source pixels covered (alpha > 8); missing=0",
+      "pass": true
+    },
+    {
+      "check": "nursery background dimensions",
+      "pass": true
+    },
+    {
+      "check": "nursery counter_left logical position",
+      "pass": true
+    },
+    {
+      "check": "nursery counter_middle logical position",
+      "pass": true
+    },
+    {
+      "check": "nursery counter_right logical position",
+      "pass": true
+    },
+    {
+      "check": "nursery resident logical position",
+      "pass": true
+    },
+    {
+      "check": "street background dimensions",
+      "pass": true
+    },
+    {
+      "check": "street counter logical position",
+      "pass": true
+    },
+    {
+      "check": "street stall_left logical position",
+      "pass": true
+    },
+    {
+      "check": "street stall_midleft logical position",
+      "pass": true
+    },
+    {
+      "check": "street stall_middle logical position",
+      "pass": true
+    },
+    {
+      "check": "street stall_midright logical position",
+      "pass": true
+    },
+    {
+      "check": "street stall_right logical position",
+      "pass": true
+    },
+    {
+      "check": "oil background dimensions",
+      "pass": true
+    },
+    {
+      "check": "oil cart_left logical position",
+      "pass": true
+    },
+    {
+      "check": "oil cart_middle logical position",
+      "pass": true
+    },
+    {
+      "check": "oil cart_right logical position",
+      "pass": true
+    },
+    {
+      "check": "oil scale_foot logical position",
+      "pass": true
+    },
+    {
+      "check": "dock background dimensions",
+      "pass": true
+    },
+    {
+      "check": "dock boat_red logical position",
+      "pass": true
+    },
+    {
+      "check": "dock boat_blue logical position",
+      "pass": true
+    },
+    {
+      "check": "dock lantern logical position",
+      "pass": true
+    },
+    {
+      "check": "dock boss_foot logical position",
+      "pass": true
+    },
+    {
+      "check": "dock packing logical position",
+      "pass": true
+    },
+    {
+      "check": "all 41 existing MK01 inputs unchanged",
+      "pass": true
+    }
+  ],
+  "passed": 207,
+  "total": 207,
+  "manifest_sha256": "56953b0032e95956eb7d88f6756e19342b176107644ffa9f9c1bbcd15e2c41ff",
+  "output_sha256": {
+    "assets/runtime/market/kit-v1/sprites/copper_fruit.png": "43242a87c419e079e68e9d8ad707543d5c781786937a492b03651bdcec98df88",
+    "assets/runtime/market/kit-v1/sprites/rope_spool.png": "c0b80db54d8782b6e3fea595cf3bec1ee9eeed10eca630a6b2bde65cd23cd9d4",
+    "assets/runtime/market/kit-v1/sprites/wick_bundle.png": "99781edbf1d7245b0137876e6f89cec9960a509c9309626d46a42fd71bb97a7e",
+    "assets/runtime/market/kit-v1/sprites/cloth_bolt.png": "b82665a13be2467aa621e19ad7fe20e33c89b7dadae041001fa9f557de1f3c39",
+    "assets/runtime/market/kit-v1/sprites/crate_red.png": "9de42b93a4ad6e5d9577a783dfca1fcf34baf0ccce3e170b2bf30ac41046b7db",
+    "assets/runtime/market/kit-v1/sprites/crate_blue.png": "7304ea84ec0284cb6d37ecb984770f82b2e5465c35d37fc6b9333562c85ce205",
+    "assets/runtime/market/kit-v1/sprites/oil_bottle.png": "ebbdd5bec71384d24c37c6833d61c0849f8ba8c1468fa3c455c35557d077b917",
+    "assets/runtime/market/kit-v1/sprites/brass_bell.png": "6f65e4ff37e1342bc496438a255063933df8d8641763f7c6e1c37f7a6f7be739",
+    "assets/runtime/market/kit-v1/sprites/paper_roll.png": "9032b2d5d6397903a114cc27dca909c5eaa10d1d946dc0a785a41a6e89c52450",
+    "assets/runtime/market/kit-v1/sprites/nail_pouch.png": "465e17111915252624253cb40a1d9cf7946fa8593ae921fd4e9ba27c767c177b",
+    "assets/runtime/market/kit-v1/sprites/receipt_blank.png": "55e54a03a35ad8a10140f86446d7bd89f631c57f7da1ed698793dd5832aa27e7",
+    "assets/runtime/market/kit-v1/sprites/receiving_tray.png": "ad10be9df31762dd2eb91f84bd3716863fb5a92c6196c85572e9bc934f692aa6",
+    "assets/runtime/market/kit-v1/sprites/oil_jug_round.png": "bdf38ba0553306aa88dbcee48369a8f17fa0ede6b8423cfff1cdc7364ff27f32",
+    "assets/runtime/market/kit-v1/sprites/oil_jug_tall.png": "c7333f2abcca2324dc4f305df3d38c43956d29734298786a860b33d345f44157",
+    "assets/runtime/market/kit-v1/sprites/weight_small.png": "0efc5068860b2e20455b4b09ac4b2389c4c9257dcd5296a94786f3fc1c356f68",
+    "assets/runtime/market/kit-v1/sprites/weight_hex.png": "fd71deb3b38234aedaff2c8bd3c3b59f083bf795cfa7e5e2ad0372e77cb7cf69",
+    "assets/runtime/market/kit-v1/sprites/weight_stepped.png": "d11951d1d8fbbf3bf491f04b05e1316423692afb7cc81c9d9aa8deb227f7ebd5",
+    "assets/runtime/market/kit-v1/sprites/scale_pan.png": "163be2e21370e83010c01668de234b10772a73f920ac4a20c635cf58eb6fbcb7",
+    "assets/runtime/market/kit-v1/sprites/scale_beam.png": "5edfbfbcfdc3ff94c0a81939578ded30938013575429da1b068ac2cc375ab9ff",
+    "assets/runtime/market/kit-v1/sprites/scale_stand.png": "160730d6faa49d6f01f8e8381a8482d019f7733c62a1f0d612b45be761e5af91",
+    "assets/runtime/market/kit-v1/sprites/parcel_large.png": "c8d8cd2d837c90abef4998ef215c5831eb07bff8e955f2290bcd2be0a31cf8ca",
+    "assets/runtime/market/kit-v1/sprites/parcel_medium.png": "077102c9cbfb8e831cecedefca6647cb556e22a6d85e38c9c37fe203764c4210",
+    "assets/runtime/market/kit-v1/sprites/parcel_small.png": "e3fccf9129ecc6b97cb8ef0d0e36e40952c87b9c1e15f19393dcaa2616366b45",
+    "assets/runtime/market/kit-v1/sprites/lantern_string.png": "1208943d4cc9bba1ac826052297f9638cf89aa9e55fa17a2a3736c0a17070050",
+    "assets/runtime/market/kit-v1/sprites/delivery_cart.png": "0024702fd6f97e0c88e10e06f4ce99ef32796a99593248bf28d042427b994373",
+    "assets/runtime/market/kit-v1/sprites/navigation_lantern.png": "d0f3da6c7922236d01ab3e2b5feebdb3e35e9d1c8b9be35111c58671a8c47ebc",
+    "assets/runtime/market/kit-v1/sprites/transport_boat_red.png": "1890de2f7b52a76fdb1b4c0455cba7ca14cd87fca6e3024f6e0150b6d50e11e2",
+    "assets/runtime/market/kit-v1/sprites/transport_boat_blue.png": "6fceabc71c191653c0e90efd4564e60326de9ff35ee673899ceab9c9af28832f"
+  },
+  "limits": [
+    "Pixel checks do not prove game logic or character/boss animation.",
+    "Alpha <= 8 outside authored regions is treated as invisible generation residue; original sheets retained."
+  ]
+}

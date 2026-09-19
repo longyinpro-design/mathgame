@@ -1,0 +1,1470 @@
+{
+  "schema_version": 1,
+  "status": "runtime_integrated_forest_1",
+  "date": "2026-09-19",
+  "chapter_id": "forest",
+  "revision": "forest-design-4",
+  "rule_conventions": {
+    "coordinates": "start=(0,0); R=x+1; U=y+1; no reverse steps",
+    "cargo_locations": [
+      "floor",
+      "left_basket",
+      "right_basket",
+      "treetop"
+    ],
+    "cargo_items": [
+      "acheng",
+      "xiaolan",
+      "seed",
+      "small_weight",
+      "medium_weight",
+      "large_weight"
+    ],
+    "cargo_delivery_items": [
+      0,
+      1,
+      2
+    ],
+    "takeaway": "FL12 retains 1..3, last taker wins. FL17/18 are no longer takeaway games.",
+    "prerequisites": "all IDs required; side levels never gate main story",
+    "cargo": "FL01 demo unchanged; FL13 capacity2; FL11 v2 manifest: goal_items 4 (阿橙2 小岚3 种子1 邮包2) + counterweights 5/4/3, capacity2, weight<=5, delivered passengers and the parcel cannot reboard. Old six-object FL11 results stay valid via legacy fallbacks.",
+    "bosses": "FL17 transfers + authored enemy permutations; FL18 probes + shared seed budget + identified-form finisher. Actual battle traces settle victory; exhaustive guarantees are author verification."
+  },
+  "levels": [
+    {
+      "id": "FL01",
+      "title": "第一袋种子",
+      "tier": "intro",
+      "prerequisites_all": [],
+      "family": "cargo",
+      "params": {
+        "weights": [
+          2,
+          3,
+          1,
+          2,
+          3,
+          4
+        ],
+        "initial_places": [
+          0,
+          0,
+          0,
+          3,
+          3,
+          3
+        ],
+        "left_low": true
+      },
+      "expected": {
+        "solvable": true,
+        "minimum_trips": 1,
+        "reachable_layouts": 4430,
+        "terminal_layouts": 14
+      },
+      "concept_ids": [
+        "balance_conservation",
+        "cargo_planning"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl01",
+        "journey_exp": 20,
+        "camp_wood": 8
+      },
+      "source": "v0.5.2 cargo unchanged",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "把物件看成整批，比较整批载重；以合法多解熟悉操作",
+        "shortcut_to_check": "不能再把三趟参考流程当作必需规划",
+        "required_evidence": [
+          "合法送达；手记可比较一趟与多趟，不强制最优通关"
+        ]
+      },
+      "hints": [
+        "哪些东西可以一起进篮？",
+        "比较所有旅客和所有配重的总重。",
+        "演示当前布局的一次合法搬运；死局提供撤销或重摆。"
+      ]
+    },
+    {
+      "id": "FL02",
+      "title": "石灵的三门借光",
+      "tier": "intro",
+      "prerequisites_all": [
+        "FL01"
+      ],
+      "family": "doubling_transfer",
+      "params": {
+        "total": 24,
+        "minimum": 1,
+        "moves": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            0
+          ]
+        ],
+        "target": [
+          8,
+          8,
+          8
+        ]
+      },
+      "expected": {
+        "initial": [
+          11,
+          7,
+          6
+        ],
+        "trace": [
+          [
+            11,
+            7,
+            6
+          ],
+          [
+            4,
+            14,
+            6
+          ],
+          [
+            4,
+            8,
+            12
+          ],
+          [
+            8,
+            8,
+            8
+          ]
+        ],
+        "solution_count": 1
+      },
+      "concept_ids": [
+        "balance_conservation",
+        "reverse_state"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl02",
+        "journey_exp": 20,
+        "camp_wood": 8
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "每次借光量取决于收光门当时的数量；从共同终态逆推相互牵连的三门",
+        "shortcut_to_check": "逐枚追差的两盾玩法不再适用；只填最终8/8/8会在正向回响中失败",
+        "required_evidence": [
+          "初态与三次正向回响吻合",
+          "倒放最后两次的前态卡，核对24枚守恒"
+        ]
+      },
+      "hints": [
+        "最后一声改变了哪两道门？",
+        "借光一次，收光门会把当时的一半给对方；第三门不变。",
+        "从终态8/8/8倒推：最后一次是C给A，退回后得到4/8/12；接着退第二次。"
+      ]
+    },
+    {
+      "id": "FL03",
+      "title": "借粮之前的三座仓",
+      "tier": "main",
+      "prerequisites_all": [
+        "FL02"
+      ],
+      "family": "temporal_transfer",
+      "params": {
+        "total": 30,
+        "minimum": 1,
+        "moves": [
+          [
+            0,
+            1,
+            4
+          ],
+          [
+            1,
+            2,
+            3
+          ]
+        ],
+        "equal_after": [
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      },
+      "expected": {
+        "initial": [
+          16,
+          8,
+          6
+        ],
+        "trace": [
+          [
+            16,
+            8,
+            6
+          ],
+          [
+            12,
+            12,
+            6
+          ],
+          [
+            12,
+            9,
+            9
+          ]
+        ],
+        "solution_count": 1
+      },
+      "concept_ids": [
+        "reverse_state",
+        "temporal_constraints"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl03",
+        "journey_exp": 20,
+        "camp_wood": 8
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "同一句一样多指向不同时间的不同两仓；联合总量和连续转移",
+        "shortcut_to_check": "把两次相等都套在初态、或只满足第一条，都会误判",
+        "required_evidence": [
+          "构造初态并实际转移",
+          "时间板上把两条相等连到对应状态"
+        ]
+      },
+      "hints": [
+        "两句话说的是同一个时刻吗？",
+        "第二次转移后，甲比乙多出的数量来自哪里？",
+        "先在末态摆出甲12、乙9、丙9，再倒放一次，剩余由玩家恢复。"
+      ]
+    },
+    {
+      "id": "FL04",
+      "title": "三架灯的秘密",
+      "tier": "main",
+      "prerequisites_all": [
+        "FL03"
+      ],
+      "family": "pair_weights",
+      "params": {
+        "ab": 29,
+        "bc": 35,
+        "ac": 30,
+        "weight_min": 1,
+        "weight_max": 20
+      },
+      "expected": {
+        "a": 12,
+        "b": 17,
+        "c": 18
+      },
+      "concept_ids": [
+        "equal_substitution",
+        "double_counting"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl04",
+        "journey_exp": 20,
+        "camp_wood": 8
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "三次合称中每架都出现两次；组合线索求整体再求局部",
+        "shortcut_to_check": "仅让一对吻合不能打开三架；逐架试数在两位数合重下代价远高于先求总量",
+        "required_evidence": [
+          "三对同时吻合",
+          "用三条光带标出每架重复计数两次，组成总量47"
+        ]
+      },
+      "hints": [
+        "把三次记录放在一起，每架灯出现了几次？",
+        "三次合称里，每架灯都出现了两次；先求三架总和。",
+        "三次合重94包含两套灯架；一套是47，再用它减去已知的一对。"
+      ]
+    },
+    {
+      "id": "FL05",
+      "title": "残缺的磨坊账簿",
+      "tier": "main",
+      "prerequisites_all": [
+        "FL04"
+      ],
+      "family": "machine_records",
+      "params": {
+        "modules": [
+          {
+            "id": "plus2",
+            "op": [
+              "add",
+              2
+            ]
+          },
+          {
+            "id": "plus5",
+            "op": [
+              "add",
+              5
+            ]
+          },
+          {
+            "id": "plus7",
+            "op": [
+              "add",
+              7
+            ]
+          },
+          {
+            "id": "double",
+            "op": [
+              "mul",
+              2
+            ]
+          },
+          {
+            "id": "triple",
+            "op": [
+              "mul",
+              3
+            ]
+          }
+        ],
+        "slots": 2,
+        "records": [
+          [
+            2,
+            8
+          ],
+          [
+            5,
+            17
+          ]
+        ],
+        "predict_input": 6
+      },
+      "expected": {
+        "orders": [
+          [
+            "triple",
+            "plus2"
+          ]
+        ],
+        "single_record_counts": [
+          2,
+          4
+        ],
+        "predicted_output": 20
+      },
+      "concept_ids": [
+        "constraint_intersection",
+        "operation_order"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl05",
+        "journey_exp": 20,
+        "camp_wood": 8
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "两条输入输出记录联合排除只符合一条的装法",
+        "shortcut_to_check": "只修好一条记录会接受错误机器；运算顺序未预先给出",
+        "required_evidence": [
+          "同一机器符合两条账簿",
+          "给被排除的候选贴上违反的记录",
+          "预测新输入6的输出后试运行"
+        ]
+      },
+      "hints": [
+        "两页账簿来自同一台机器。",
+        "先留下符合第一页的装法，再检查第二页。",
+        "加2再翻倍能把2变8，但不能把5变17；留下另一种装法继续算。"
+      ]
+    },
+    {
+      "id": "FL06",
+      "title": "只能试一次的育苗机",
+      "tier": "main",
+      "prerequisites_all": [
+        "FL05"
+      ],
+      "family": "diagnostic_probe",
+      "params": {
+        "candidates": {
+          "A": [
+            [
+              "add",
+              2
+            ],
+            [
+              "mul",
+              2
+            ]
+          ],
+          "B": [
+            [
+              "mul",
+              3
+            ],
+            [
+              "add",
+              2
+            ]
+          ],
+          "C": [
+            [
+              "add",
+              5
+            ],
+            [
+              "add",
+              7
+            ]
+          ]
+        },
+        "probe_inputs": [
+          2,
+          5,
+          6
+        ]
+      },
+      "expected": {
+        "distinguishing_inputs": [
+          6
+        ],
+        "outputs_at_solution": {
+          "A": 16,
+          "B": 20,
+          "C": 18
+        },
+        "ambiguous_inputs": [
+          2,
+          5
+        ]
+      },
+      "concept_ids": [
+        "information_choice",
+        "operation_order"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl06",
+        "journey_exp": 20,
+        "camp_wood": 8
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "试验应使每一种候选给出不同结果，才能保证识别",
+        "shortcut_to_check": "随便投入2或5，可能遇到两个候选相同的输出；棋盘不再代算三台结果，预测必须自己算",
+        "required_evidence": [
+          "选择试验前，填写三条预测",
+          "每个可能观测结果都只对应一台候选",
+          "预测与实际回响逐台对上后才完成"
+        ]
+      },
+      "hints": [
+        "如果看见这个结果，还会剩几种可能？",
+        "把同一种投入量在三台机器上的结果自己排成一列比较。",
+        "投入2会让A和B都得到8；找一列没有重复结果的投入量。"
+      ]
+    },
+    {
+      "id": "FL07",
+      "title": "磨坊的24点",
+      "tier": "main",
+      "prerequisites_all": [
+        "FL06"
+      ],
+      "family": "twenty_four",
+      "params": {
+        "cards": [
+          1,
+          4,
+          5,
+          9
+        ],
+        "target": 24
+      },
+      "expected": {
+        "solvable": true,
+        "solution_count": 3,
+        "direct_product_pairs": 0,
+        "integer_only_solutions": 3
+      },
+      "concept_ids": [
+        "arithmetic_composition",
+        "operation_order"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl07",
+        "journey_exp": 20,
+        "camp_wood": 8
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "把四个数逐步合并，用括号和四则运算得到24；直接的两卡乘积不存在，必须先合成新数",
+        "shortcut_to_check": "每张数字卡必须恰好用一次；5×4、9×4等第一直觉都到不了精确24，先乘出20/36的线无法收尾",
+        "required_evidence": [
+          "四张数字卡合并为一个精确等于24的式子"
+        ]
+      },
+      "hints": [
+        "每张卡都要用一次。先把两张卡合成一个新数，再看它和24差多少。",
+        "想办法先凑出25或15：9与4、9与1、4与1之间做减法。",
+        "5×(9−4)=25，再减1；或者5×(4−1)=15，再加9。"
+      ]
+    },
+    {
+      "id": "FL08",
+      "title": "不会漏信的分邮袋",
+      "tier": "main",
+      "prerequisites_all": [
+        "FL07"
+      ],
+      "family": "route_partition",
+      "params": {
+        "right": 3,
+        "up": 2,
+        "avoid": [],
+        "via": [],
+        "partition": "height_of_first_R"
+      },
+      "expected": {
+        "count": 10,
+        "group_counts": {
+          "0": 6,
+          "1": 3,
+          "2": 1
+        },
+        "seed_filing_size": 9,
+        "misplaced": "URURR",
+        "missing": "RUURR",
+        "corrected_counts": [
+          6,
+          3,
+          1
+        ]
+      },
+      "concept_ids": [
+        "systematic_routes",
+        "exhaustive_partition"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl08",
+        "journey_exp": 20,
+        "camp_wood": 8
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "用第一次向右跨出的高度作互斥且穷尽的分类，并靠各袋应有的条数（C(4,2)=6、C(3,2)=3、C(2,2)=1）发现漏掉的那条",
+        "shortcut_to_check": "把袋子照抄一遍不算复核；不看条数就无法发现少了一条",
+        "required_evidence": [
+          "找出放错袋的那一张并说明它的正确层数",
+          "列出三层应有的条数 6/3/1",
+          "补出缺失的那条路线并归档"
+        ]
+      },
+      "hints": [
+        "每条路总要第一次向右，它会从哪一层出发？",
+        "哪一张卡第一次向右的层数和它所在的袋子不一致？",
+        "每层袋应有6、3、1条；对不上就说明少了一条，想想它从哪里开始。"
+      ]
+    },
+    {
+      "id": "FL09",
+      "title": "落石放在哪里",
+      "tier": "main",
+      "prerequisites_all": [
+        "FL08"
+      ],
+      "family": "route_block_choice",
+      "params": {
+        "right": 3,
+        "up": 3,
+        "candidate_blocks": [
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ]
+      },
+      "expected": {
+        "total_paths": 20,
+        "survivors": [
+          8,
+          11,
+          11,
+          8
+        ],
+        "best_blocks": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            1
+          ]
+        ],
+        "maximum_paths": 11
+      },
+      "concept_ids": [
+        "path_complement",
+        "optimization"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl09",
+        "journey_exp": 20,
+        "camp_wood": 8
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "通过某点的路线可分前后两段；要比较损失而不只找一条绕路",
+        "shortcut_to_check": "四处条数先预测才揭示；选离起点远一点或只证明仍有一条路，并不能得到最优布局",
+        "required_evidence": [
+          "四个候选的预测条数与揭示后的实际一致",
+          "选择两种最优位置之一，并展示11与其他方案的比较"
+        ]
+      },
+      "hints": [
+        "哪一块石头会截断最多的送信方式？",
+        "一条经过落石点的路，可以拆成前半和后半。",
+        "封住1/1会损失12条，只剩8条；比较另一个点。"
+      ]
+    },
+    {
+      "id": "FL10",
+      "title": "互不碰面的两封信",
+      "tier": "main",
+      "prerequisites_all": [
+        "FL08"
+      ],
+      "family": "disjoint_route_pairs",
+      "params": {
+        "right": 3,
+        "up": 2,
+        "avoid": [],
+        "via": [],
+        "shared_endpoints_only": true
+      },
+      "expected": {
+        "route_count": 10,
+        "pair_count": 6,
+        "max_simultaneous": 2,
+        "witness": [
+          "RRRUU",
+          "URRUR"
+        ],
+        "reason": "先向右的必过(1,0)、先向上的必过(0,1)，三封中必有两封同向相撞"
+      },
+      "concept_ids": [
+        "joint_constraints",
+        "systematic_routes"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl10",
+        "journey_exp": 20,
+        "camp_wood": 8
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "构造一组能同时走的信，并用抽屉原理证明上限：同方向的两封必然在(1,0)或(0,1)相撞",
+        "shortcut_to_check": "只检验每条能到终点、或逐个列出全部配对，都不能说明为什么不能更多",
+        "required_evidence": [
+          "一组互不碰面的路线（一右一上）",
+          "说明同方向两封必然相撞",
+          "因此上限为2"
+        ]
+      },
+      "hints": [
+        "两条路单独都能走，为什么一起会碰面？",
+        "先向右的信都会经过(1,0)，先向上的都会经过(0,1)。",
+        "一右一上可以配成一组；再来第三封，必有两封同方向，一定相撞。"
+      ]
+    },
+    {
+      "id": "FL11",
+      "title": "轻装才有下一趟",
+      "tier": "main",
+      "prerequisites_all": [
+        "FL09",
+        "FL10"
+      ],
+      "family": "cargo_planning",
+      "params": {
+        "weights": [
+          2,
+          3,
+          1,
+          2,
+          5,
+          4,
+          3
+        ],
+        "initial_places": [
+          0,
+          0,
+          0,
+          0,
+          3,
+          3,
+          3
+        ],
+        "left_low": true,
+        "max_items_per_basket": 2,
+        "max_basket_weight": 5,
+        "lock_delivered": true,
+        "goal_items": 4,
+        "item_names": [
+          "阿橙",
+          "小岚",
+          "种子",
+          "邮包",
+          "大配重",
+          "中配重",
+          "小配重"
+        ],
+        "greedy_state": [
+          3,
+          0,
+          0,
+          0,
+          2,
+          3,
+          3,
+          false
+        ]
+      },
+      "expected": {
+        "solvable": true,
+        "minimum_trips": 3,
+        "greedy_can_finish": false,
+        "single_rider_manifests": 0,
+        "two_trip_solutions": 0,
+        "minimal_manifests": 7
+      },
+      "concept_ids": [
+        "cargo_planning",
+        "pigeonhole_counting",
+        "irreversible_resources"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl11",
+        "journey_exp": 20,
+        "camp_wood": 8
+      },
+      "source": "forest-design-4-manifest",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "四件上行货对三块配重：每趟至多一件上行货的一人一石走法在计数上就不存在，必有一趟两件同篮；大配重浪费在轻货上会让后面某件永远上不来",
+        "shortcut_to_check": "把石块逐人配对的旧走法在第四件货处无石可用；先把5号石喂给种子或邮包，小岚与拼趟组合就再也凑不出更重的下行篮",
+        "required_evidence": [
+          "可执行的恰好三趟计划",
+          "四件货物全部到站且到站者不再上篮",
+          "实际拼趟的一趟确实两件同篮"
+        ]
+      },
+      "hints": [
+        "数一数：四件货、三块配重、每趟每篮最多两件——有一趟必须两件一起走。",
+        "小岚最重，能拉起她的只有5号石；别把大石浪费在轻的货物上。",
+        "先让小岚独趟被5号石拉上去，再把阿橙和种子拼一趟交给剩下的配重。"
+      ]
+    },
+    {
+      "id": "FL12",
+      "title": "守门人的三种回应",
+      "tier": "main",
+      "prerequisites_all": [
+        "FL11"
+      ],
+      "family": "takeaway_policy",
+      "params": {
+        "start_positions": [
+          13,
+          14,
+          15
+        ],
+        "max_take": 3,
+        "last_taker": "wins",
+        "response_position": 12,
+        "shortcut_first": 1,
+        "shortcut_repeat": 3
+      },
+      "expected": {
+        "winning_openings": [
+          [
+            1
+          ],
+          [
+            2
+          ],
+          [
+            3
+          ]
+        ],
+        "response_moves": [
+          [
+            3
+          ],
+          [
+            2
+          ],
+          [
+            1
+          ]
+        ],
+        "constant_shortcut_guaranteed": false
+      },
+      "concept_ids": [
+        "strategy_blocks",
+        "universal_response"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl12",
+        "journey_exp": 20,
+        "camp_wood": 8
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "先留下关键剩余量，再根据对手实际取数补足一组；策略必须覆盖所有合法回应",
+        "shortcut_to_check": "第一次1以后一直3不能保证胜利；固定对局通过不等于完成策略板",
+        "required_evidence": [
+          "13/14/15三个起局的首步",
+          "对手取1/2/3时分别回应3/2/1",
+          "完整对局使用规则内多种同优回应"
+        ]
+      },
+      "hints": [
+        "怎样让对方每次面对相同的一类局面？",
+        "试着从只剩4颗的局面往回找。",
+        "留下12后，如果对手取2，你应取2；补全另外两种回应。"
+      ]
+    },
+    {
+      "id": "FL13",
+      "title": "两趟足够吗",
+      "tier": "side",
+      "prerequisites_all": [
+        "FL01"
+      ],
+      "family": "cargo_optimal",
+      "params": {
+        "weights": [
+          2,
+          3,
+          1,
+          2,
+          3,
+          4
+        ],
+        "initial_places": [
+          0,
+          0,
+          0,
+          3,
+          3,
+          3
+        ],
+        "left_low": true,
+        "max_items_per_basket": 2
+      },
+      "expected": {
+        "solvable": true,
+        "minimum_trips": 2,
+        "lower_bound_trips": 2
+      },
+      "concept_ids": [
+        "cargo_planning",
+        "lower_bound"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl13",
+        "journey_exp": 10,
+        "camp_wood": 4
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "构造可行两趟，并用每篮两位证明一趟不可能",
+        "shortcut_to_check": "单看一次载重足够不能解决三项放不进两位",
+        "required_evidence": [
+          "两趟构造",
+          "容量下界；明确这里没有FL11的载重4和到站锁定规则"
+        ]
+      },
+      "hints": [
+        "三项能否同时放进两位？",
+        "另一只篮子到林下后也能载人。",
+        "先左装小岚与阿橙，右装3和4；第二趟换另一只篮运种子。"
+      ]
+    },
+    {
+      "id": "FL14",
+      "title": "偶数也到不了的石径",
+      "tier": "side",
+      "prerequisites_all": [
+        "FL08"
+      ],
+      "family": "parity_repair",
+      "params": {
+        "start": 0,
+        "moves": [
+          -2,
+          2
+        ],
+        "steps": 5,
+        "minimum": 0,
+        "maximum": 10,
+        "targets": [
+          8,
+          9,
+          10
+        ],
+        "repair_target": 9,
+        "repair_moves": [
+          -1,
+          1
+        ]
+      },
+      "expected": {
+        "reachable_targets": [
+          false,
+          false,
+          true
+        ],
+        "final_positions": [
+          2,
+          6,
+          10
+        ],
+        "minimum_replacements": 1
+      },
+      "concept_ids": [
+        "parity_invariant",
+        "step_count_invariant"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl14",
+        "journey_exp": 10,
+        "camp_wood": 4
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "奇偶只能排除9，恰好五步还有另一约束，不能保证到任何偶数",
+        "shortcut_to_check": "所有偶数都可达的猜想被8反驳；目标不是只点不能",
+        "required_evidence": [
+          "分类8/9/10并构造可达轨迹",
+          "从全向右的10出发，每次改向少4的配对解释",
+          "用最少一次步长替换到9，给出轨迹"
+        ]
+      },
+      "hints": [
+        "8和10都是偶数，五步后都能到吗？",
+        "把一条向右的2改成向左的2，终点少了多少？",
+        "一次改向让10变6；要到9可把一步+2换成+1。"
+      ]
+    },
+    {
+      "id": "FL15",
+      "title": "两次称量找出异晶",
+      "tier": "side",
+      "prerequisites_all": [
+        "FL06"
+      ],
+      "family": "heavy_coin_plan",
+      "params": {
+        "coin_count": 9,
+        "max_weighings": 2,
+        "normal_weight": 1,
+        "heavy_weight": 2,
+        "reference_plan": {
+          "left": [
+            0,
+            1,
+            2
+          ],
+          "right": [
+            3,
+            4,
+            5
+          ],
+          "branches": {
+            "left": {
+              "left": [
+                0
+              ],
+              "right": [
+                1
+              ],
+              "branches": {
+                "left": 0,
+                "right": 1,
+                "equal": 2
+              }
+            },
+            "right": {
+              "left": [
+                3
+              ],
+              "right": [
+                4
+              ],
+              "branches": {
+                "left": 3,
+                "right": 4,
+                "equal": 5
+              }
+            },
+            "equal": {
+              "left": [
+                6
+              ],
+              "right": [
+                7
+              ],
+              "branches": {
+                "left": 6,
+                "right": 7,
+                "equal": 8
+              }
+            }
+          }
+        }
+      },
+      "expected": {
+        "identified_cases": 9,
+        "maximum_depth": 2,
+        "one_weighing_sufficient": false
+      },
+      "concept_ids": [
+        "information_choice",
+        "decision_tree"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl15",
+        "journey_exp": 10,
+        "camp_wood": 4
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "把可能性分成三组，根据每一种天平结果选择后续称量",
+        "shortcut_to_check": "按顺序逐颗检查、或只在一个隐藏答案上成功，不能保证两次完成",
+        "required_evidence": [
+          "构造三分支称量树",
+          "同一方案覆盖9种更重位置",
+          "用一次至多3种结果说明一次不能区分9种情况"
+        ]
+      },
+      "hints": [
+        "一次天平有几种不同结果？",
+        "把九颗分成三组，并为平衡结果留下去处。",
+        "先3对3；若平衡，在余下三颗中1对1。把另外两条分支补齐。"
+      ]
+    },
+    {
+      "id": "FL16",
+      "title": "借一道墙的花圃",
+      "tier": "side",
+      "prerequisites_all": [
+        "FL10"
+      ],
+      "family": "wall_fence",
+      "params": {
+        "fence_units": 12,
+        "minimum_side": 1
+      },
+      "expected": {
+        "maximum_area": 18,
+        "best_dimensions": [
+          [
+            3,
+            6
+          ]
+        ],
+        "candidate_count": 5,
+        "completion_sweep_count": 5
+      },
+      "concept_ids": [
+        "area_perimeter",
+        "optimization"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl16",
+        "journey_exp": 10,
+        "camp_wood": 4
+      },
+      "source": "forest-design-2",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "墙替代一条边，木料实际围三边；必须比较完整整数方案",
+        "shortcut_to_check": "照搬正方形最省的经验会选4×4，仅得16格；五种宽度全部试齐并围定真正最大的3×6才算完成",
+        "required_evidence": [
+          "五种方案的三边耗材和面积全部入列",
+          "围定3×6，面积18，超过邻居的4×4=16",
+          "解释宽增加一格为什么可用长减少两格"
+        ]
+      },
+      "hints": [
+        "哪一条边已经由墙提供？",
+        "把一份木料给宽，两条宽边都要增加。",
+        "宽3时长6，面积18；把其他整数宽也列齐再比较。"
+      ]
+    },
+    {
+      "id": "FL17",
+      "title": "风枝石灵·借力破阵",
+      "tier": "boss",
+      "prerequisites_all": [
+        "FL12"
+      ],
+      "family": "boss_seal_duel",
+      "params": {
+        "initial_energy": [
+          2,
+          8,
+          11
+        ],
+        "target_energy": [
+          7,
+          7,
+          7
+        ],
+        "transfer_cards": [
+          1,
+          2,
+          3
+        ],
+        "locked_core_by_turn": [
+          0,
+          1,
+          2
+        ],
+        "boss_response_after_turn": 1,
+        "boss_responses": [
+          {
+            "id": "stomp",
+            "permutation": [
+              0,
+              1,
+              2
+            ]
+          },
+          {
+            "id": "leaf_swap",
+            "permutation": [
+              0,
+              2,
+              1
+            ]
+          }
+        ],
+        "greedy_opening": [
+          1,
+          1,
+          2
+        ]
+      },
+      "expected": {
+        "robust_openings": [
+          [
+            1,
+            2,
+            1
+          ]
+        ],
+        "winning_tail_by_response": {
+          "stomp": [
+            [
+              3,
+              2,
+              0
+            ],
+            [
+              2,
+              1,
+              0
+            ]
+          ],
+          "leaf_swap": [
+            [
+              2,
+              2,
+              0
+            ],
+            [
+              3,
+              1,
+              0
+            ]
+          ]
+        },
+        "greedy_opening_can_win": false,
+        "fixed_stomp_tail_survives_swap": false
+      },
+      "concept_ids": [
+        "resource_order",
+        "reverse_planning",
+        "state_change_response"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl17",
+        "journey_exp": 30,
+        "camp_wood": 12
+      },
+      "source": "forest-design-3-boss",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "有限转移符必须全部用完；先为后招布置中间态，再根据敌方实际换盘选择剩余符石顺序",
+        "shortcut_to_check": "先把中盘凑成7会失去后续解；把跺脚分支的后两招照搬到换盘分支也失败",
+        "required_evidence": [
+          "本盘三个转移与一次敌方回应的真实轨迹",
+          "所有卡各使用一次且始终避开封盘",
+          "最终三盘同时为7后，玩家触发合力反击；不填全策略表"
+        ]
+      },
+      "hints": [
+        "你还剩哪些符石，后两次分别能动哪两盘？",
+        "第一步暂时让某盘离7更远，可能是在给后手留路。",
+        "首步用1从右盘移到中盘；敌方回应后重新看右盘离7差几。"
+      ]
+    },
+    {
+      "id": "FL18",
+      "title": "雾冠树心·唤醒春天",
+      "tier": "boss",
+      "prerequisites_all": [
+        "FL17"
+      ],
+      "family": "boss_probe_reserve",
+      "params": {
+        "forms": {
+          "A": {
+            "name": "双藤",
+            "operations": [
+              [
+                "mul",
+                2
+              ],
+              [
+                "add",
+                4
+              ]
+            ]
+          },
+          "B": {
+            "name": "三芽",
+            "operations": [
+              [
+                "mul",
+                3
+              ],
+              [
+                "add",
+                2
+              ]
+            ]
+          },
+          "C": {
+            "name": "长根",
+            "operations": [
+              [
+                "add",
+                12
+              ]
+            ]
+          },
+          "D": {
+            "name": "逆刺",
+            "operations": [
+              [
+                "mul",
+                4
+              ],
+              [
+                "sub",
+                8
+              ]
+            ]
+          }
+        },
+        "probe_inputs": [
+          2,
+          5,
+          6
+        ],
+        "max_probes": 2,
+        "seed_budget": 15,
+        "target_response": 20,
+        "finisher_inputs": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "finisher_requires_identified_form": true,
+        "probes_consume_seeds": true,
+        "greedy_probe": 6,
+        "analysis_scopes": {
+          "continuous_plan": {
+            "prior_case_observations": false,
+            "undo": false
+          },
+          "replanning": {
+            "full_probe_refund": true,
+            "prior_observations_available": true
+          }
+        }
+      },
+      "expected": {
+        "finisher_costs": {
+          "A": 8,
+          "B": 6,
+          "C": 8,
+          "D": 7
+        },
+        "probe_columns": {
+          "2": {
+            "A": 8,
+            "B": 8,
+            "C": 14,
+            "D": 0
+          },
+          "5": {
+            "A": 14,
+            "B": 17,
+            "C": 17,
+            "D": 12
+          },
+          "6": {
+            "A": 16,
+            "B": 20,
+            "C": 18,
+            "D": 16
+          }
+        },
+        "guaranteed_first_probes_without_undo": [
+          2,
+          5
+        ],
+        "minimum_guaranteed_budget_without_undo": 15,
+        "greedy_probe_guaranteed_without_undo": false,
+        "minimum_budget_with_probe_refund_and_prior_observations": 13
+      },
+      "concept_ids": [
+        "information_choice",
+        "adaptive_probe",
+        "resource_reservation",
+        "inverse_operation"
+      ],
+      "reward": {
+        "id": "forest.first_clear.fl18",
+        "journey_exp": 30,
+        "camp_wood": 12
+      },
+      "source": "forest-design-3-boss",
+      "runtime_status": "implemented_forest_runtime_1",
+      "thinking_contract": {
+        "insight": "试探既提供信息又消耗合击资源；依据实际回应安排第二次试探，并保留足够种子逆推恰20的合击",
+        "shortcut_to_check": "首次无既往观测且不撤销的连续规划中，首包6不能保证留足合击资源；撤销后利用先前情报重新规划是允许的恢复行为；侦察回响20仍不是合击胜利",
+        "required_evidence": [
+          "本盘有效试探及唯一候选的产生过程",
+          "试探与合击共用15种子，观测和花费同时保存",
+          "仅在雾壳解除后用恰好20的回响完成合击；无需战前填写候选表",
+          "分别记录有效轨迹、撤销次数与既往观测；再规划不等于首次连续规划，撤销不自动计为主动提示"
+        ]
+      },
+      "hints": [
+        "知道它是谁之后，还需要留多少种子完成最后一击？",
+        "不仅比较能排除哪些影子，还要比较试探后最坏情况下的剩余种子。",
+        "若先投2得到8，A/B仍可能；再投5可区分，并为最费种子的合击留下8。"
+      ]
+    }
+  ],
+  "progression": {
+    "xp_thresholds": [
+      0,
+      40,
+      100,
+      180,
+      280
+    ],
+    "starting_companion": "acheng",
+    "recruit_at": {
+      "mossling": "FL02",
+      "feather": "FL08"
+    },
+    "acheng_growth_requires_all": [
+      "FL01",
+      "FL06",
+      "FL12"
+    ],
+    "skill_unlocks": {
+      "acheng_observe": null,
+      "acheng_compare": "FL06",
+      "mossling_bundle": "FL02",
+      "mossling_group": "FL11",
+      "feather_sign": "FL08",
+      "feather_shadow": "FL10"
+    },
+    "buildings": [
+      {
+        "id": "roof",
+        "requires": "FL04",
+        "cost": 30
+      },
+      {
+        "id": "workbench",
+        "requires": "FL08",
+        "cost": 40
+      },
+      {
+        "id": "garden",
+        "requires": "FL18",
+        "cost": 50
+      }
+    ]
+  },
+  "difficulty_target": "小学二至三年级基础上的奥数入门思维；设计评审与结构验算不代表实测难度达标",
+  "boss_revision_date": "2026-09-10",
+  "runtime_revision": "forest-runtime-1"
+}

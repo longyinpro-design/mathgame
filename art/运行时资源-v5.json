@@ -1,0 +1,19 @@
+{
+  "version": 5,
+  "new_assets": {
+    "assets/runtime/treetop-v5.png": "715b409348233fc554041c4b151dd295fdd43686bd42979114b6b5c696b59a06",
+    "assets/runtime/cargo-props-v5.png": "515c4ccf5c6a55d96d8fc9d97bfe3c5dfcd1c0df58feba532f5403cea41f253f",
+    "assets/fonts/NotoSansSC.ttf": "450625c8d46ab3df97b7904ded955ec2746d17ec76740cb1e91d1ba63a0f89af",
+    "assets/fonts/NotoSansSC-Semibold.ttf": "7c941d13e1f99a7c78fc89ef734b9322404804573a936085f7a910b47b8bb984",
+    "assets/fonts/OFL.txt": "c9ccdf2be41f83f609c149ccc4594f793d29a6a1905418c8c43f1c8810d2aa70"
+  },
+  "new_images": "Built-in imagegen; original output bytes copied without image editing. Prop alpha sampled in Godot; atlas regions in scripts/cargo/world.gd. All digits drawn by engine.",
+  "fonts": "Google Fonts official Noto Sans SC 400/600 TTF; unmodified; copyright and SIL OFL 1.1 in assets/fonts/OFL.txt",
+  "reused": [
+    "assets/source/explorer-sprites-v2.png",
+    "assets/runtime/fox-v2.png",
+    "assets/runtime/v3/*",
+    "assets/audio/v3/*"
+  ],
+  "source_preservation": "Existing source and runtime assets retained unchanged."
+}

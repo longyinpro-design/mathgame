@@ -1,0 +1,16 @@
+{
+  "scripts/mechanisms/twenty_four_rules.gd": "88eedf31a5865a8861637bb5a9450f1dc2a1ef78c890e662344f305b12add7c2",
+  "scripts/ui/twenty_four_board.gd": "c258fcca4164d32cd27e934276ad5f19bcbdc0e387a6bad9b6cd44aa994b5ec7",
+  "scripts/mechanisms/mechanism_rules.gd": "4ef12f0fe8b6e5efc7949e08b6325b6d23dc769a8ef561eb85776d06d54da14d",
+  "scripts/core/game_session.gd": "069db964202ed0e0ecc899ccbbf6e64050562d4ee255cb324981e16ffd46254f",
+  "scripts/content/content_catalog.gd": "82e8091a7e0795dffceaba1e2439fb630f834f8992fe4185d98033e8bc6a9350",
+  "scripts/persistence/save_repository.gd": "fc6c4d93bbdafd78bb2ae7b95ff58d49704fa49d56815675d32813a786b82a04",
+  "scripts/learning/learning_record.gd": "0b29259269e22b4997f56c34f6aa0f5746ebf5a3bcbcadfd750c5cdc168a91b1",
+  "scripts/ui/forest_release.gd": "0f1d182769e46d3a5a9644709c626b0dbff346cc36c70170ead53048a84bced7",
+  "scripts/ui/story_stage.gd": "859934aa11d3b2ba10f0ced42a73166a83d8e5332a4e23e2ed5e70006ecaeaee",
+  "scripts/content/story_catalog.gd": "ad9b694eb8fe6d81c73763ac9d78607a983823742af1bb5755c657db1f9714ce",
+  "docs/production/forest_levels.json": "0914ffcca097d5db845d481fe6dab93c02afef6a3191b8f75f067a5c8eba99ed",
+  "docs/production/legacy_fl07.json": "8585d7be2ae4de7076d7067b2da4702ff90605d50a3065208aca8420095cff67",
+  "tests/forest/twenty_four_test.gd": "d50c68e731e6fa065339bb9d0e14cfa394dd3ca03fd44bb055aa95fd8ffbe98c",
+  "tests/forest/fl07_playtest.gd": "5c41d299b12b58f98ed7fdafadc69c836257f87395147a0701099031b2621e81"
+}

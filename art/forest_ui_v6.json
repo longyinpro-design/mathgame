@@ -1,0 +1,202 @@
+{
+  "version": "forest-ui-v6",
+  "sources": [
+    {
+      "path": "assets/source/ui-kit-v1.png",
+      "background": [
+        248,
+        236,
+        217
+      ],
+      "used": true
+    },
+    {
+      "path": "assets/source/effects-rewards-v1.png",
+      "background": [
+        24,
+        36,
+        63
+      ],
+      "used": true
+    }
+  ],
+  "engine_numeric_overlay": true,
+  "pixel_edits": "none on sources; slices chroma-keyed with edge decontamination",
+  "outputs": {
+    "ui": [
+      {
+        "path": "assets/runtime/forest/ui/panel-paper.png",
+        "sha256": "9535193fb13ea304992bd58695dec7ceca25e576637305c349e5e8cead17068c",
+        "size": [
+          855,
+          266
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/panel-tall.png",
+        "sha256": "075db3e6933ff6309a4e4a1b31b3dfd9dc24e0b564ec38e860bbd3e65a1c7651",
+        "size": [
+          230,
+          536
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/button-teal.png",
+        "sha256": "821d08893ee862c9efb404876d58295d2c40aa8bc61284c31d2bef57c860bfbb",
+        "size": [
+          256,
+          108
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/button-teal-small.png",
+        "sha256": "c3de963c94b34e9657ac8398ae73eba1eaca83d8ca02d6db24d81421837d5db3",
+        "size": [
+          102,
+          43
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/button-teal-bright.png",
+        "sha256": "660f41cdafe6fba321ca227ec364c10ab045e8dd0383acbcd85cf13be3c6e579",
+        "size": [
+          254,
+          109
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/button-teal-bright-small.png",
+        "sha256": "d2eb7ee44a56d2550e950a6c49681933026d41872e35de2d3e34b00bcdce48ed",
+        "size": [
+          102,
+          44
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/button-teal-dark.png",
+        "sha256": "d304cbf1330f00bb4b3e4cc836bb5e9a05e0748b2ed552c84457ad59aaa9dc15",
+        "size": [
+          258,
+          108
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/button-teal-dark-small.png",
+        "sha256": "ee593e005afd30190dea4d252f02e8fb2e29385c7a831c4812f76f0d9e62924c",
+        "size": [
+          103,
+          43
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/button-gold.png",
+        "sha256": "f6fa582ec128920df5470a17a2fe4e6ea7c8fe6cc2b12530a187a3bff734f3a9",
+        "size": [
+          256,
+          109
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/button-gold-small.png",
+        "sha256": "88cde62c59ccd1024c80bd0ecbfe48f5ec8f9b0b32557856328b6dcdc6b6f211",
+        "size": [
+          102,
+          44
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/button-gold-bright.png",
+        "sha256": "6651229bf95e04875b89b04f9a65384a70fbaf533741d274962e277815298cb0",
+        "size": [
+          257,
+          109
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/button-gold-bright-small.png",
+        "sha256": "f5391bec76f0338b302eb517951356a904c8556fb107db1f4805ac7e901abee6",
+        "size": [
+          103,
+          44
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/button-gray.png",
+        "sha256": "30948dea03874c3736b32cd19b37f83594225fdcb2cd208012d5f82683ec61dd",
+        "size": [
+          258,
+          109
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/ui/button-gray-small.png",
+        "sha256": "22d30cd726ec68006cba4c525460c8aa57d71d1069ca82a75d65d308ce27591e",
+        "size": [
+          103,
+          44
+        ],
+        "mode": "RGBA"
+      }
+    ],
+    "fx": [
+      {
+        "path": "assets/runtime/forest/fx/crystal-idle.png",
+        "sha256": "3bfcc0bacc9f0f44af090655c8f4943152bf8544b3261a7a1390c79858da9a7a",
+        "size": [
+          120,
+          158
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/fx/crystal-lit.png",
+        "sha256": "09eb160f8f28e4ba68cbe165812596629296d4a3c1f422e43862b90692a8f7c2",
+        "size": [
+          120,
+          158
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/fx/spark.png",
+        "sha256": "e2de9e5681528d1d88f4afb63d75735031ec7621e1676e045219acb2179816f5",
+        "size": [
+          84,
+          76
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/fx/burst.png",
+        "sha256": "d2f9da3ad73ba30aa03510ef16482631ff05fbb133d55f7c20864e2087baaad4",
+        "size": [
+          216,
+          172
+        ],
+        "mode": "RGBA"
+      },
+      {
+        "path": "assets/runtime/forest/fx/reward-burst.png",
+        "sha256": "62960a7798c5ec323dd659c53830faa404f73c7fd97cc968562f3a65ed0d1f03",
+        "size": [
+          234,
+          242
+        ],
+        "mode": "RGBA"
+      }
+    ]
+  }
+}

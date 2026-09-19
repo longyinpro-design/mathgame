@@ -1,0 +1,44 @@
+[
+  {
+    "role": "coordinator",
+    "requested": {
+      "model": "gpt-6-astra",
+      "effort": "medium"
+    },
+    "observed": {
+      "model": "gpt-6-astra",
+      "effort": "medium"
+    },
+    "session_id": "01a0b5c6-624e-7af0-9430-7f7305133ea2",
+    "source": "/Users/long/.codex/sessions/2026/09/19/rollout-2026-09-19T02-27-52-01a0b5c6-624e-7af0-9430-7f7305133ea2.jsonl",
+    "writer": true
+  },
+  {
+    "role": "math audit",
+    "requested": {
+      "model": "gpt-5.6-sol",
+      "effort": "medium"
+    },
+    "observed": {
+      "model": "gpt-5.6-sol",
+      "effort": "medium"
+    },
+    "session_id": "01a0b820-3216-70f3-8fff-8cd37d48be62",
+    "source": "/Users/long/.codex/sessions/2026/09/19/rollout-2026-09-19T13-25-12-01a0b820-3216-70f3-8fff-8cd37d48be62.jsonl",
+    "writer": false
+  },
+  {
+    "role": "final review",
+    "requested": {
+      "model": "gpt-5.6-sol",
+      "effort": "high"
+    },
+    "observed": {
+      "model": "gpt-5.6-sol",
+      "effort": "high"
+    },
+    "session_id": "01a0b82c-8452-7821-8eb3-28d6547dccb0",
+    "source": "/Users/long/.codex/sessions/2026/09/19/rollout-2026-09-19T13-38-40-01a0b82c-8452-7821-8eb3-28d6547dccb0.jsonl",
+    "writer": false
+  }
+]

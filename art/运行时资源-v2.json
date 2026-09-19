@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "assets": [
+    {
+      "path": "assets/runtime/forest-ravine-v2.png",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "sha256": "393c7fe1aef026b30bcb2cb14c9bce250bc7d9a9f2f49b07db2d6a12c1d9c262",
+      "alpha_extrema": null,
+      "source": "built-in image_gen",
+      "role": "forest gameplay background"
+    },
+    {
+      "path": "assets/runtime/fox-v2.png",
+      "width": 1303,
+      "height": 1207,
+      "mode": "RGBA",
+      "sha256": "17a52b1cb04e00c4fc322c313db42ae0dc6ebcb976eba15889d209e3e707155c",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "source": "built-in image_gen",
+      "role": "fox companion transparent sprite"
+    }
+  ],
+  "preserved_sources": [
+    "assets/source/explorer-sprites-v2.png",
+    "assets/source/chapter-rooms-v1.png"
+  ],
+  "runtime": "forest_world.gd defines explicit explorer source regions and stable display foot position; original pixels not rewritten"
+}

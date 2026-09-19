@@ -1,0 +1,10 @@
+{
+  "scripts/core/game_session.gd": "6254ae221876f91082e3ee7967c76b6f81d67cc0c43f4b23cdf88a9f9b485178",
+  "scripts/persistence/save_repository.gd": "dd1573186993619f00bcac85d65fdc7e33678f5f6b782d317280a56442988e1b",
+  "scripts/content/story_catalog.gd": "18416f950517255695b64491a6892536a6008657161fc1ee5bd1321f6cb639f7",
+  "scripts/progression/story_progress.gd": "0b45da0328a74a2df79fe5e534458b72226deedb4bffb0c1d4b3e21dafd1c487",
+  "scripts/ui/forest_release.gd": "65864fec15de3e7774c4cbd460c9a3f6e671f02925d8d5dc737c1ec180e69bf3",
+  "scripts/ui/story_stage.gd": "7bb2b3a82c1d25ff12fac7f8dcfc61dac83dc8fe203004865f9f3f6f9b691080",
+  "tests/forest/story_test.gd": "c64b3ed4732aaca75ccca9a80150d628893566ff59f937d35056ee737ed37313",
+  "tests/forest/story_playtest.gd": "6e378782de7740d40ae9bff91479ba95e5981111044f1a7ea905c7c325f29003"
+}

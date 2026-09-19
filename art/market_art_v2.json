@@ -1,0 +1,109 @@
+{
+  "date": "2026-09-19",
+  "generator": "built-in image_gen",
+  "style_reference": "assets/runtime/market/harbor-empty-v2.png",
+  "prompts": "art/prompts/market/06-followup-batch.json",
+  "items": [
+    {
+      "path": "assets/source/market/nursery-exchange-stage-v1.png",
+      "title": "育苗铺交换台",
+      "levels": "MK02–04、MK13",
+      "use": "交换货物、封箱称重、原单核对与围巾修补",
+      "placement": "中央三块木纹操作面；后方石路供人物站位；左侧夹板写引擎文字；右侧修补台。",
+      "limits": "背景含秤安装柱。接独立秤时应隐藏/去除该柱，不能叠出两座秤。",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "sha256": "f455dc95520e1bbbd74c9379853be860bd056c435adb5348f1c1c80ef3eafcf9",
+      "alpha_range": null,
+      "fully_transparent_fraction": null,
+      "status": "source_art_only"
+    },
+    {
+      "path": "assets/source/market/lantern-street-stage-v1.png",
+      "title": "灯芯街与货栈",
+      "levels": "MK05–09、MK15",
+      "use": "货签配对、采购、援助、重单核对、交换循环",
+      "placement": "前景为采购/配货台，中景摊台对应真实接收位置，右侧货架与夹绳用于单号回执。",
+      "limits": "壁灯常亮是环境光，任务成功新增灯串必须单独绘制；五摊交互需要按视角放大，不能直接把远景当触控区。",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "sha256": "c457ddfa7765f68414abe2d35e8185a72b824768f80f82b558274a3a9c2a1351",
+      "alpha_range": null,
+      "fully_transparent_fraction": null,
+      "status": "source_art_only"
+    },
+    {
+      "path": "assets/source/market/oil-courtyard-stage-v1.png",
+      "title": "分油庭院",
+      "levels": "MK11–12、MK14",
+      "use": "双盘称量、三家分油与砝码迁移",
+      "placement": "前景放独立秤，三辆空车对应三个需求，拱门空牌写准确目标。",
+      "limits": "三车已在底景中，只可作为静止接收位；若要推车离场，先去烘焙再以独立车精灵接管。右侧安装柱同样需匹配秤底座。",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "sha256": "102e78ba6c452f6931dbf76d09a340be18fe99aaf773cd4cb5f8210b3c4d1600",
+      "alpha_range": null,
+      "fully_transparent_fraction": null,
+      "status": "source_art_only"
+    },
+    {
+      "path": "assets/source/market/grand-dock-stage-v1.png",
+      "title": "总货栈与灯船码头",
+      "levels": "MK10、MK16–18",
+      "use": "两船运输、寄礼、铜鹭验货和万签灯船收束",
+      "placement": "左前方打包台，中间空甲板容纳独立首领，三泊位对应交货阶段，右侧独立领航灯位置。",
+      "limits": "两艘船和右侧空灯壳已在底景里；航行/灯壳移动前先拆出。甲板上的角色、首领和货物尚未接入。",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "sha256": "e43fd62c3f6fcae042f4a13d31c153d7ba693d2f57ee41bd1f432f5ad5548499",
+      "alpha_range": null,
+      "fully_transparent_fraction": null,
+      "status": "source_art_only"
+    },
+    {
+      "path": "assets/source/market/exchange-goods-source-v1.png",
+      "title": "交换货物部件母版",
+      "levels": "MK02–09、MK13、MK15–16",
+      "use": "铜果、线、芯、布、封箱、油瓶、铃、纸、钉、回执、托盘",
+      "placement": "每个物品单独建立身份与归属，原货位拿走后空出；准确数量由实例数与标签决定。",
+      "limits": "12类物件源图，不是可直接等分的精灵图集；灯芯纤维和钉子画出的根数不代表关卡数量。MK13围巾与MK16叶章仍需补。",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGBA",
+      "sha256": "4b72f950b8dc96316bf45c355c5ad8c948ad2ebd2b0fb723f58acbc46321a4e5",
+      "alpha_range": [
+        0,
+        254
+      ],
+      "fully_transparent_fraction": 0.5481891632080078,
+      "status": "source_art_only"
+    },
+    {
+      "path": "assets/source/market/oil-scale-cargo-source-v1.png",
+      "title": "油壶、铜秤与封装部件母版",
+      "levels": "MK11–12、MK14、MK17–18",
+      "use": "两类油壶、三类砝码、秤盘、秤梁、秤座、大中小封包、灯串",
+      "placement": "梁中心为旋转枢轴；盘与绳为一件，复制左右盘后保持盘水平；砝码数字和封装量由引擎绘制。",
+      "limits": "12类部件源图，灯串作为装饰整体；若逐灯点亮需进一步拆灯壳。长秤梁和灯串跨等分网格，必须人工圈片；未做骨骼/逐帧动画。",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGBA",
+      "sha256": "7d1b4572b2ed775fa2728e364d215d4e283b9a000c821a77a2fe06214c5df1f5",
+      "alpha_range": [
+        0,
+        254
+      ],
+      "fully_transparent_fraction": 0.690008799235026,
+      "status": "source_art_only"
+    }
+  ],
+  "limits": [
+    "未接入新关卡，不声称MK02–18已可玩。",
+    "源图像素尺寸不等于逻辑分辨率；严格像素网格、切片和缩放需引擎验收。",
+    "RGBA最高alpha为254，保留原生成alpha；半透明边缘仍需引擎亮暗背景验收。"
+  ]
+}

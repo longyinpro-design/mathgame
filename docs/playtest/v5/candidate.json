@@ -1,0 +1,28 @@
+{
+  "base": "No Git; old entry and docs in .scratch/v05-before; existing v4 scripts unchanged",
+  "files": {
+    "game/treetop.tscn": "fe086aed8c5469534be22118d167ddc87a7c8dff122530702b31f561d3168fc2",
+    "project.godot": "0c16155b3029819610d6a30e250f7f23f7986a97b11d3dd16762187c9226f2fd",
+    "scripts/cargo/journey.gd": "7440477c725913a619d686a75e6958cda5debf9563773e93266010f26e0b0d36",
+    "scripts/cargo/rules.gd": "44fb963cc14f6c340cac26a770b1b228fe5a13f1f92e93c1fdecb9cdf5f3747b",
+    "scripts/cargo/skin.gd": "f3c6437a5dc2c00100f9c124fe3d6ba77dd5d19fe447ce102daab548245c5749",
+    "scripts/cargo/store.gd": "9426246edec66d652c5ab852ab1e72972a31b2a531a7c5a2f261729b5dedf167",
+    "scripts/cargo/world.gd": "8df9e1c5475464cf8dbdca5a163935289aeb1699881606256b76afbac9a42794",
+    "tests/cargo/playtest.gd": "661767420b28ea4fb8ce263d7aa79519f6d134a04eb182bf65906a06f27f4225",
+    "tests/cargo/rules_test.gd": "73624aa0d918e5b9d99f68db8989c0ded28503994117aa5b215e80b84598ee33"
+  },
+  "date": "2026-09-09T14:35:56.551779+08:00",
+  "environment": "macOS Apple M5 Pro, Godot 4.7.stable.official.5b4e0cb0f, OpenGL",
+  "checks": {
+    "rules": 18,
+    "real_window": 49,
+    "small_window": "960x540 real input PASS",
+    "independent_review": "PASS after P2 modal-focus and P3 shortcut fixes"
+  },
+  "evidence": {
+    "rules": "docs/playtest/v5/rules.log",
+    "window": "docs/playtest/v5/journey.log",
+    "review": "docs/playtest/v5/review.md"
+  },
+  "scope": "One cargo mechanic, UI/font upgrade, standalone v5 journey/save; not new full RPG/AI/hidden side quest/production release."
+}

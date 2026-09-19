@@ -1,0 +1,12 @@
+{
+  "scripts/village_scene_preview.gd": "487f3b3462bbd04516f9ea8ba3cfc52e773f698fa5016342ce1d816b83a247fe",
+  "scripts/ui/forest_release.gd": "524ca63eec4f4f348ff7cb4cdfa6bd0864e499000d0e8ba9da8477762e640354",
+  "scripts/ui/story_stage.gd": "b9f0824bd46bd9d1bed3cf94d876cd66459e25d14f982736fb64c46d76eb9913",
+  "scripts/ui/forest_world.gd": "5c8d9d910f742084b91e0ec056bc6877f5db9f5fbdcabdae59160a85865e1a0d",
+  "scripts/ui/transfer_stage.gd": "4ea01cce683e2364d209a6912f950e127c46335fd7b3a4354cd4596910762c51",
+  "tests/forest/village_scene_playtest.gd": "2049fa327fd6de0258758adf3ae7e100c0c1fac97c6a410cc53156ae83c3fba9",
+  "tests/forest/ground_occlusion_playtest.gd": "bd864975366ce7e2705cf2a1b5049a32487543ca4ac78dd642016a1204cd62f6",
+  "tests/forest/run_checks.py": "782bbf4d76da21e63651325fcd1ab51d2756a02f31cee739a6fb5285b1b38ca2",
+  "启动三粮仓原图试玩.command": "53f80ae80629d1ebd6b100f62e0f1516451d67061132c70ccc8169e66627df4e",
+  "tests/forest/scene_integration_playtest.gd": "4b29091171079002669630eb031c4f7b7dfa627e3305968799969e754e75e11b"
+}

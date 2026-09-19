@@ -1,0 +1,35 @@
+# Godot editor cache and OS metadata
+.godot/
+.DS_Store
+
+# Local scratch: per-session backups, capture harnesses and font trials
+.scratch/
+.zcode/
+
+# Python bytecode from the verification runners
+__pycache__/
+*.pyc
+
+# Design archive that duplicates docs/production (19 MB)
+像素数学-策划与素材-v1.zip
+
+# Playtest evidence: the runners rewrite captured media and logs on every run, so only
+# the reports (verification.json, *.md) stay in history; media stays on disk.
+docs/playtest/**/*.png
+docs/playtest/**/*.jpg
+docs/playtest/**/*.gif
+docs/playtest/**/*.mp4
+docs/playtest/**/*.webm
+docs/playtest/**/*.mov
+docs/playtest/**/*.log
+docs/playtest/**/*.import
+*.import.tmp
+
+# Kept on disk but out of history: rejected art drafts, and the two Noto cuts that no
+# script or .tscn loads (the UI uses ZCOOLKuaiLe-Regular with NotoSansSC as fallback).
+# Re-add them if a scene starts referencing these exact paths.
+art/rejected/
+assets/fonts/NotoSerifSC-Medium.ttf
+assets/fonts/NotoSerifSC-Medium.ttf.import
+assets/fonts/NotoSansSC-Semibold.ttf
+assets/fonts/NotoSansSC-Semibold.ttf.import

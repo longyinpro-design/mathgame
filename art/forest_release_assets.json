@@ -1,0 +1,223 @@
+{
+  "version": "forest-runtime-1",
+  "sources": [
+    {
+      "path": "assets/runtime/forest/acheng-actions-v1.png",
+      "sha256": "cc4829780794a69cfb880633e259d46f50eb010ab02e13aa0adf2acaca7416a9",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "generated_by": "built-in image_gen",
+      "pixel_edits": "none; original selected PNG copied byte-for-byte",
+      "engine_numeric_overlay": true,
+      "alpha": {
+        "zero": 804178,
+        "total": 1572864,
+        "minimum": 0,
+        "maximum": 254,
+        "at_least_240": 562686
+      },
+      "actor_id": "acheng",
+      "frame_count": 24,
+      "atlas_and_pivots": "assets/runtime/forest/actors.json",
+      "actions": [
+        "idle",
+        "walk",
+        "interact",
+        "skill",
+        "affected",
+        "success",
+        "rest",
+        "talk"
+      ],
+      "frames_per_action": 3
+    },
+    {
+      "path": "assets/runtime/forest/feather-actions-v1.png",
+      "sha256": "5b179e0b1f183bb440984e55e758c7d2b260d7574514c53a484531355bc4dda3",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "generated_by": "built-in image_gen",
+      "pixel_edits": "none; original selected PNG copied byte-for-byte",
+      "engine_numeric_overlay": true,
+      "alpha": {
+        "zero": 913785,
+        "total": 1572864,
+        "minimum": 0,
+        "maximum": 254,
+        "at_least_240": 493260
+      },
+      "actor_id": "feather",
+      "frame_count": 24,
+      "atlas_and_pivots": "assets/runtime/forest/actors.json",
+      "actions": [
+        "idle",
+        "walk",
+        "interact",
+        "skill",
+        "affected",
+        "success",
+        "rest",
+        "talk"
+      ],
+      "frames_per_action": 3
+    },
+    {
+      "path": "assets/runtime/forest/hero-actions-v1.png",
+      "sha256": "73fc6e5b42d2aee5aa842ba8ed2a335d10ba5864f08ebf1d62120250fd5e8d60",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "generated_by": "built-in image_gen",
+      "pixel_edits": "none; original selected PNG copied byte-for-byte",
+      "engine_numeric_overlay": true,
+      "alpha": {
+        "zero": 1017129,
+        "total": 1572864,
+        "minimum": 0,
+        "maximum": 254,
+        "at_least_240": 387447
+      },
+      "actor_id": "hero",
+      "frame_count": 24,
+      "atlas_and_pivots": "assets/runtime/forest/actors.json",
+      "actions": [
+        "idle",
+        "walk",
+        "interact",
+        "skill",
+        "affected",
+        "success",
+        "rest",
+        "talk"
+      ],
+      "frames_per_action": 3
+    },
+    {
+      "path": "assets/runtime/forest/mill-v1.png",
+      "sha256": "08c0054636d8dd614f25d12f9b74082d8451d7fbae1383c3475d4dfd41615493",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "generated_by": "built-in image_gen",
+      "pixel_edits": "none; original selected PNG copied byte-for-byte",
+      "engine_numeric_overlay": true
+    },
+    {
+      "path": "assets/runtime/forest/mossling-actions-v1.png",
+      "sha256": "0bb4cc1fa59f3d38f3a37f9c59841ff3b17f8c5dbdaef4cdf349f5f52aadc83a",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "generated_by": "built-in image_gen",
+      "pixel_edits": "none; original selected PNG copied byte-for-byte",
+      "engine_numeric_overlay": true,
+      "alpha": {
+        "zero": 997004,
+        "total": 1572864,
+        "minimum": 0,
+        "maximum": 254,
+        "at_least_240": 410322
+      },
+      "actor_id": "mossling",
+      "frame_count": 24,
+      "atlas_and_pivots": "assets/runtime/forest/actors.json",
+      "actions": [
+        "idle",
+        "walk",
+        "interact",
+        "skill",
+        "affected",
+        "success",
+        "rest",
+        "talk"
+      ],
+      "frames_per_action": 3
+    },
+    {
+      "path": "assets/runtime/forest/tree-forms-v1.png",
+      "sha256": "3c85352c2401477f0f74fb375936a5f23d0099e1844be8a3665d9c84c900375b",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "generated_by": "built-in image_gen",
+      "pixel_edits": "none; original selected PNG copied byte-for-byte",
+      "engine_numeric_overlay": true,
+      "alpha": {
+        "zero": 762703,
+        "total": 1572864,
+        "minimum": 0,
+        "maximum": 254,
+        "at_least_240": 592923
+      }
+    },
+    {
+      "path": "assets/runtime/forest/village-v1.png",
+      "sha256": "91d2ce389ca42664c54b49efa3a53e7474ba022edd33cd1040ffc8ebaa2acc83",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "generated_by": "built-in image_gen",
+      "pixel_edits": "none; original selected PNG copied byte-for-byte",
+      "engine_numeric_overlay": true
+    },
+    {
+      "path": "assets/runtime/forest/npcs-v1.png",
+      "sha256": "40f6fa31eea30afc62a0282906c2fd89da57bcf705092200f8629cf59f5c2584",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "generated_by": "built-in image_gen",
+      "pixel_edits": "none; original selected PNG copied byte-for-byte",
+      "frame_count": 9,
+      "atlas_and_pivots": "assets/runtime/forest/npcs.json",
+      "purpose": "tree station/village/mill daily actions; story states driven by actual completed events",
+      "alpha": {
+        "zero": 1183884,
+        "total": 1572864,
+        "minimum": 0,
+        "maximum": 254
+      }
+    }
+  ],
+  "prompt_files": [
+    "art/prompts/forest/acheng-actions-v1.txt",
+    "art/prompts/forest/acheng-alpha-v1.txt",
+    "art/prompts/forest/feather-actions-v1.txt",
+    "art/prompts/forest/hero-actions-v1.txt",
+    "art/prompts/forest/hero-alpha-v1.txt",
+    "art/prompts/forest/hero-regenerated-v1.txt",
+    "art/prompts/forest/mill-v1.txt",
+    "art/prompts/forest/mossling-actions-v1.txt",
+    "art/prompts/forest/npcs-v1.txt",
+    "art/prompts/forest/tree-forms-v1.txt",
+    "art/prompts/forest/village-v1.txt"
+  ],
+  "qa": {
+    "source_analysis": "Dimensions, alpha distribution, SHA-256; connected-component measurements recorded atlas regions and ground pivots without editing PNG pixels. Detached decoration is not authoritative game content.",
+    "runtime": "Window capture across three frames of six core actions on alternating light/dark backgrounds; chapter screenshots and input checks.; NPC proximity/daily-action/source-return window regression.",
+    "art_direction": "New companion and hero action sheets, village/mill scenery, four echo forms and dormant/awake tree heart. Existing fox/hero identity, warm forest colors and fonts retained.",
+    "limits": [
+      "Three-frame stylized actions, not motion-captured or target-child art acceptance.",
+      "No export/platform claim from local rendering."
+    ]
+  },
+  "preserved": "Existing source assets, runtime art, audio, fonts and licenses retained; legacy entry remains game/treetop.tscn."
+}

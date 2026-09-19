@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数字群岛 · 统一美术母版 v1</title>
+<style>
+:root{color-scheme:light;--ink:#223247;--paper:#f6efdf;--teal:#326b70;--line:#d7cab2}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7}
+main{max-width:1360px;margin:0 auto;padding:48px 30px 60px}header{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:28px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.13em;color:var(--teal)}h1{font-size:clamp(32px,5vw,54px);letter-spacing:-.04em;line-height:1.2;margin:10px 0 18px}header p{max-width:880px;margin:0 0 18px}
+.facts{display:flex;gap:10px;flex-wrap:wrap}.facts span{border:1px solid var(--line);padding:5px 12px;border-radius:4px;font-size:13px;background:#fff8e9}
+.toolbar{display:flex;align-items:center;gap:10px;margin:18px 0 26px;flex-wrap:wrap}.toolbar label{font-size:13px;cursor:pointer}input{accent-color:var(--teal)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.card{overflow:hidden;border:1px solid var(--line);background:#fffaf0;border-radius:9px}.picture{display:flex;align-items:center;justify-content:center;height:400px;background:#f3e4c0;overflow:hidden}.picture img{width:100%;height:100%;object-fit:contain}.card-copy{padding:21px 23px 24px}h2{font-size:21px;margin:6px 0 9px}.card p{font-size:14px;margin:0 0 10px}.meta{font-size:12px;color:#646c70;margin-bottom:15px}.card a:not(.picture){font-size:13px;margin-right:17px;color:var(--teal);text-underline-offset:4px}
+.notice{margin:28px 0;padding:20px 24px;background:#e8e4d8;border-left:4px solid #c2a367;font-size:14px}.notice strong{display:block;margin-bottom:4px}footer{font-size:13px;color:#596465;margin-top:30px}footer a{color:var(--teal);margin-right:18px}
+body.dark-matte .picture{background:#223247}body.white-matte .picture{background:#fff}
+@media(max-width:760px){main{padding:28px 16px}.grid{grid-template-columns:1fr}.picture{height:auto;min-height:240px}.picture img{height:auto;max-height:520px}.card-copy{padding:18px}.toolbar{align-items:flex-start}}
+</style></head><body><main>
+<header><div class="eyebrow">PIXEL MATH · ART DIRECTION / 2026.09.08</div>
+<h1>数字群岛，开始成形。</h1>
+<p>浅奥数学解谜冒险的首套统一美术母版。苔藓遗迹、黄铜机关、青绿能量与羊皮纸界面，共用同一张风格参考，由内置 imagegen 分批生成。</p>
+<div class="facts"><span>6 个主题章节</span><span>18 关数学规则已验算</span><span>9 类当前母版</span><span>最终引擎：Godot</span></div></header>
+<div class="notice"><strong>本轮交付状态：策划与源图包 v1</strong>当前图片用于确定统一视觉和继续制作。主角修订版有真实透明通道；其余多数图仍带底色。切片、逐帧锚点、透明边缘与地形拼缝需在 Godot 素材整备阶段继续验证。原始图片未被本预览页面改写。</div>
+<div class="toolbar"><span>查看透明图的底色：</span>
+<label><input type="radio" name="matte" value="paper" checked> 羊皮纸</label>
+<label><input type="radio" name="matte" value="white"> 纯白</label>
+<label><input type="radio" name="matte" value="dark"> 深蓝</label></div>
+<section class="grid"><article class="card">
+          <a class="picture" href="../assets/source/style-master-v1.png" target="_blank" rel="noopener">
+            <img src="../assets/source/style-master-v1.png" alt="统一风格基准" loading="lazy">
+          </a>
+          <div class="card-copy"><div class="eyebrow">视觉参考</div>
+          <h2>统一风格基准</h2><p>风格参考板，包含角色、环境、机关、界面与配色。</p>
+          <div class="meta">1536 × 1024 · RGB · 不透明源图</div>
+          <a href="../assets/source/style-master-v1.png" target="_blank" rel="noopener">查看原图 ↗</a>
+          <a href="../art/prompts/01-style-master.txt" target="_blank" rel="noopener">生成提示词 ↗</a></div></article>
+<article class="card">
+          <a class="picture" href="../assets/source/world-map-v1.png" target="_blank" rel="noopener">
+            <img src="../assets/source/world-map-v1.png" alt="数字群岛世界地图" loading="lazy">
+          </a>
+          <div class="card-copy"><div class="eyebrow">不透明背景母版</div>
+          <h2>数字群岛世界地图</h2><p>六座主题岛屿与中央营地；实际关卡节点由引擎叠加。</p>
+          <div class="meta">1536 × 1024 · RGB · 不透明源图</div>
+          <a href="../assets/source/world-map-v1.png" target="_blank" rel="noopener">查看原图 ↗</a>
+          <a href="../art/prompts/02-world-map.txt" target="_blank" rel="noopener">生成提示词 ↗</a></div></article>
+<article class="card">
+          <a class="picture" href="../assets/source/explorer-sprites-v2.png" target="_blank" rel="noopener">
+            <img src="../assets/source/explorer-sprites-v2.png" alt="主角四方向姿态" loading="lazy">
+          </a>
+          <div class="card-copy"><div class="eyebrow">RGBA 源图 · 待校准</div>
+          <h2>主角四方向姿态</h2><p>真实 alpha；需检查部分透明边缘、残留光晕和脚底锚点，不能直接等分三行。</p>
+          <div class="meta">1536 × 1024 · RGBA · 真实 alpha</div>
+          <a href="../assets/source/explorer-sprites-v2.png" target="_blank" rel="noopener">查看原图 ↗</a>
+          <a href="../art/prompts/04-explorer-alpha-repair.txt" target="_blank" rel="noopener">生成提示词 ↗</a></div></article>
+<article class="card">
+          <a class="picture" href="../assets/source/companions-npcs-v1.png" target="_blank" rel="noopener">
+            <img src="../assets/source/companions-npcs-v1.png" alt="狐狸伙伴与六岛居民" loading="lazy">
+          </a>
+          <div class="card-copy"><div class="eyebrow">不透明部件母版</div>
+          <h2>狐狸伙伴与六岛居民</h2><p>狐狸方向按实际图为正面、右、背面、左；需透明化及逐项命名。</p>
+          <div class="meta">1448 × 1086 · RGB · 不透明源图</div>
+          <a href="../assets/source/companions-npcs-v1.png" target="_blank" rel="noopener">查看原图 ↗</a>
+          <a href="../art/prompts/05-companions-npcs.txt" target="_blank" rel="noopener">生成提示词 ↗</a></div></article>
+<article class="card">
+          <a class="picture" href="../assets/source/mechanisms-props-v1.png" target="_blank" rel="noopener">
+            <img src="../assets/source/mechanisms-props-v1.png" alt="数学机关与探索道具" loading="lazy">
+          </a>
+          <div class="card-copy"><div class="eyebrow">不透明部件母版</div>
+          <h2>数学机关与探索道具</h2><p>24 个部件；天平拆分为支座、横梁和托盘。数字槽保持空白。需按实际轮廓切片。</p>
+          <div class="meta">1536 × 1024 · RGB · 不透明源图</div>
+          <a href="../assets/source/mechanisms-props-v1.png" target="_blank" rel="noopener">查看原图 ↗</a>
+          <a href="../art/prompts/06-mechanisms-props.txt" target="_blank" rel="noopener">生成提示词 ↗</a></div></article>
+<article class="card">
+          <a class="picture" href="../assets/source/terrain-textures-v1.png" target="_blank" rel="noopener">
+            <img src="../assets/source/terrain-textures-v1.png" alt="六主题地表纹理" loading="lazy">
+          </a>
+          <div class="card-copy"><div class="eyebrow">地表样本母版</div>
+          <h2>六主题地表纹理</h2><p>24 个地表样本；尚未验证重复拼缝，也未补齐自动地形边角。</p>
+          <div class="meta">1024 × 1536 · RGB · 不透明源图</div>
+          <a href="../assets/source/terrain-textures-v1.png" target="_blank" rel="noopener">查看原图 ↗</a>
+          <a href="../art/prompts/07-terrain-textures.txt" target="_blank" rel="noopener">生成提示词 ↗</a></div></article>
+<article class="card">
+          <a class="picture" href="../assets/source/ui-kit-v1.png" target="_blank" rel="noopener">
+            <img src="../assets/source/ui-kit-v1.png" alt="对话、按钮与功能图标" loading="lazy">
+          </a>
+          <div class="card-copy"><div class="eyebrow">UI 母版 · 待切片</div>
+          <h2>对话、按钮与功能图标</h2><p>面板、六种按钮状态、八个功能图标与三种关卡节点。需定义九宫格与焦点状态。</p>
+          <div class="meta">1536 × 1024 · RGB · 不透明源图</div>
+          <a href="../assets/source/ui-kit-v1.png" target="_blank" rel="noopener">查看原图 ↗</a>
+          <a href="../art/prompts/08-ui-kit.txt" target="_blank" rel="noopener">生成提示词 ↗</a></div></article>
+<article class="card">
+          <a class="picture" href="../assets/source/effects-rewards-v1.png" target="_blank" rel="noopener">
+            <img src="../assets/source/effects-rewards-v1.png" alt="机关特效与探索奖励" loading="lazy">
+          </a>
+          <div class="card-copy"><div class="eyebrow">分镜母版 · 待校准</div>
+          <h2>机关特效与探索奖励</h2><p>三组特效分镜和四个奖励图案；深蓝底为源图背景，帧中心与连续性尚未验收。</p>
+          <div class="meta">1254 × 1254 · RGB · 不透明源图</div>
+          <a href="../assets/source/effects-rewards-v1.png" target="_blank" rel="noopener">查看原图 ↗</a>
+          <a href="../art/prompts/09-effects-rewards.txt" target="_blank" rel="noopener">生成提示词 ↗</a></div></article>
+<article class="card">
+          <a class="picture" href="../assets/source/chapter-rooms-v1.png" target="_blank" rel="noopener">
+            <img src="../assets/source/chapter-rooms-v1.png" alt="六章机关房间" loading="lazy">
+          </a>
+          <div class="card-copy"><div class="eyebrow">房间背景母版</div>
+          <h2>六章机关房间</h2><p>中央区域用于放置数学棋盘，边缘装饰对应六个主题。</p>
+          <div class="meta">1536 × 1024 · RGB · 不透明源图</div>
+          <a href="../assets/source/chapter-rooms-v1.png" target="_blank" rel="noopener">查看原图 ↗</a>
+          <a href="../art/prompts/10-chapter-rooms.txt" target="_blank" rel="noopener">生成提示词 ↗</a></div></article></section>
+<footer><a href="../docs/策划案-v1.md">完整策划案</a><a href="../docs/美术资源规范-v1.md">美术与 Godot 规格</a><a href="素材清单-v1.json">文件清单与实际检查</a><a href="../docs/首章关卡-v1.json">18 关规则</a><a href="../docs/关卡验算-v1.json">数学验算结果</a></footer>
+</main><script>document.querySelectorAll('input[name="matte"]').forEach(input=>input.addEventListener('change',()=>{document.body.classList.remove('dark-matte','white-matte');if(input.value!=='paper')document.body.classList.add(input.value+'-matte')}));</script></body></html>

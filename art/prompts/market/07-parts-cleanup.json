@@ -1,0 +1,25 @@
+[
+  {
+    "file": "nursery-exchange-clean-v1.png",
+    "source": "nursery-exchange-stage-v1.png",
+    "prompt": "Precise object edit of this supplied pixel art game background. Remove ONLY the small freestanding brass scale mounting pillar on the left foreground countertop (roughly x240-336 y480-620 of 1672x941). Reconstruct uninterrupted matching wooden tabletop underneath. Preserve absolutely all other architecture, camera, three main tray insets, receipt clips, plants, lighting, colors and dimensions. No additions, no characters, no text, no scale parts. Deliver same composition 1672x941.",
+    "generated_path": "/Users/long/.codex/generated_images/01a0b5c6-624e-7af0-9430-7f7305133ea2/exec-3850fefe-348c-4f6d-88a0-02a802cfb0fd.png"
+  },
+  {
+    "file": "oil-courtyard-clean-v1.png",
+    "source": "oil-courtyard-stage-v1.png",
+    "prompt": "Precise object edit of supplied pixel-art game background for clean plate. Remove ALL THREE wooden delivery carts and their wheels and cast shadows from the middle courtyard beneath the three arches. Reconstruct matching stone paving and background wherever carts stood. Also remove the little brass scale mounting socket on the right end of the foreground tabletop, reconstruct matching wood. Preserve three arches, hanging blank signs, central empty foreground bench, lamps shelves, sea, pots and all other composition, geometry, lighting, palette and framing. No replacement objects, no new props. Same 1672x941 composition.",
+    "generated_path": "/Users/long/.codex/generated_images/01a0b5c6-624e-7af0-9430-7f7305133ea2/exec-5d435ec9-d745-455e-ac35-b7338dcdd156.png"
+  },
+  {
+    "file": "grand-dock-clean-v1.png",
+    "source": "grand-dock-stage-v1.png",
+    "prompt": "Precise clean-plate edit of supplied pixel-art game scene. Remove the TWO small transport sailboats at the left (red and blue), including their sails, masts, rigging, hulls and reflections, restoring water behind. Remove ONLY the large EMPTY lantern housing on the foreground RIGHT stone pedestal, leaving the entire stone pedestal and cloth intact. Preserve all piers, posts, blank signboards, rope rails, warehouse, background cliffs, sunset, center empty deck and all surrounding ambient lit lamps. No new boats, props or characters. Keep original camera composition and size1672x941.",
+    "generated_path": "/Users/long/.codex/generated_images/01a0b5c6-624e-7af0-9430-7f7305133ea2/exec-beb3f69b-7cf5-4098-9e96-461573fe5291.png"
+  },
+  {
+    "file": "transport-parts-source-v1.png",
+    "prompt": "Use case: background-extraction / supporting game sprites. From the TWO reference game scenes, create an isolated transparent sprite source sheet of FOUR movable objects, preserving their established pixel-art style, wood/brass/teal colors and near-frontal slightly elevated viewing angle. Actual TRANSPARENT RGBA background; no scenery, ground, glow, UI, captions, letters, numbers or painted checkerboard. Spacious 2 by 2 layout 1536x1024, silhouettes fully separated with at least 60px clear gutters: TOP LEFT one EMPTY wooden delivery cart matching the carts beneath the arches in reference1, front view with all wheels, no pole or cargo, complete silhouette; TOP RIGHT the large EMPTY brass navigation lantern housing from the right stone pedestal of reference2, WITHOUT stone pedestal or cloth, no flame; BOTTOM LEFT the small RED trimmed transport sailing boat from reference2, hull plus complete mast and sail, no dock/ropes to scenery; BOTTOM RIGHT its BLUE trimmed counterpart, same view and comparable scale. These replace removed objects in clean scene plates; no duplicates, no shadows outside objects, keep the cart bed clearly empty and lantern glass transparent. Match actual original designs as closely as possible; do not reinterpret as icons.",
+    "generated_path": "/Users/long/.codex/generated_images/01a0b5c6-624e-7af0-9430-7f7305133ea2/exec-9bd57e7b-33aa-40ed-8c54-381cc0d65aae.png"
+  }
+]

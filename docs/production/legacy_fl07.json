@@ -1,0 +1,101 @@
+{
+  "id": "FL07",
+  "title": "被擦掉的中间记录",
+  "tier": "main",
+  "prerequisites_all": [
+    "FL06"
+  ],
+  "family": "machine_ambiguity",
+  "params": {
+    "modules": [
+      {
+        "id": "plus3",
+        "op": [
+          "add",
+          3
+        ]
+      },
+      {
+        "id": "minus1",
+        "op": [
+          "sub",
+          1
+        ]
+      },
+      {
+        "id": "double",
+        "op": [
+          "mul",
+          2
+        ]
+      }
+    ],
+    "slots": 3,
+    "records": [
+      [
+        4,
+        12
+      ],
+      [
+        7,
+        18
+      ]
+    ],
+    "input_domain": [
+      1,
+      10
+    ],
+    "checkpoint": {
+      "input": 4,
+      "after_step": 1,
+      "value": 3
+    }
+  },
+  "expected": {
+    "orders_before": [
+      [
+        "plus3",
+        "minus1",
+        "double"
+      ],
+      [
+        "minus1",
+        "plus3",
+        "double"
+      ]
+    ],
+    "orders_after": [
+      [
+        "minus1",
+        "plus3",
+        "double"
+      ]
+    ],
+    "externally_indistinguishable": true
+  },
+  "concept_ids": [
+    "identifiability",
+    "equivalent_operations"
+  ],
+  "reward": {
+    "id": "forest.first_clear.fl07",
+    "journey_exp": 20,
+    "camp_wood": 8
+  },
+  "source": "forest-design-2",
+  "runtime_status": "implemented_forest_runtime_1",
+  "thinking_contract": {
+    "insight": "不同内部顺序可能产生同样结果；必须知道该补哪种信息",
+    "shortcut_to_check": "多试几个外部输入仍无法分清两个等价装法",
+    "required_evidence": [
+      "保留两种符合账簿的机器",
+      "配对抵消展示两种都等效为先加2再翻倍",
+      "选择中间记录并据此唯一确定顺序"
+    ]
+  },
+  "hints": [
+    "不同的机器一定会给出不同的最后结果吗？",
+    "比较先加3再减1与先减1再加3。",
+    "输入4的第一步留下3，只可能先减1；再对照整台机器确认。"
+  ]
+}

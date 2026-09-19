@@ -1,0 +1,71 @@
+{
+  "surface": "Multi-Agent V2",
+  "root_observed": {
+    "session_id": "01a0b5c6-624e-7af0-9430-7f7305133ea2",
+    "observed_model": "gpt-6-astra",
+    "observed_effort": "medium",
+    "evidence": "/Users/long/.codex/sessions/2026/09/19/rollout-2026-09-19T02-27-52-01a0b5c6-624e-7af0-9430-7f7305133ea2.jsonl",
+    "source": "vscode"
+  },
+  "children": [
+    {
+      "requested_model": "gpt-5.6-luna",
+      "requested_effort": "medium",
+      "requested_fork": "none",
+      "task": "mk01_discovery",
+      "observed": {
+        "session_id": "01a0b7f2-d9e1-7403-8624-ee797c0e5b1e",
+        "observed_model": "gpt-5.6-luna",
+        "observed_effort": "medium",
+        "evidence": "/Users/long/.codex/sessions/2026/09/19/rollout-2026-09-19T12-35-41-01a0b7f2-d9e1-7403-8624-ee797c0e5b1e.jsonl",
+        "source": {
+          "subagent": {
+            "thread_spawn": {
+              "parent_thread_id": "01a0b5c6-624e-7af0-9430-7f7305133ea2",
+              "depth": 1,
+              "agent_path": "/root/mk01_discovery",
+              "agent_nickname": "Anscombe",
+              "agent_role": "explorer"
+            }
+          }
+        }
+      }
+    },
+    {
+      "requested_model": "gpt-5.6-sol",
+      "requested_effort": "high",
+      "requested_fork": "none",
+      "task": "mk01_review",
+      "observed": {
+        "session_id": "01a0b800-d8f2-7042-8d6a-d288204a079a",
+        "observed_model": "gpt-5.6-sol",
+        "observed_effort": "high",
+        "evidence": "/Users/long/.codex/sessions/2026/09/19/rollout-2026-09-19T12-50-58-01a0b800-d8f2-7042-8d6a-d288204a079a.jsonl",
+        "source": {
+          "subagent": {
+            "thread_spawn": {
+              "parent_thread_id": "01a0b5c6-624e-7af0-9430-7f7305133ea2",
+              "depth": 1,
+              "agent_path": "/root/mk01_review",
+              "agent_nickname": "Popper",
+              "agent_role": "reviewer"
+            }
+          }
+        }
+      }
+    },
+    {
+      "task": "mk01_recheck",
+      "requested_model": "gpt-5.6-sol",
+      "requested_effort": "high",
+      "requested_fork": "none",
+      "observed": {
+        "session_id": "01a0b808-50c3-7ac1-b638-c0072307256c",
+        "observed_model": "gpt-5.6-sol",
+        "observed_effort": "high",
+        "evidence": "/Users/long/.codex/sessions/2026/09/19/rollout-2026-09-19T12-59-07-01a0b808-50c3-7ac1-b638-c0072307256c.jsonl"
+      }
+    }
+  ],
+  "writer": "root only"
+}

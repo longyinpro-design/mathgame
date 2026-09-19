@@ -1,0 +1,23 @@
+{
+  "scripts/market/mk01_scene.gd.uid": "03f3053e5d751a72817e31a0950e05939252bc46fa62e8593f91b79afcc6fa50",
+  "scripts/market/mk01_world.gd": "db504c24081b43610d14c152b7d587b68f7acce255ebd003e44acdb03779a608",
+  "scripts/market/mk01_scene.gd": "692d1305c55f09e9f0b5e83053ceda1758e31d307ce5d20ec2a489ac8f9a36ea",
+  "scripts/market/mk01_rules.gd": "da3326d031bdb59e5a82a3cdf375fe72281b7f92129ac7d604e6dbfea0ffb62f",
+  "scripts/market/mk01_rules.gd.uid": "77e6de0f911437caa98351c07fcb382695de324010d487952e885798f94e7f1a",
+  "scripts/market/mk01_world.gd.uid": "6ea88740607fc7e5ffd7ec2a5e12ac55915f726bea3ecab378605fa4b919a404",
+  "tests/market/mk01_playtest.gd": "b30f577c6657fb9785ebf561ab6072a0f1aeb2cb00fd09cae9dcfce33ab66b3c",
+  "tests/market/mk01_playtest.gd.uid": "b19d95173e8beb2bb0b5d11cb11a4077e77dba47c5849eeea599a93e04dc4a6a",
+  "tests/market/mk01_demo.gd": "adb0d234191c5f357e0801b9abce83ad638a9d3881e95b3bb7de1ea4e265f691",
+  "tests/market/mk01_test.gd.uid": "63183775fedd8326bcbbad936411e0988cef09241adecd8c4ca2126440e28f18",
+  "tests/market/mk01_demo.gd.uid": "dc81ebe795eca5b7fe43f54d772139372e187a0eb1a3b9d96b56c1af1cdc1092",
+  "tests/market/run_checks.py": "59d84980fed123c2a3f455bc8cc04a71dbf72ed48e816b6e1f35516c7939e0b0",
+  "tests/market/mk01_test.gd": "f4ae3c206f82031cc874c7715895b32df7dd0c3b3b613e432806b35e013fad7a",
+  "assets/runtime/market/harbor-empty-v1.png": "02f9e27cd03a180c217393741f27bd85de34509d0b4d4e05daf714b5d9c36384",
+  "assets/runtime/market/harbor-empty-v2.png": "57746b51942a312d178084d65d46115eaf775509cdd2d4fe4460dcd824406998",
+  "assets/runtime/market/harbor-empty-v2.png.import": "ff2db9e5bdba7f72cff6e78284792312e5e5eb0c75adee821d64cdf731ba0871",
+  "assets/runtime/market/harbor-empty-v1.png.import": "2a8d3098d77ee42d167b11afb001d1967ec05abd3ed3898b7dcfbe7d3d0dc172",
+  "game/market_mk01.tscn": "e967cd7b67094f8d2da5dc1148a205cd449d58d51b235d034885b0ed6d04ca03",
+  "启动千灯集市样板.command": "57459a67d33f858da062301acea7b2c7afe6696060c8dd2cd846878609888bc1",
+  "docs/production/market_mk01_sample.md": "7283641f73e63219b64920bf1f7afa3040af79f145117f0b78a8170cc48977a4",
+  "docs/playtest/market-mk01/forest-baseline.json": "b33eca9d168a39d81c9327e9a02653288afc23993a425b0da1ae496ce154ad01"
+}

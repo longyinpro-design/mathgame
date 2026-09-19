@@ -1,0 +1,14 @@
+{
+  "scripts/market/mk01_world.gd": "7b317e1d22cc9eab857b29c3817102c4f564a1bd75e8c298f4c7fac27d1198e1",
+  "scripts/market/mk01_scene.gd": "161a50ea98f353944ae3423cfb97eab04b1cfffd8644cd504f288f3d8613d29a",
+  "scripts/market/mk01_rules.gd": "c96ad1aeb4e8701d5f9db5e205cd71430fbb0d23c76de286faec9d6df38d07f1",
+  "tests/market/mk01_playtest.gd": "985d730c05ea78e3d0c13e4a29047fcd697321cfab5e9420d4bc42599ef7379f",
+  "tests/market/mk01_demo.gd": "ed33a2b4ff6e6311d655d9858a02deae8413053c5f1bc68d10f6d448545bbfd4",
+  "tests/market/mk01_test.gd": "6773ba1d5583ba2b9cc38f550ae66762d45701e43bca7da3ec63e765599f95a2",
+  "tests/market/run_checks.py": "2be17b87fceca88f3745b9738d665d9557482bbae530b350976aa9561e2e7fdf",
+  "docs/production/market_mk01_sample.md": "3cd3600aa6db896fad0a26302338ce1bd61e70d417b890eb037dcf21ceeb3190",
+  "README.md": "ef126f84b306ec62a300c86a7e8af9f5927bb41d36ec5dae8d88dae667e5e48d",
+  "docs/production/market_chapter.md": "6f55d520b0a940065726be4bcb3b09679d928c827fff1e5a327bce8bdd4e7fa2",
+  "docs/production/market_art_direction.md": "7ac7fd84dba94dafb38487cc6dd5947270ac235817189bf8dcd962c49478f916",
+  "docs/production/market_design_verification.md": "b10362879f91581d8196d27f74f461c9695d335115739a970355570b6d3f0244"
+}

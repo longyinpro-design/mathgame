@@ -1,0 +1,11 @@
+{
+  "scripts/core/game_session.gd": "5122a9a8b65c468948c3b090188b2e6c23c8a1b198352524ddd1ec5adb3b9307",
+  "scripts/persistence/save_repository.gd": "dd1573186993619f00bcac85d65fdc7e33678f5f6b782d317280a56442988e1b",
+  "scripts/content/story_catalog.gd": "77b17d06ad1ceadac5323a82228bea6ca4fb274eb4a855e8b20b60204043b313",
+  "scripts/progression/story_progress.gd": "1ec8f42a071e67e5ea219fbbc41901f92cd08f2a82ec3dbf06e61489dc5f0255",
+  "scripts/ui/forest_release.gd": "d8ce59afcc90e002ff5f56fa1b4a9448b47f059c0c6382ee3cea16e15c7ae482",
+  "scripts/ui/story_stage.gd": "688b5b8a72e24ab18e008865c545d7d0d4320bccbe4061d039d6b84c071442a7",
+  "tests/forest/story_test.gd": "ff4cb7288c5b143b3a0b36da686cd3c2627d7c4ba551866f7a2061da69e0057e",
+  "tests/forest/story_playtest.gd": "8910c7e3d464fdd286e3eb1e56326b558a56fdb071d8388d84d601d8f33eba0f",
+  "tests/forest/story_chapter_playtest.gd": "7c4a7ea5435a0deff4f65b64156f7e78cc20f1449329fe1b35611a810a068400"
+}

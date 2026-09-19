@@ -1,0 +1,71 @@
+extends SceneTree
+const Session = preload("res://scripts/core/game_session.gd")
+const Rules = preload("res://scripts/mechanisms/twenty_four_rules.gd")
+const Scenarios = preload("res://tests/forest/scenarios.gd")
+class LegacySession extends Session:
+	func _init() -> void: catalog.levels.FL07 = catalog.legacy_fl07.duplicate(true)
+	func validate(value: Variant) -> bool: return validate_base(value) and validate_story(value)
+var checks = 0
+var failures = 0
+var directory = "/tmp/pixel-24-"+str(Time.get_ticks_usec())
+func check(ok: bool, label: String) -> void:
+	checks += 1
+	if ok: print("PASS ",label)
+	else: failures += 1; push_error(label)
+func combine(p: Dictionary, state: Dictionary, a: int, b: int, op: String) -> Dictionary:
+	var result = Rules.apply(p,state,{"kind":"combine","left":a,"right":b,"op":op})
+	check(result.accepted,"legal operation "+op); return result.get("state",state)
+func legacy(path: String, complete_old: bool = false) -> RefCounted:
+	var s = LegacySession.new(); s.open(path)
+	for id in ["FL01","FL02","FL03","FL04","FL05","FL06"]: Scenarios.play(s,id)
+	s.profile.story.node = "pre_FL07"
+	check(Scenarios.send(s,{"kind":"start","level_id":"FL07","narrative":true,"node":"pre_FL07"}),"legacy active fixture")
+	Scenarios.rule(s,{"kind":"reveal","step":0})
+	if complete_old: Scenarios.rule(s,{"kind":"final_order","value":["minus1","plus3","double"]})
+	return s
+func _initialize() -> void:
+	DirAccess.make_dir_recursive_absolute(directory)
+	var p = {"cards":[1,4,5,9],"target":24}; var s = Rules.fresh(p)
+	s = combine(p,s,3,1,"-"); s = combine(p,s,1,2,"*"); s = combine(p,s,1,0,"-")
+	check(Rules.complete(p,s) and Rules.replay(p,s)[0].expression == "((5 × (9 − 4)) − 1)","all four cards form exact 24")
+	var alternative = Rules.fresh(p)
+	alternative = combine(p,alternative,1,0,"-"); alternative = combine(p,alternative,0,2,"*"); alternative = combine(p,alternative,1,0,"+")
+	check(Rules.complete(p,alternative),"a different legitimate solution is accepted")
+	var partial = combine(p,Rules.fresh(p),2,3,"*")
+	check(not Rules.complete(p,partial),"intermediate 24 with unused cards is not victory")
+	check(not Rules.apply(p,partial,{"kind":"combine","left":0,"right":0,"op":"+"}).accepted,"same card cannot be reused")
+	check(not Rules.apply(p,partial,{"kind":"combine","left":0,"right":99,"op":"+"}).accepted,"outside card rejected")
+	var fractional = {"cards":[3,3,8,8],"target":24}; var exact = Rules.fresh(fractional)
+	exact = combine(fractional,exact,2,0,"/")
+	check(Rules.replay(fractional,exact).back().n == 8 and Rules.replay(fractional,exact).back().d == 3,"intermediate is exact 8/3")
+	exact = combine(fractional,exact,0,2,"-"); exact = combine(fractional,exact,0,1,"/")
+	check(Rules.complete(fractional,exact),"8 divided by (3 minus 8/3) is exactly 24")
+	var zero = combine(fractional,Rules.fresh(fractional),0,1,"-")
+	check(not Rules.apply(fractional,zero,{"kind":"combine","left":0,"right":2,"op":"/"}).accepted,"division by zero leaves original state intact")
+	check(not Rules.valid(p,{"steps":[{"left":0,"right":1,"op":"pow"}]}),"unknown operation rejected")
+	check(not Rules.valid(p,{"steps":[{"left":0.5,"right":1,"op":"+"}]}),"fractional card index rejected")
+	check(not Rules.valid(p,{"steps":s.steps+[{"left":0,"right":0,"op":"+"}]}),"fourth operation cannot reuse consumed cards")
+	var old = legacy(directory+"/active.json"); var original = old.profile.duplicate(true); var raw = FileAccess.get_file_as_string(old.repository.path)
+	var migrated = Session.new(); migrated.repository.fail_at = "replace"
+	check(not migrated.open(old.repository.path) and migrated.profile.is_empty() and not migrated.pending.is_empty(),"failed migration holds candidate uninstalled")
+	check(FileAccess.get_file_as_string(old.repository.path) == raw and FileAccess.get_file_as_string(migrated.repository.migration_backup) == raw,"original and backup preserve exact bytes")
+	migrated.repository.fail_at = ""; check(migrated.retry(),"migration retry succeeds")
+	check(migrated.profile.active_run.state == {"steps":[]} and migrated.profile.active_run.outcome == "active","only old active FL07 changes to new unsolved board")
+	check(migrated.profile.progress == original.progress and migrated.profile.learning == original.learning and migrated.profile.roster == original.roster,"migration leaves economy learning and party unchanged")
+	check(migrated.profile.legacy_fl07_runs[original.active_run.run_id] == original.active_run,"full old active run is archived")
+	check(migrated.profile.story.run_id == migrated.profile.active_run.run_id and migrated.profile.story.node == "puzzle_FL07","story pointer follows migrated run")
+	var reopened = Session.new(); check(reopened.open(old.repository.path) and reopened.profile == migrated.profile and reopened.repository.migration_backup == "","reopen does not migrate again")
+	check(Scenarios.play(migrated,"FL07") and migrated.profile.progress.journey_exp == original.progress.journey_exp+20,"new puzzle earns its first reward exactly once")
+	old = legacy(directory+"/complete.json",true); original = old.profile.duplicate(true)
+	check(reopened.open(old.repository.path) and reopened.profile == original,"completed old puzzle rewards and receipts stay byte-equivalent as data")
+	check(reopened.profile.learning.observations.back().context_id == "machine_ambiguity","old learning is not relabeled as 24-point completion")
+	check(Scenarios.play(reopened,"FL07") and reopened.profile.progress == original.progress,"24-point replay does not repay old first-clear reward")
+	check(reopened.profile.learning.observations.back().context_id == "twenty_four","new completion has its own arithmetic evidence")
+	old = legacy(directory+"/suspended.json"); Scenarios.send(old,{"kind":"start","level_id":"FL13"}); original = old.profile.duplicate(true)
+	check(reopened.open(old.repository.path) and reopened.profile.active_run == original.active_run and reopened.profile.suspended_runs.FL07.state == {"steps":[]},"suspended FL07 converts without changing active other puzzle")
+	old = legacy(directory+"/bad.json"); old.profile.active_run.state.final_order = ["made_up"]
+	var file = FileAccess.open(old.repository.path,FileAccess.WRITE); file.store_string(JSON.stringify(old.profile)); file.close()
+	check(not reopened.open(old.repository.path) and reopened.repository.protected,"malformed legacy state is protected, never silently reset")
+	for name in DirAccess.get_files_at(directory): DirAccess.remove_absolute(directory.path_join(name))
+	DirAccess.remove_absolute(directory)
+	print("FOREST TWENTY FOUR ",checks-failures,"/",checks," PASS"); quit(1 if failures else 0)

@@ -1,0 +1,109 @@
+{
+  "status": "PASS",
+  "permutations": 720,
+  "first_phase_solutions": 6,
+  "cases": [
+    {
+      "origin": [
+        1,
+        4,
+        5,
+        2,
+        3,
+        6
+      ],
+      "targets": [
+        10,
+        14,
+        9
+      ],
+      "minimum_exchanges": 2,
+      "two_exchange_routes": 5
+    },
+    {
+      "origin": [
+        1,
+        6,
+        3,
+        2,
+        5,
+        4
+      ],
+      "targets": [
+        10,
+        12,
+        13
+      ],
+      "minimum_exchanges": 2,
+      "two_exchange_routes": 2
+    },
+    {
+      "origin": [
+        3,
+        2,
+        5,
+        4,
+        1,
+        6
+      ],
+      "targets": [
+        10,
+        12,
+        7
+      ],
+      "minimum_exchanges": 2,
+      "two_exchange_routes": 2
+    },
+    {
+      "origin": [
+        3,
+        6,
+        1,
+        4,
+        5,
+        2
+      ],
+      "targets": [
+        10,
+        8,
+        15
+      ],
+      "minimum_exchanges": 2,
+      "two_exchange_routes": 2
+    },
+    {
+      "origin": [
+        5,
+        2,
+        3,
+        6,
+        1,
+        4
+      ],
+      "targets": [
+        10,
+        8,
+        9
+      ],
+      "minimum_exchanges": 2,
+      "two_exchange_routes": 2
+    },
+    {
+      "origin": [
+        5,
+        4,
+        1,
+        6,
+        3,
+        2
+      ],
+      "targets": [
+        10,
+        6,
+        13
+      ],
+      "minimum_exchanges": 2,
+      "two_exchange_routes": 5
+    }
+  ]
+}

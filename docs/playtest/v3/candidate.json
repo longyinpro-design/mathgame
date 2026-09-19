@@ -1,0 +1,19 @@
+{
+  "version": "0.3",
+  "engine": "4.7.stable.official.5b4e0cb0f",
+  "checks": 36,
+  "result": "PASS",
+  "review": "P2 and P3 repaired and closed in read-only re-review",
+  "sha256": {
+    "scripts/encounter/audio.gd": "3f49dff0782fa3642dd268ddafb8e244c05edd0f201b089968f6c3fd29de5730",
+    "scripts/encounter/encounter.gd": "c3a53a032ae3d9065562192f098092735f41681e3da8ac91895f34ab3b67fd45",
+    "scripts/encounter/rules.gd": "98abf5f554fbffb8cab42e62a9cf0b0e844f8d636bf3ca563947b582bc9ddcf3",
+    "scripts/encounter/store.gd": "44b017cc670ac4e3280b44ecccafcd70f293e1c8c9825cfb7b01efed2d910354",
+    "scripts/encounter/visuals.gd": "b761d38aaedbdbb5fc249522a26d9f61e85de23fe7240998626a90575ca6f215",
+    "game/encounter.tscn": "bfebb58fc071b35ee975ad6a27b7d7c9e8c5ee15d3bb2805738bf274830a6a3e",
+    "project.godot": "25f684f51a88c964a388dabeb83565531c1302e5175b6609dd20262b006d13ec",
+    "tests/encounter/playtest.gd": "af4672063864c29fee31475f45eeb3bf7db37fc56189ab4c85c37abd9b83a558",
+    "tests/encounter/demo.gd": "d7e1bd7db328d85e641681a0a0c136ddc2d37c9149200187a96bef0f714dafdd",
+    "art/build_audio_v3.py": "98dcc01af93f95f2055c98f7c6e20f4e5f969d198c3c11dc5a829f78d262910a"
+  }
+}
