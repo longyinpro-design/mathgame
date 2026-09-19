@@ -7,7 +7,9 @@ extends Control
 # /tmp 路径，子类若无条件覆盖就会读写玩家真实存档。
 const Repository = preload("res://scripts/persistence/save_repository.gd")
 const UIStyle = preload("res://scripts/cargo/skin.gd")
+const Bridge = preload("res://scripts/market/market_bridge.gd")
 const FOREST_SCENE = "res://game/forest_release.tscn"
+const ISLAND_SCENE = "res://game/market_island.tscn"
 const LAND_TIME = 0.28
 var rules: Script
 var world_script: Script
@@ -35,6 +37,8 @@ var transient = 0.0
 var origin = ""
 
 func _ready() -> void:
+	# 进来时是谁送的：hub = 集市航图，mk01 = 码头，空 = 直接启动本关。读一次即清空。
+	origin = Bridge.origin; Bridge.origin = ""
 	configure()
 	state = rules.fresh()
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -162,11 +166,18 @@ func refresh() -> void:
 		add_button("deliver",submit_label(),Rect2(1020,646,235,54),advance,true).disabled = transient > 0
 		var status = status_line()
 		if not status.is_empty(): UIStyle.text(ui,status,Rect2(470,656,300,42),20)
+		# 摆放中途也能回航图：每一步都已经落盘，离开不会丢现场。
+		if origin == "hub": add_button("leave_hub","集市航图",Rect2(786,654,124,46),go_hub)
 	else:
 		var labels = stage_labels()
 		if labels.has(state.stage):
 			add_button("next",labels[state.stage],Rect2(982,646,274,54),confirm_restart if state.stage == "complete" else advance,true)
-		if state.stage == "complete": exit_buttons()
+		if state.stage == "complete":
+			exit_buttons()
+			# 从航图进来的关卡，办完事就把玩家送回航图，灯火由枢纽读档补记。
+			if origin == "hub": add_button("back_hub","返回集市航图",Rect2(690,646,280,54),go_hub)
+	# 关卡自己的回执、单据与阶段说明画在最后，才能压在按钮之上。
+	extra()
 	if modal:
 		for b in buttons.values(): b.disabled = true
 
@@ -237,6 +248,9 @@ func restart() -> void:
 
 func go_forest() -> void:
 	get_tree().change_scene_to_file(FOREST_SCENE)
+
+func go_hub() -> void:
+	get_tree().change_scene_to_file(ISLAND_SCENE)
 
 # ---- modals ----
 func show_modal(text: String) -> void:

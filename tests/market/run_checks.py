@@ -25,13 +25,22 @@ SAMPLES = {
              'limits':['Native macOS 1280x720 and 960x540 only; no child comprehension or touch-device acceptance.',
                        'Goods are static kit-v1 sprites; the exchange, carry and hand-over evidence covers counts, camera and drop targets only.',
                        'Independent sample profile; MK01 hands over a one-way note, no forest progress or reward integration.']},
+    'hub': {'label':'HUB', 'headless':'hub_test.gd', 'window':'hub_playtest.gd',
+             'launcher':'启动千灯集市岛.command',
+             'own':['chapter_catalog.gd','chapter_progress.gd','kit_world.gd','level_host.gd','hub_world.gd','market_hub.gd','market_bridge.gd'],
+             'scene':'game/market_island.tscn',
+             'output':'docs/playtest/market-chapter-hub',
+             'limits':['Native macOS 1280x720 and 960x540 only; no child comprehension or touch-device acceptance.',
+                       'The chart reads each station\u2019s own save as completion evidence; it never writes a station profile.',
+                       'Stations not yet shipped stay on the chart as unlit, disabled cards.']},
 }
 SHARED = [ROOT/'project.godot', ROOT/'assets/runtime/cargo-props-v5.png', ROOT/'scripts/cargo/skin.gd',
     ROOT/'scripts/persistence/save_repository.gd', ROOT/'tests/forest/window_focus.gd']
 
 def sources(sample):
-    paths = list(SHARED) + [ROOT/'scripts/market'/(sample+'_rules.gd'), ROOT/'scripts/market'/(sample+'_world.gd'),
-        ROOT/'scripts/market'/(sample+'_scene.gd'), ROOT/('game/market_'+sample+'.tscn'), ROOT/SAMPLES[sample]['launcher']]
+    spec = SAMPLES[sample]
+    own = spec.get('own', [sample+'_rules.gd', sample+'_world.gd', sample+'_scene.gd'])
+    paths = list(SHARED) + [ROOT/'scripts/market'/name for name in own] + [ROOT/spec.get('scene', 'game/market_'+sample+'.tscn'), ROOT/spec['launcher']]
     for folder in ['scripts/market', 'scripts/content', 'tests/market', 'tools/market',
                    'assets/runtime/market', 'assets/source/market', 'assets/runtime/forest/ui', 'assets/fonts']:
         paths += [p for p in (ROOT/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.suffix not in ['.uid','.import']]

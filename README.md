@@ -26,7 +26,15 @@
 
 底景、铜果、线卷、灯芯、托盘与空白回执全部来自拆件包 `art/market-kit-v1/manifest.json`，扣扣使用抱货与挥手两个离散姿态；数量、约定和状态文字由引擎绘制。只从 MK01 过来时，完成后另有「办完回礼 · 回营地」回到森林营地，仍是剧情桥接，不发森林奖励、不改森林进度。
 
-[MK02契约](docs/production/market_mk02_sample.md) · [MK02验证](docs/playtest/market-mk02-exchange/verification.json)。复验：`python3 tests/market/run_checks.py` 默认两关全跑，可加参数 `mk01` 或 `mk02` 只验一关。
+[MK02契约](docs/production/market_mk02_sample.md) · [MK02验证](docs/playtest/market-mk02-exchange/verification.json)。复验：`python3 tests/market/run_checks.py` 默认 MK01、MK02、航图三项全跑，可加参数 `mk01`、`mk02` 或 `hub` 只验一项。
+
+## 千灯集市 · 千灯航图
+
+双击 [启动千灯集市岛.command](启动千灯集市岛.command)，进入 18 关共用的航图：一盏灯对应一张关卡卡，卡片写明第几幕、关卡名和当前状态（待出发 / 已点亮 · 可重玩 / 需先完成 MKxx / 尚未制作），点卡片或右下角「下一站」进关，办完事后用关卡里的「返回集市航图」回来。还没做的关卡留在图上呈暗色、不可点，不会给玩家一间空房间。森林营地的入口要等 18 关串接时再接。
+
+进度档 `user://profiles/market-chapter-v1/save-v1.json` 只由航图写：它逐关读那一关自己的存档（`stage == complete`）作为证据，关卡不需要知道章节档存在，改档或跳关也点不亮别人的灯；坏档保留原文件再另存新档。18 关的编号、幕次、场景、存档路径、前置与一句话目标都取自 [chapter_catalog.gd](scripts/market/chapter_catalog.gd)。
+
+[航图验证](docs/playtest/market-chapter-hub/verification.json)。复验：`python3 tests/market/run_checks.py hub`（无头 46 项 + 真实窗口 28 项，截图在 `docs/playtest/market-chapter-hub/`）。
 
 ## 开始游戏
 

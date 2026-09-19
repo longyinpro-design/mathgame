@@ -126,8 +126,20 @@ func run() -> void:
 		check(game.state.stage == "complete" and game.state.hook.count(1) == 2,"the delivery ends with 扣扣's two spools kept")
 		check(not game.buttons.has("back_camp"),"a standalone sample keeps its own exit")
 		await capture(prefix+"08-receipt")
+		var receipt = ""
+		for child in game.ui.get_children():
+			if child is Label and "回执 · 育苗铺" in child.text: receipt = child.text
+		check(receipt.contains("约定一 ×4") and receipt.contains("交付架 5 根"),
+			"the receipt restates the groups the player actually made")
 		await click("next"); await click("cancel")
 		check(game.state.stage == "complete","leaving the restart dialog preserves the finished order")
+		game.queue_free(); await process_frame
+		# A station opened from the chart hands the player back to the chart.
+		Bridge.origin = "hub"
+		game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame
+		check(game.state.stage == "complete" and game.buttons.has("back_hub"),
+			"the finished nursery, opened from the chart, offers the way back to it")
+		check(not game.buttons.has("back_camp"),"the camp door waits for the harbour hand-off only")
 		game.queue_free(); await process_frame
 		Bridge.origin = "mk01"; HarborSample.entry = "camp"
 		game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame

@@ -22,6 +22,9 @@ var font: Font
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	font = UIStyle.face()
+	# ready_level() only declares scene_id and backdrop; the kit parts and station table
+	# are resolved after it, so a level never has to repeat the manifest walk.
+	ready_level()
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(MANIFEST_PATH))
 	for item in parsed.sprites:
 		parts[item.id] = item
@@ -29,7 +32,6 @@ func _ready() -> void:
 	for scene in parsed.scenes:
 		if scene.id == scene_id: stations = scene.stations
 	if stations.is_empty(): push_error("kit-v1 manifest has no scene id "+scene_id)
-	ready_level()
 
 # Overridable hooks: the base owns _ready/_process/_draw so levels never repeat their boilerplate.
 func ready_level() -> void: pass

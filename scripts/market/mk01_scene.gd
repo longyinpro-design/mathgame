@@ -7,12 +7,14 @@ const Bridge = preload("res://scripts/market/market_bridge.gd")
 const DURATIONS = {"approach":1.6,"measuring":4.5,"delivery":5.0}
 const FOREST_SCENE = "res://game/forest_release.tscn"
 const NURSERY_SCENE = "res://game/market_mk02.tscn"
+const ISLAND_SCENE = "res://game/market_island.tscn"
 const LINES = ["码头工：容量牌被雨冲掉了，这批杯子可不能凭外形猜。","陶姨：蓝杯和白杯各能装二到八小杯，同一种杯装得一样多。","小岚：先测两种混合装法，看看换一只杯会改变多少。"]
 var save_path = "user://profiles/market-mk01-2/save-v2.json"
 # Set by the forest release hub before switching in: "camp" = arrived from the camp,
 # and this sample writes "return" back on the way out so the forest opens at the camp.
 static var entry = ""
 var from_camp = false
+var from_hub = false
 var repository = Repository.new()
 var state = Rules.fresh()
 var pending: Dictionary = {}
@@ -33,6 +35,8 @@ var transient = 0.0
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	from_camp = entry == "camp"; entry = ""
+	from_hub = Bridge.origin == "hub"
+	if from_hub: Bridge.origin = ""
 	repository.path = save_path
 	var read = repository.read_profile(Rules.validate)
 	if read.status == "loaded": state = read.profile
@@ -175,6 +179,7 @@ func refresh() -> void:
 		if labels.has(state.stage): add_button("next",labels[state.stage],Rect2(982,646,274,54),confirm_restart if state.stage == "complete" else advance,true)
 		if state.stage == "complete" and from_camp: add_button("back_forest","交完货 · 回营地",Rect2(700,646,270,54),go_forest)
 		if state.stage == "complete": add_button("next_sample","去育苗铺 · 留下一段线",Rect2(414,646,272,54),go_nursery)
+		if state.stage == "complete" and from_hub: add_button("back_hub","返回集市航图",Rect2(132,646,270,54),go_hub)
 		if state.stage == "result" and state.calibrated and not Rules.delivered(state): add_button("undo_result","撤销上一次摆杯",Rect2(24,654,225,46),undo_from_result).disabled = history.is_empty()
 	if modal:
 		for b in buttons.values(): b.disabled = true
@@ -291,6 +296,10 @@ func go_nursery() -> void:
 	if modal or transient > 0: return
 	Bridge.origin = "mk01"
 	get_tree().change_scene_to_file(NURSERY_SCENE)
+
+func go_hub() -> void:
+	if modal or transient > 0: return
+	get_tree().change_scene_to_file(ISLAND_SCENE)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo or modal: return

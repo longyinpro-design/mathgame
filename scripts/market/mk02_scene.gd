@@ -1,7 +1,6 @@
 extends "res://scripts/market/level_host.gd"
 const Rules = preload("res://scripts/market/mk02_rules.gd")
 const World = preload("res://scripts/market/mk02_world.gd")
-const Bridge = preload("res://scripts/market/market_bridge.gd")
 const HarborSample = preload("res://scripts/market/mk01_scene.gd")
 const LINES = ["扣扣：种子先寄存到育苗铺……这次的回礼，我可以少拿一点。","小岚：别急着让步。台面上有 8 颗铜果，门口挂着两条公开的约定。","陶姨：2 颗铜果换 3 卷线，2 卷线换 1 根灯芯，只能整组换。码头要 5 根灯芯，扣扣的捆货绳还差 2 卷线。"]
 
@@ -11,7 +10,6 @@ func configure() -> void:
 	if save_path.is_empty(): save_path = "user://profiles/market-mk02-1/save-v1.json"
 	durations = {"approach":1.6,"delivery":4.2}
 	rules = Rules; world_script = World
-	origin = Bridge.origin; Bridge.origin = ""
 
 # A batched exchange plays longer, but never faster per group than a single one.
 func duration() -> float:
