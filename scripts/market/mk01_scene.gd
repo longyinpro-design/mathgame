@@ -3,8 +3,10 @@ const Rules = preload("res://scripts/market/mk01_rules.gd")
 const World = preload("res://scripts/market/mk01_world.gd")
 const Repository = preload("res://scripts/persistence/save_repository.gd")
 const UIStyle = preload("res://scripts/cargo/skin.gd")
+const Bridge = preload("res://scripts/market/market_bridge.gd")
 const DURATIONS = {"approach":1.6,"measuring":4.5,"delivery":5.0}
 const FOREST_SCENE = "res://game/forest_release.tscn"
+const NURSERY_SCENE = "res://game/market_mk02.tscn"
 const LINES = ["码头工：容量牌被雨冲掉了，这批杯子可不能凭外形猜。","陶姨：蓝杯和白杯各能装二到八小杯，同一种杯装得一样多。","小岚：先测两种混合装法，看看换一只杯会改变多少。"]
 var save_path = "user://profiles/market-mk01-2/save-v2.json"
 # Set by the forest release hub before switching in: "camp" = arrived from the camp,
@@ -172,6 +174,7 @@ func refresh() -> void:
 		var labels = {"arrival":"继续听他们说" if state.beat < 2 else "靠近接货台","ready":"开始复核","result":result_action,"complete":"再体验一次"}
 		if labels.has(state.stage): add_button("next",labels[state.stage],Rect2(982,646,274,54),confirm_restart if state.stage == "complete" else advance,true)
 		if state.stage == "complete" and from_camp: add_button("back_forest","交完货 · 回营地",Rect2(700,646,270,54),go_forest)
+		if state.stage == "complete": add_button("next_sample","去育苗铺 · 留下一段线",Rect2(414,646,272,54),go_nursery)
 		if state.stage == "result" and state.calibrated and not Rules.delivered(state): add_button("undo_result","撤销上一次摆杯",Rect2(24,654,225,46),undo_from_result).disabled = history.is_empty()
 	if modal:
 		for b in buttons.values(): b.disabled = true
@@ -283,6 +286,11 @@ func go_forest() -> void:
 	if modal or transient > 0: return
 	entry = "return"
 	get_tree().change_scene_to_file(FOREST_SCENE)
+
+func go_nursery() -> void:
+	if modal or transient > 0: return
+	Bridge.origin = "mk01"
+	get_tree().change_scene_to_file(NURSERY_SCENE)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo or modal: return
