@@ -43,4 +43,4 @@
 - 唯一性靠代码穷举，不靠人工声明；本关不引入匹配算法或一般求解器，画面也不显示“还剩几种可能”。
 - 验证：`godot --headless --path . --script tests/market/mk07_test.gd` → `MARKET MK07 RULES 143/143 PASS`，无 `ERROR:`/`SCRIPT ERROR`，覆盖全排列唯一性与陷阱、每条 stage 迁移、失败留证与不扣货、约 20 条坏档拒读、`restore()` 往返、`shortfalls` 点名到人、提示数与 `hint_texts()` 上限一致、目录一致性与 `ResourceLoader.exists()`、`save_path` 默认值、真实场景实例化的按钮可用性与热点尺寸、写档失败注入与坏档保护。实窗：`godot --path . --script tests/market/mk07_playtest.gd` → `MARKET MK07 WINDOW 170/170 PASS`（1280×720 与 960×540 各一遍，零 `ERROR:`/`SCRIPT ERROR`/`WARNING`），截图在 `docs/playtest/market-mk07-goods/`；窗口化里改掉了回执面板压住货物（右边界 376→360）与回执末两行跑出版面（字号 16→18 下限 + `line_spacing` 归零）两处，并补了 `off_paper()` 守卫——`Control.size` 会被内容最小值悄悄撑大，只量 `spilled()` 看不见纵向溢出。
 - 因为落位动画现在真的会占 0.28s 落地锁，`tests/market/mk07_test.gd` 里 25 处连续 `choose_good/choose_person/undo` 需要按 mk06 的先例加 `settle(game)`（`:41-42`）清 `transient` 再刷新；断言总数仍是 143，没有削弱或删除任何一条。
-- `tests/market/run_checks.py` 的关卡表由集成者统一补 `mk07` 一行（属共享文件，本轮未改、未运行）。自动化通过不代表儿童真实理解度、触屏验收或人物连续动画完成。
+- `tests/market/run_checks.py` 的关卡表里已经有 `mk07` 一行（样板期这一条由集成者统一补，属共享文件）；整表 pass 已由整合者跑过，`docs/playtest/market-mk07-goods/verification.json` 记着这两条检查的条数、退出码与全部源文件 SHA256。自动化通过不代表儿童真实理解度、触屏验收或人物连续动画完成。

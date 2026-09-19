@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "sample": "HUB",
+  "sample": "MK15",
   "source_stable_during_run": true,
   "existing_runtime_check": "not_requested",
   "baseline_path": null,
@@ -109,7 +109,7 @@
     "assets/source/market/oil-courtyard-stage-v1.png": "102e78ba6c452f6931dbf76d09a340be18fe99aaf773cd4cb5f8210b3c4d1600",
     "assets/source/market/oil-scale-cargo-source-v1.png": "7d1b4572b2ed775fa2728e364d215d4e283b9a000c821a77a2fe06214c5df1f5",
     "assets/source/market/transport-parts-source-v1.png": "40ec2cfa2847fb7bfbbf81709abb5b3703cdc8eaa2ba1d494fc17a4d6f3a79e3",
-    "game/market_island.tscn": "acac16ebf9e6309e762f09d69a4bb7459cb2aaf2f5c2836e53678e87ca5d2d71",
+    "game/market_mk15.tscn": "8af84d299eef47b1873b81ad66a633416baa1b2bc0084f358698d9c34f0c9e09",
     "project.godot": "233fc26672e3334d75735cbc3139151d23985aac1aec223c5cec17e4b8e4406e",
     "scripts/cargo/skin.gd": "ca48f7a97a1665775a4b2702bb68973f1202fd405bf148217533eeb46a4bc6f2",
     "scripts/content/content_catalog.gd": "c41a45cf557251b386d492389e9d3910b5530ed524a12c5f60eb49069dfe9013",
@@ -222,50 +222,50 @@
     "tools/market/cut_koukou.py": "3872dbc0f625c03b50a0ca1c66cca87dd86416a002df495a3a602f03901df005",
     "tools/market/export_kit.gd": "eff17fb6b193d44d19cce3b362abd4ff7e8b15bfd65304dfb2619ba6da6f596a",
     "tools/market/kit_preview.gd": "5839c5965629ac2df8ce34ab46da28a839664ff36198356ca4ac8170cdf204fe",
-    "启动千灯集市岛.command": "4723b679b33ec0657e75c41e6f14e954fd8c3fd57c561ea74788ab4909ea9ce9"
+    "启动千灯集市MK15样板.command": "26ef74991fec87a9a536ab8c85faea6487bc4f224fced1b6c8d0dfb0d3a72d93"
   },
   "results": [
     {
-      "name": "hub_test.gd",
+      "name": "mk15_test.gd",
       "command": [
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
         "/Users/long/Code/像素数学",
         "--script",
-        "tests/market/hub_test.gd",
+        "tests/market/mk15_test.gd",
         "--log-file",
-        "/Users/long/Code/像素数学/docs/playtest/market-chapter-hub/hub_test.log"
+        "/Users/long/Code/像素数学/docs/playtest/market-mk15-copper-nut/mk15_test.log"
       ],
       "mode": "headless",
       "exit_code": 0,
-      "passed": 48,
-      "total": 48,
+      "passed": 266,
+      "total": 266,
       "errors": [],
       "status": "PASS"
     },
     {
-      "name": "hub_playtest.gd",
+      "name": "mk15_playtest.gd",
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
         "/Users/long/Code/像素数学",
         "--script",
-        "tests/market/hub_playtest.gd",
+        "tests/market/mk15_playtest.gd",
         "--log-file",
-        "/Users/long/Code/像素数学/docs/playtest/market-chapter-hub/hub_playtest.log"
+        "/Users/long/Code/像素数学/docs/playtest/market-mk15-copper-nut/mk15_playtest.log"
       ],
       "mode": "macOS_native_window",
       "exit_code": 0,
-      "passed": 28,
-      "total": 28,
+      "passed": 88,
+      "total": 88,
       "errors": [],
       "status": "PASS"
     }
   ],
   "limits": [
     "Native macOS 1280x720 and 960x540 only; no child comprehension or touch-device acceptance.",
-    "The chart reads each station’s own save as completion evidence; it never writes a station profile.",
-    "All 18 stations now ship their own scene and save; the 尚未制作 branch stays only as a guard the chart can no longer reach."
+    "The three contracts and the 36-slot gauge are engine-drawn plaques; kit-v1 has no contract board or exchange-ring part.",
+    "The wind-chime that replaces the signboard reuses brass_bell; 衡伯 never appears on screen."
   ]
 }

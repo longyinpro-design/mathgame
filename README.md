@@ -26,15 +26,40 @@
 
 底景、铜果、线卷、灯芯、托盘与空白回执全部来自拆件包 `art/market-kit-v1/manifest.json`，扣扣使用抱货与挥手两个离散姿态；数量、约定和状态文字由引擎绘制。只从 MK01 过来时，完成后另有「办完回礼 · 回营地」回到森林营地，仍是剧情桥接，不发森林奖励、不改森林进度。
 
-[MK02契约](docs/production/market_mk02_sample.md) · [MK02验证](docs/playtest/market-mk02-exchange/verification.json)。复验：`python3 tests/market/run_checks.py` 默认 MK01、MK02、航图三项全跑，可加参数 `mk01`、`mk02` 或 `hub` 只验一项。
+[MK02契约](docs/production/market_mk02_sample.md) · [MK02验证](docs/playtest/market-mk02-exchange/verification.json)。复验：`python3 tests/market/run_checks.py` 默认把十八关与航图共 19 项一次跑完（无头规则 + 真实 macOS 窗口），可加参数 `mk01`、`mk02`、`hub` 之类只验一项。
 
 ## 千灯集市 · 千灯航图
 
-双击 [启动千灯集市岛.command](启动千灯集市岛.command)，进入 18 关共用的航图：一盏灯对应一张关卡卡，卡片写明第几幕、关卡名和当前状态（待出发 / 已点亮 · 可重玩 / 需先完成 MKxx / 尚未制作），点卡片或右下角「下一站」进关，办完事后用关卡里的「返回集市航图」回来。还没做的关卡留在图上呈暗色、不可点，不会给玩家一间空房间。森林营地的入口要等 18 关串接时再接。
+双击 [启动千灯集市岛.command](启动千灯集市岛.command)，进入 18 关共用的航图：一盏灯对应一张关卡卡，卡片写明第几幕、关卡名和当前状态（待出发 / 已点亮 · 可重玩 / 需先完成 MKxx），点卡片或右下角「下一站」进关，办完事后用关卡里的「返回集市航图」回来。十八关都已建成交互，图上没有空的灯位；从森林营地进岛的旅客在 MK01、MK02 办完事后可直接点「去千灯航图」上岛。
 
 进度档 `user://profiles/market-chapter-v1/save-v1.json` 只由航图写：它逐关读那一关自己的存档（`stage == complete`）作为证据，关卡不需要知道章节档存在，改档或跳关也点不亮别人的灯；坏档保留原文件再另存新档。18 关的编号、幕次、场景、存档路径、前置与一句话目标都取自 [chapter_catalog.gd](scripts/market/chapter_catalog.gd)。
 
-[航图验证](docs/playtest/market-chapter-hub/verification.json)。复验：`python3 tests/market/run_checks.py hub`（无头 46 项 + 真实窗口 28 项，截图在 `docs/playtest/market-chapter-hub/`）。
+[航图验证](docs/playtest/market-chapter-hub/verification.json)。复验：`python3 tests/market/run_checks.py hub`（无头 48 项 + 真实窗口 28 项，截图在 `docs/playtest/market-chapter-hub/`）。
+
+## 千灯集市 MK03–MK18
+
+余下十六关各自有独立存档（`user://profiles/market-mkNN-1/save-v1.json`）与独立入口 `启动千灯集市MKNN样板.command`，也都能从航图进。目标一句话取自章节目录，细节写在各自的契约里。
+
+| 关卡 | 幕次 | 这一幕要办成的事 | 契约 / 验证 |
+| --- | --- | --- | --- |
+| MK03 封箱里的重量 | 二 · 扣扣没有偷东西 | 叠合两份称量、消去相同组，给红蓝箱挂上真实重量 | [契约](docs/production/market_mk03_sample.md) · [验证](docs/playtest/market-mk03-weight/verification.json) |
+| MK04 不可能兑现的收据 | 二 · 扣扣没有偷东西 | 沿两条原约实换一遍，指出转抄收据错在哪 | [契约](docs/production/market_mk04_sample.md) · [验证](docs/playtest/market-mk04-receipt/verification.json) |
+| MK05 四张被雨打湿的货签 | 三 · 每家都还缺一点 | 用留下的线索把四箱货配回四个去处 | [契约](docs/production/market_mk05_sample.md) · [验证](docs/playtest/market-mk05-labels/verification.json) |
+| MK06 十根灯芯怎么凑 | 三 · 每家都还缺一点 | 19 张筹票恰好买满 10 根灯芯 | [契约](docs/production/market_mk06_sample.md) · [验证](docs/playtest/market-mk06-packs/verification.json) |
+| MK07 先别把东西平均分 | 三 · 每家都还缺一点 | 让四位居民都拿到用得上的那一件 | [契约](docs/production/market_mk07_sample.md) · [验证](docs/playtest/market-mk07-goods/verification.json) |
+| MK08 多出来的三瓶油 | 四 · 没有人收到的回信 | 对齐单位，撤下重复副本、补回漏掉的单号 | [契约](docs/production/market_mk08_sample.md) · [验证](docs/playtest/market-mk08-oil/verification.json) |
+| MK09 不必两个人就换成 | 四 · 没有人收到的回信 | 牵起交换线，让五摊一次换完且各自满意 | [契约](docs/production/market_mk09_sample.md) · [验证](docs/playtest/market-mk09-cyclic-exchange/verification.json) |
+| MK10 无论回哪封信 | 四 · 没有人收到的回信 | 选一条能同时覆盖两种订单箱数的船 | [契约](docs/production/market_mk10_sample.md) · [验证](docs/playtest/market-mk10-fare/verification.json) |
+| MK11 砝码也能站在货物旁 | 五 · 公平不只是一样多 | 用 1、3、9 三枚砝码称出恰好 7 单位灯油 | [契约](docs/production/market_mk11_sample.md) · [验证](docs/playtest/market-mk11-scale/verification.json) |
+| MK12 不一样多，也都够用 | 五 · 公平不只是一样多 | 按三处各自的需要分封油，一壶不剩 | [契约](docs/production/market_mk12_sample.md) · [验证](docs/playtest/market-mk12-oil/verification.json) |
+| MK13 扣扣的旧围巾 | 二 · 支线（MK04 后开放） | 只用整包补边布凑出恰好 11 段 | [契约](docs/production/market_mk13_sample.md) · [验证](docs/playtest/market-mk13-scarf/verification.json) |
+| MK14 三枚砝码的小摊 | 五 · 支线（MK11 后开放） | 为 5 与 8 两笔订单分别配一次秤 | [契约](docs/production/market_mk14_sample.md) · [验证](docs/playtest/market-mk14-scale/verification.json) |
+| MK15 不会越换越多的铜果 | 四 · 支线（MK09 后开放） | 实演一个闭环，回到 12 颗铜果 | [契约](docs/production/market_mk15_sample.md) · [验证](docs/playtest/market-mk15-copper-nut/verification.json) |
+| MK16 给森林寄回一份礼物 | 五 · 支线（MK12 后开放） | 挑 3 样纪念物，带上绿叶章和信纸 | [契约](docs/production/market_mk16_sample.md) · [验证](docs/playtest/market-mk16-gift/verification.json) |
+| MK17 铜鹭巡守 · 三次验货 | 六 · 首领一 | 三次验货：用有限的重新封装通过三个码头的装载约定 | [契约](docs/production/market_mk17_sample.md) · [验证](docs/playtest/market-mk17-inspection/verification.json) |
+| MK18 万签守约兽 · 让每一盏灯都有回信 | 六 · 首领二 | 让每一盏灯都有回信：一次联合采购，按实际更正回执完成三街交付 | [契约](docs/production/market_mk18_sample.md) · [验证](docs/playtest/market-mk18-lantern/verification.json) |
+
+四条支线都是可选的：在某关之后点亮，办完回到原来的停点，不挡主线。两场首领沿用集市自己的机关，不开新的资源系统。十八关的关卡逻辑、存档与奖励已交付，人物仍是批次一／批次二的整图配离散姿态（无连续走路动画），首领的鹭与万签由引擎变换驱动（无翅膀骨骼）——这一条与逐关限制一并写在各关契约的「边界与已知限制」里，也记在 [美术交接](docs/production/market_asset_handoff.md) 的尚未交付清单中。
 
 ## 开始游戏
 
