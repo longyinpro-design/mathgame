@@ -167,8 +167,16 @@ func run() -> void:
 	check(not hub.buttons.card_MK01.disabled and not hub.buttons.card_MK02.disabled,
 		"finished and available stations can both be entered again")
 	check(hub.buttons.card_MK04.disabled and hub.buttons.card_MK13.disabled, "a station without its story stays closed")
-	check(hub.card_status("MK03") == "尚未制作" and hub.card_status("MK13") == "需先完成 MK04",
-		"a closed card says what is missing: the making, or the promise")
+	check(hub.card_status("MK13") == "需先完成 MK04", "a closed card names the promise it is still waiting on")
+	# 这条按目录现况判定：关卡一张张做完后，"尚未制作" 的样本会换人，检查不能跟着失效。
+	var unmade_open = 0
+	var wrong_reason = 0
+	for id in ids:
+		if Catalog.built(id) or not hub.progress.is_open(id): continue
+		unmade_open += 1
+		if hub.card_status(id) != "尚未制作" or hub.enterable(id): wrong_reason += 1
+	check(unmade_open > 0 and wrong_reason == 0,
+		"a station that is open but not made yet says so, and stays out of reach")
 	check(hub.card_status("MK02") == "已点亮 · 可重玩" and hub.card_status("MK01") == "待出发",
 		"a lit lamp still offers the station back to the player")
 	check(hub.buttons.has("next_station") and hub.buttons.next_station.text == "下一站 · MK01",

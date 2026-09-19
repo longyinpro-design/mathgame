@@ -113,6 +113,9 @@ func apply_committed(candidate: Dictionary, next_history: Array) -> void:
 	state = candidate.duplicate(true); history = next_history.duplicate(true)
 	if previous.stage != state.stage:
 		elapsed = 0; world.progress = 0; paused = false; message = ""
+	# begin_land compares the goods already on the table with the ones that just arrived,
+	# so the world must be handed the committed state before it is asked who landed.
+	world.state = state
 	world.begin_land(previous)
 	if world.land_place != "": world.land_progress = 0; transient = LAND_TIME
 	refresh()
@@ -154,7 +157,9 @@ func refresh() -> void:
 		sign_text(goal,Rect2(442,20,790,48),22)
 	var spoken = line()
 	if not message.is_empty(): spoken = message
-	sign_text(spoken,Rect2(338,98,826,68),20)
+	# 台词条内可以有一处显式换行：UIStyle 把 20 号抬到 22 号，两行 CJK 要 61px，
+	# 板子内框只给 56px 时第二行会压过下边框。位置不能动（mk12 的审计按 (338,98) 认这块板）。
+	sign_text(spoken,Rect2(338,98,826,86),20)
 	if state.stage in rules.ANIMATIONS:
 		add_button("pause","继续动画" if paused else "暂停动画",Rect2(922,654,140,46),toggle_pause)
 		add_button("skip","跳过当前动画",Rect2(1080,654,176,46),skip_animation)

@@ -138,7 +138,7 @@ func refresh() -> void:
 		"delivery": line = "码头工：刻度找回来了，订单也对了。起吊——把种子送上岸！"
 		"complete": line = "扣扣：两张回执一起看，才找回了每只杯的刻度。种子可以交给陶姨啦！"
 	if not message.is_empty(): line = message
-	sign_text(line,Rect2(338,98,826,68),20)
+	sign_text(line,Rect2(338,98,826,86),20)
 	if state.stage in Rules.ANIMATIONS:
 		add_button("pause","继续动画" if paused else "暂停动画",Rect2(922,654,140,46),toggle_pause)
 		add_button("skip","跳过当前动画",Rect2(1080,654,176,46),skip_animation)
