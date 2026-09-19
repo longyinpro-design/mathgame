@@ -87,14 +87,13 @@ func run() -> void:
 		await make_hub(Catalog.order())
 		check(hub.summary().contains("18 / 18"), "the night market is fully lit when every station reports home")
 		check(not hub.buttons.has("next_station"), "with nothing owed the chart stops pushing a next station")
-		# 灯火全亮也不该把没做出来的关送进空房间：这条按目录现况逐张卡判定。
-		var unmade = 0
-		var opened = 0
+		# 灯火全亮也不该把玩家送进空房间：这条按目录现况逐张卡判定，
+		# 关卡一张张做完后「尚未制作」的样本会换人，所以只断言开着的卡一定进得去。
+		var stale = 0
 		for id in Catalog.order():
-			if Catalog.built(id): continue
-			unmade += 1
-			if not hub.buttons["card_" + id].disabled: opened += 1
-		check(unmade > 0 and opened == 0, "even a finished station stays closed until it is actually made")
+			if not hub.progress.is_open(id): continue
+			if not hub.enterable(id) or hub.card_status(id) == "尚未制作": stale += 1
+		check(stale == 0, "every station the record has opened can actually be entered")
 		check(overflow_count() == 0, "the finished chart keeps every label inside its box")
 		await capture(prefix+"02-chart-all-lamps")
 		await free_hub()

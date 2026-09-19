@@ -180,6 +180,8 @@ func refresh() -> void:
 		if state.stage == "complete" and from_camp: add_button("back_forest","交完货 · 回营地",Rect2(700,646,270,54),go_forest)
 		if state.stage == "complete": add_button("next_sample","去育苗铺 · 留下一段线",Rect2(414,646,272,54),go_nursery)
 		if state.stage == "complete" and from_hub: add_button("back_hub","返回集市航图",Rect2(132,646,270,54),go_hub)
+		# 营地进来的旅客也要能直接上航图，否则后面十七站在游戏里没有路可达（重玩时本关已经停在 complete，不该再走一遍育苗铺）。
+		if state.stage == "complete" and from_camp: add_button("open_hub","去千灯航图",Rect2(132,646,270,54),go_hub)
 		if state.stage == "result" and state.calibrated and not Rules.delivered(state): add_button("undo_result","撤销上一次摆杯",Rect2(24,654,225,46),undo_from_result).disabled = history.is_empty()
 	if modal:
 		for b in buttons.values(): b.disabled = true

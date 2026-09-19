@@ -112,7 +112,11 @@ func apply_committed(candidate: Dictionary, next_history: Array) -> void:
 	var previous = state
 	state = candidate.duplicate(true); history = next_history.duplicate(true)
 	if previous.stage != state.stage:
-		elapsed = 0; world.progress = 0; paused = false; message = ""
+		elapsed = 0; world.progress = 0; paused = false
+	# 上一次按下的那句话只描述当时的现场：换货、撤销、重摆都会把状态改掉，
+	# 留着它就会把「这一行本来就空着」这类旧话挂在已经改过的板子上。
+	# hint() 在 commit 成功之后才写下新一句，所以不受这里影响。
+	message = ""
 	# begin_land compares the goods already on the table with the ones that just arrived,
 	# so the world must be handed the committed state before it is asked who landed.
 	world.state = state
@@ -133,7 +137,16 @@ func clear_children(parent: Node) -> void:
 func add_button(id: String, text: String, rect: Rect2, callback: Callable, primary: bool = false, parent: Node = null) -> Button:
 	var button = UIStyle.button(ui if parent == null else parent,text,rect,callback,primary)
 	button.name = id; buttons[id] = button
+	# 鼠标点过的按钮会把焦点留在自己身上，而 Godot 的 Button 用 ui_accept 响应 Space/Enter：
+	# 玩家点过「扣扣提醒」或「撤销」之后再按 Space，等来的是那两块按钮被按第二次，而不是本关的提交。
+	# 只在鼠标按下时把焦点放回窗口，Tab/Enter 的键盘走位照旧。
+	button.gui_input.connect(_drop_focus_on_click)
 	return button
+
+func _drop_focus_on_click(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var clicked = get_viewport().gui_get_hovered_control()
+		if clicked is Button: clicked.release_focus()
 
 func add_hotspot(id: String, rect: Rect2, callback: Callable, label: String) -> Button:
 	var button = add_button(id,"",rect,callback,false,world)
@@ -151,7 +164,9 @@ func refresh() -> void:
 	for child in world.get_children(): world.remove_child(child); child.queue_free()
 	buttons = {}; world.state = state
 	update_camera()
-	sign_text("千灯集市  /  "+title,Rect2(24,20,394,48),24)
+	# 关卡名最长 9 个汉字：24 号被 skin 抬到 28 号，394 宽只剩 366 内框，
+	# 「千灯集市 / 四张被雨打湿的货签」量到 372 就会折成第二行压过板底。410 留到 382。
+	sign_text("千灯集市  /  "+title,Rect2(24,20,410,48),24)
 	var goal = goal_line()
 	if not goal.is_empty() and state.stage not in ["arrival","complete","delivery"]:
 		sign_text(goal,Rect2(442,20,790,48),22)

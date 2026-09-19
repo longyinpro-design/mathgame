@@ -47,6 +47,9 @@ func promise(good: int, person: int) -> void:
 func pose(seconds: float) -> void:
 	game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
+	# 镜头是 world.progress 的派生值，宿主在自己的 _process 里才换算：先叫它按新进度算一次，
+	# 否则个别帧序下读到的是上一帧的旧镜头（整表 pass 里 MK09／MK11 各撞见过一次）。
+	game.update_camera()
 	await process_frame
 func hold(seconds: float) -> void:
 	game.paused = true; await pose(seconds)

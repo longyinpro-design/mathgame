@@ -64,6 +64,9 @@ func extra() -> void:
 
 func exit_buttons() -> void:
 	if origin == "mk01": add_button("back_camp","办完回礼 · 回营地",Rect2(690,646,280,54),go_camp)
+	# 营地的旅客经 MK01 → MK02 走进岛里，这一张是航图的第一道门：不给他这条，
+	# 后面十六站在游戏里就没有路可以到达（从航图进来的场合由宿主给「返回集市航图」）。
+	if origin != "hub": add_button("open_hub","去千灯航图",Rect2(390,646,280,54),go_hub)
 
 func snapshot(value: Dictionary) -> Dictionary:
 	return {"a": value.a, "b": value.b, "rack": value.rack.duplicate(), "hook": value.hook.duplicate()}

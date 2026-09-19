@@ -6,6 +6,7 @@ const Scene = preload("res://game/market_island.tscn")
 const Bridge = preload("res://scripts/market/market_bridge.gd")
 const Mk02Rules = preload("res://scripts/market/mk02_rules.gd")
 const World = preload("res://scripts/market/hub_world.gd")
+const UIStyle = preload("res://scripts/cargo/skin.gd")
 var checks = 0
 var failures = 0
 var root_dir = "/tmp/pixel-market-hub-" + str(Time.get_ticks_usec())
@@ -168,15 +169,28 @@ func run() -> void:
 		"finished and available stations can both be entered again")
 	check(hub.buttons.card_MK04.disabled and hub.buttons.card_MK13.disabled, "a station without its story stays closed")
 	check(hub.card_status("MK13") == "需先完成 MK04", "a closed card names the promise it is still waiting on")
-	# 这条按目录现况判定：关卡一张张做完后，"尚未制作" 的样本会换人，检查不能跟着失效。
-	var unmade_open = 0
-	var wrong_reason = 0
+	# 这条曾经按目录现况判定「哪张卡片还没做」：18 关一张张建完之后样本换到了零，
+	# 再断言「存在未制作的开放站」就会永远失败。现在守的是反过来那条不变式：
+	# 记录已经点亮的站，卡片必须可进、且不得停在「尚未制作」；没开放的站另由上面的
+	# 「需先完成 MKxx」那条守住熄灭分支。
+	var stale = 0
 	for id in ids:
-		if Catalog.built(id) or not hub.progress.is_open(id): continue
-		unmade_open += 1
-		if hub.card_status(id) != "尚未制作" or hub.enterable(id): wrong_reason += 1
-	check(unmade_open > 0 and wrong_reason == 0,
-		"a station that is open but not made yet says so, and stays out of reach")
+		if not hub.progress.is_open(id): continue
+		if not hub.enterable(id) or hub.card_status(id) == "尚未制作": stale += 1
+	check(stale == 0, "every station the record has opened can actually be entered")
+	# 抬头木牌 (24,20,410,48) 的内框只有 382，汉字不会自动断行：任何一关把名字改长，
+	# 最后一个字就被折到板外（MK17 的全名量到 386，「货」掉到了牌下面）。这条一次守住十八张。
+	var wide = 0
+	for id in ids:
+		var probe = load(Catalog.scene(id)).instantiate()
+		var name = ""
+		if probe.has_method("configure"):
+			probe.configure(); name = str(probe.get("title"))
+		if name == "<null>" or name.is_empty(): name = Catalog.card_title(id)
+		if probe != null: probe.free()
+		var w = UIStyle.face().get_string_size("千灯集市  /  "+name, HORIZONTAL_ALIGNMENT_LEFT, -1, UIStyle.text_size(24)).x
+		if w > 382.0: wide += 1
+	check(wide == 0, "every station name fits the header board the host draws it on")
 	check(hub.card_status("MK02") == "已点亮 · 可重玩" and hub.card_status("MK01") == "待出发",
 		"a lit lamp still offers the station back to the player")
 	check(hub.buttons.has("next_station") and hub.buttons.next_station.text == "下一站 · MK01",
