@@ -241,7 +241,7 @@ func hotspots_clear() -> int:
 					print("HOTSPOT ", kind, index, " ", rect, " keeps only ", maxf(below,above), " free at ", paper)
 	return over
 # 换货、交货之后玩家还能看见街面：动画期间绝不允许任何可点热点活着。
-# 「一次交上这条线」是无条件提交的，漏掉这一条就等于给了玩家一张已经入账之后的街。
+# 「一次交上整条街」是无条件提交的，漏掉这一条就等于给了玩家一张已经入账之后的街。
 func clicks_off() -> int:
 	var live = 0
 	for id in game.buttons:
@@ -278,9 +278,9 @@ func run() -> void:
 		await key(KEY_ENTER)
 		check(game.state.beat == 1 and "两个人当面换" in game.line() and "五摊一起换" in game.line(),
 			"the second line asks the real question: must five stalls still be paired two by two")
-		await click("next")
+		await key(KEY_SPACE)
 		check(game.state.beat == Rules.BEATS - 1 and game.buttons.next.text == "当众叫齐五摊",
-			"the third line is the one that convenes the five stalls")
+			"the third line is the one that convenes the five stalls, and Space walks the story too")
 		check("需求都写在自家门面上" in game.line() and "一次换完" in game.line(),
 			"the promise is stated before the player is handed the street")
 		await click("next")
@@ -300,6 +300,10 @@ func run() -> void:
 		await click("skip")
 		check(game.state.stage == "ready","the walk-in stops before player control")
 		check(game.buttons.next.text == "开始牵线","the briefing explains the click order")
+		# 走位收尾已经把镜头推到 1.10：这一格讲的是「先点哪件货、再点哪只盘」，
+		# 画面得还贴着同一张台面，不许先弹回整条街再随「开始牵线」跳回来。
+		check(at_camera(1.10, Vector2(-64,-43)),
+			"the briefing cell keeps the closed camera it walked in with")
 		await click("next")
 		# ---- 2. 贴近的街面：五摊、五只盘、需求写在门面上 ----
 		check(game.state.stage == "puzzle" and at_camera(1.10, Vector2(-64,-43)),
@@ -307,10 +311,10 @@ func run() -> void:
 		check(hotspots() == Rules.COUNT*2,"five goods and five trays, each 48 pixels or bigger, are live")
 		check(game.buttons.undo.disabled and game.state.hint == 0,
 			"an untouched street has nothing to take back")
-		check(game.status_line() == "线 0 / 五 · 满意 0 / 五",
+		check(game.status_line() == "线 0 / 5 · 满意 0 / 5",
 			"the running tally reports lines drawn and stalls pleased, never a verdict")
 		check(game.world.signs().size() == Rules.COUNT*2 + 2
-			and board_with("灯芯街 · 五摊当众换货") != "" and board_with("线 0 条") != "",
+			and board_with("灯芯街 · 五摊当众换货") != "" and board_with("线 0 / 5") != "",
 			"the street names itself and counts the lines in the world, not only in the panels")
 		var wants_seen = 0
 		for receiver in range(Rules.COUNT):
@@ -364,7 +368,7 @@ func run() -> void:
 			"the world draws exactly the one line the player committed, and the cloth is promised, not moved")
 		check(game.world.goods_held() == [0,1,2,3,4],
 			"drafting leaves every good hanging at its own stall: ownership is only computed from booked")
-		check(game.status_line() == "线 1 / 五 · 满意 1 / 五" and game.world.state == game.state,
+		check(game.status_line() == "线 1 / 5 · 满意 1 / 5" and game.world.state == game.state,
 			"the tally is computed from the street the world was handed")
 		tap("tray_2"); await process_frame; await settle()
 		# ---- 5. 错法二：同一卷布许给两家 ----
@@ -372,13 +376,18 @@ func run() -> void:
 		check(game.state.lines == plan(-1,-1,0,0,-1) and Rules.double_promised(game.state.lines) == [0],
 			"one bolt of cloth can be drafted onto two trays at once")
 		await click("deliver")
-		check(game.message.begins_with("布卷同时许给了丙摊、丁摊：一件货只能有一个新主人"),
+		check(game.message.begins_with("布同时许给了丙摊、丁摊：一件货只能有一个新主人"),
 			"the double promise is refused by naming the good and both stalls it was promised to")
 		check(game.state.stage == "puzzle" and game.state.booked == EMPTY
 			and game.state.lines == plan(-1,-1,0,0,-1),"the refusal changes nothing on the street")
 		check(off_board() == 0,"the complaint reads inside its own board")
 		await capture(prefix+"06-double-promise")
 		# ---- 6. 重摆模态：先问，再清，还能撤销回来 ----
+		# 底栏那枚按钮写着「重摆 X」：写了键就要按得到，鼠标不去底栏也能开同一张问句。
+		await key(KEY_X)
+		check(game.modal and game.state.lines == plan(-1,-1,0,0,-1),
+			"X opens the same 重摆 question the button advertises")
+		await click("cancel")
 		await click("reset")
 		check(game.modal and game.state.lines == plan(-1,-1,0,0,-1),"重摆 asks before wiping the street")
 		await capture(prefix+"07-reset-asked")
@@ -422,7 +431,7 @@ func run() -> void:
 			await click("tray_%d" % receiver)
 		check(game.state.lines == Rules.SOLUTION and Rules.solved(game.state),
 			"the unique plan is drawn stall by stall with nothing but clicks")
-		check(game.status_line() == "线 5 / 五 · 满意 5 / 五"
+		check(game.status_line() == "线 5 / 5 · 满意 5 / 5"
 			and game.world.line_paths().size() == Rules.COUNT,
 			"all five stalls nod before a single good has left its own stall")
 		check(hotspots_clear() == 0 and covered() == 0,"the shipped shape reads clear of every panel")
@@ -447,14 +456,36 @@ func run() -> void:
 		var moving = game.world.in_flight(mid)
 		check(mid.size() == Rules.COUNT and moving["landed"].size() == 2 and moving["flying"].size() == 3,
 			"the world's own carry plan says two goods have landed and three are still in the air")
-		check(game.status_line() == "已落定 %d / 五件" % moving["landed"].size(),
+		check(game.status_line() == "已落定 %d / 5" % moving["landed"].size(),
 			"the running count quotes that world state, not a label of its own")
+		# 门面那块牌跟着货落地：三件还在空中时不能改口，最后一件落进盘子那一刻才一起改。
+		check(board_with("%s摊 · 有%s" % [Rules.ACTORS[0], Rules.GOODS[0]]) != "",
+			"the shopfront still names the good hanging at it while three of five are in the air")
+		var keep_progress: float = game.world.progress
+		game.world.progress = 0.95
+		var landed_at = game.world.goods_held()[0]
+		check(board_with("%s摊 · 有%s" % [Rules.ACTORS[0], Rules.GOODS[landed_at]]) != ""
+			and board_with("%s摊 · 有%s" % [Rules.ACTORS[0], Rules.GOODS[0]]) == "",
+			"the shopfronts change wording once the last good has landed in its tray")
+		game.world.progress = keep_progress
 		var legible = 0
 		for lifted in mid:
 			if lifted["phase"] <= 0.1 or lifted["phase"] >= 0.9: continue
 			var chord = lifted["home"].lerp(lifted["dest"], smoothstep(0.0,1.0,lifted["phase"]))
 			if lifted["at"].distance_to(chord) > 4.0: legible += 1
 		check(legible == 2,"every good in the air rides its own arc instead of sliding along a straight line")
+		# 货既然说好了「沿着自己那条线走」，就把整条线逐点扫一遍：
+		# 线本身、以及吊在线上那件货的货顶，全程都不许碰扣扣正在说的这块板。
+		var spoken = dialogue_panel()
+		check(spoken.get_area() > 0.0,"the exchange keeps its own dialogue board up, so the sweep has a target")
+		var scraped = 0
+		for entry in game.world.line_paths():
+			for step in range(21):
+				var at: Vector2 = game.world.arc_at(entry["giver"], entry["receiver"], step / 20.0)
+				var thread = on_screen(Rect2(at - Vector2(2, 2), Vector2(4, 4)))
+				var cargo = on_screen(kit_rect(Rules.KIT_GOODS[entry["giver"]], at, World.GOOD_WIDTH[entry["giver"]]))
+				if spoken.intersects(thread) or spoken.intersects(cargo): scraped += 1
+		check(scraped == 0,"no thread and no good scrapes the dialogue board anywhere along its own route")
 		check(covered() == 0,"the goods in flight pass clear of the dialogue board and every other panel")
 		await capture(prefix+"11-exchanging")
 		game.paused = false; await create_timer(0.12).timeout
@@ -469,7 +500,7 @@ func run() -> void:
 		check(game.world.goods_held() == Rules.SOLUTION and game.world.shown_lines() == Rules.SOLUTION,
 			"the world counts the hand-over itself: each stall now holds the good it accepted")
 		check(game.world.line_paths().size() == Rules.COUNT,"the same five lines are what got booked")
-		check(game.status_line() == "满意 5 / 五摊" and board_with("五摊满意 5 / 五摊") != "",
+		check(game.status_line() == "满意 5 / 5" and board_with("满意 5 / 5") != "",
 			"the nodding stage reports five pleased stalls in the street and on the tally board")
 		var on_screen_lights = 0
 		for glass in lit_spots():
@@ -502,7 +533,10 @@ func run() -> void:
 			"the receipt keeps the house minimum type size")
 		check(game.world.signs().size() == Rules.COUNT*2 + 2,
 			"the closed street keeps its own boards: the receipt does not double them")
-		check(receipt_overlaps() == ["甲摊 · 有布", Rules.accepts_text(0)],
+		# 甲摊门口那两块：交货之后门面牌念的是它换到手的那件（SOLUTION 把 乙 的油给了甲），
+		# 需求牌不变；回执把同样的话复述一遍，所以只许接管这两块。
+		check(receipt_overlaps() == ["%s摊 · 有%s" % [Rules.ACTORS[0], Rules.GOODS[Rules.SOLUTION[0]]],
+				Rules.accepts_text(0)],
 			"the only boards the receipt takes over are 甲's two, whose text it restates")
 		check(off_board() == 0 and spilled_boards() == 0,"the receipt adds no text outside its own board")
 		check(covered() == 0,"the receipt covers no tray, good, lantern or button")

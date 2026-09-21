@@ -21,10 +21,13 @@ const STRING_WIDTH = 260.0
 const GOOD_TARGET = 88.0
 const TRAY_TARGET = 72.0
 const GOOD_LIFT_TARGET = 76.0
-# 线的拱高：同一批线各走一层，免得五根线叠成一团墨；自牵的结画在摊位右侧。
-# 峰顶不许爬进口述板底下——牵线阶段镜头抬到 1.10，世界 y 206 以下就会被那块板整块吃掉。
+# 线的拱高按「收货的那一摊」取层，不按第几条线取：一条线拉回之后，剩下几条线不该跟着整排跳高度。
+# 五摊的盘在街上排开，收货位不同线就不同高，两条线交叉时也各走一层（实际拱高见 arc_points 的让路）。
 const ARC_LIFT = [46.0, 60.0, 52.0, 76.0, 68.0]
-const ROPE_COLOR = Color("ffe297")
+# 口述板的下沿：牵线阶段镜头抬到 1.10、整体下压 43 像素，世界 y 212 换算到屏幕正好是板底再往下 6 像素。
+const BOARD_FLOOR = 212.0
+# 一条线一种绳色：丁、戊那一对在街心十字交叉，只有颜色能说出哪根绳通向哪一个盘。
+const ROPE_COLORS = [Color("ff7d63"), Color("ffd452"), Color("6fd3b8"), Color("7fb6ff"), Color("d79bff")]
 # 灯串拆件里五盏灯的玻璃中心（裁剪图像素），按 manifest 的 attachment 公式换算。
 const LANTERN_GLASS = [Vector2(47, 124), Vector2(136, 163), Vector2(225, 173), Vector2(316, 163), Vector2(402, 125)]
 
@@ -41,9 +44,11 @@ func name_rect(index: int) -> Rect2: return Rect2(foot(index).x - 75, foot(index
 func want_rect(index: int) -> Rect2: return Rect2(foot(index).x - 75, foot(index).y + 84, 150, 26)
 func counter_at(dx: float, dy: float) -> Vector2: return station("counter") + Vector2(dx, dy)
 func koukou_foot() -> Vector2: return counter_at(-6, 62)
-func tally_rect() -> Rect2: return Rect2(490, 566, 190, 28)
-# 街名牌挂在甲摊门面上方的檐口：世界 y 208 才躲得开贴脸镜头下压 43 像素的台词板。
-func street_rect() -> Rect2: return Rect2(60, 208, 220, 28)
+# 读数牌挂在丁摊与扣扣之间那段空街面上：490 那一版正压着扣扣的胸口和怀里的包袱。
+func tally_rect() -> Rect2: return Rect2(752, 566, 200, 28)
+# 街名牌挂在甲摊门面上方的檐口：世界 y 218 才躲得开贴脸镜头下压 43 像素的台词板，
+# x 也从 60 挪到 72——贴脸时牌框左沿只剩 2 像素，看着像被窗框啃掉了半个字。
+func street_rect() -> Rect2: return Rect2(72, 218, 220, 28)
 # 灯串挂在丁、戊两摊之间的檐口下：整条串的顶端落在世界 y 216，
 # 贴脸镜头（1.10，整体下压 43 像素）抬起来时仍躲得开台词板，五盏玻璃也不会被货样吃掉。
 func string_foot() -> Vector2: return station("stall_midright") + Vector2(135, 12)
@@ -74,6 +79,7 @@ func goods_held() -> Array:
 
 # 交货演出：五件货各自沿着自己那条线离开原摊，按出货摊的先后一批起飞，全程由 booked 驱动。
 # 相位为 0 的货还在原摊上，所以每一件货都出现在这份计划里，画面上不会出现「已经消失又还没到」的空档。
+# 落点直接取自 arc_at()：台词说「每一件货都沿着自己的那条线走」，货就得真的压在那根画出来的线上。
 func carry_plan(p: float) -> Array:
 	var plan: Array = []
 	if state.stage != "exchanging": return plan
@@ -83,8 +89,8 @@ func carry_plan(p: float) -> Array:
 		if giver < 0: continue
 		var phase = clampf((p - 0.08 * giver) / 0.55, 0.0, 1.0)
 		var home = good_spot(giver); var dest = tray_spot(receiver) - Vector2(0, TRAY_RISE)
-		var at = home.lerp(dest, smoothstep(0.0, 1.0, phase)) - Vector2(0, sin(phase * PI) * ARC_LIFT[receiver] * 0.5)
-		plan.append({"giver": giver, "receiver": receiver, "home": home, "dest": dest, "at": at, "phase": phase})
+		plan.append({"giver": giver, "receiver": receiver, "home": home, "dest": dest,
+			"at": arc_at(giver, receiver, smoothstep(0.0, 1.0, phase)), "phase": phase})
 	return plan
 
 func carry_by_giver(plan: Array) -> Dictionary:
@@ -115,34 +121,76 @@ func good_position(giver: int, carried: Dictionary) -> Dictionary:
 func line_paths() -> Array:
 	var paths: Array = []
 	var lines = shown_lines()
-	var lane = 0
 	for receiver in range(Rules.COUNT):
 		var giver: int = lines[receiver]
 		if giver < 0: continue
-		paths.append({"giver": giver, "receiver": receiver, "points": arc(giver, receiver, lane)})
-		lane += 1
+		paths.append({"giver": giver, "receiver": receiver, "points": arc_points(giver, receiver)})
 	return paths
 
 # 一条线 = 出货摊挂着的货 → 收货摊门前的盘；自己牵给自己画成摊边的一个结。
-func arc(giver: int, receiver: int, lane: int) -> PackedVector2Array:
-	var from = good_spot(giver) - Vector2(0, 14.0); var to = tray_spot(receiver) - Vector2(0, 26.0)
+# 两端钉死在货的家与落点上：起飞那一刻不弹一下，落地那一刻正落在盘心。
+# 拱高还要给台词板让路：货是吊在线上走的，线上拱多少货顶就跟着上拱多少，
+# 拱过头就等于把「布」藏进扣扣正在说的那句话底下。让不出就让这一条平一点，别整排一起动。
+func arc_points(giver: int, receiver: int) -> PackedVector2Array:
+	var from = good_spot(giver); var to = tray_spot(receiver) - Vector2(0, TRAY_RISE)
 	if giver == receiver:
 		return [from, from + Vector2(46, -26), from + Vector2(72, 12), to + Vector2(46, 26), to]
-	var lift = ARC_LIFT[lane % ARC_LIFT.size()]
+	var lift = clampf(arc_room(from, to, BOARD_FLOOR + good_rise(giver)), 0.0, ARC_LIFT[receiver])
 	var mid = (from + to) * 0.5
 	return [from, from.lerp(to, 0.22) - Vector2(0, lift * 0.6), mid - Vector2(0, lift),
 		from.lerp(to, 0.78) - Vector2(0, lift * 0.6), to]
 
+# 三个拱点各自能抬多高，取最小的那一个；权重与上面 0.22/0.6、0.5/1.0、0.78/0.6 一一对应。
+func arc_room(from: Vector2, to: Vector2, ceiling: float) -> float:
+	var best := INF
+	for spot in [[0.22, 0.6], [0.5, 1.0], [0.78, 0.6]]:
+		var walk: float = spot[0]
+		var weight: float = spot[1]
+		best = minf(best, (lerpf(from.y, to.y, walk) - ceiling) / weight)
+	return best
+
+# 货顶到货脚的高度：拆件的 anchor 就钉在货脚，缩放一次之后 anchor_px.y × scale 即这件货高出钩子多少。
+func good_rise(giver: int) -> float:
+	var id: String = Rules.KIT_GOODS[giver]
+	var item: Dictionary = parts[id]
+	return item.anchor_px[1] * (GOOD_WIDTH[giver] / atlases[id].get_width())
+
+# 沿这条折线按路程取点：t=0 在货挂着的钩子上，t=1 在收货盘里。
+func arc_at(giver: int, receiver: int, t: float) -> Vector2:
+	var points := arc_points(giver, receiver)
+	var legs := []
+	var total := 0.0
+	for index in range(1, points.size()):
+		var length := points[index].distance_to(points[index - 1])
+		legs.append(length); total += length
+	var want := clampf(t, 0.0, 1.0) * total
+	for index in range(legs.size()):
+		if want > legs[index] and index + 1 < legs.size():
+			want -= legs[index]; continue
+		return points[index].lerp(points[index + 1], (want / legs[index]) if legs[index] > 0.0 else 1.0)
+	return points[points.size() - 1]
+
+# 方向就写在两头：出货的那一头点一颗绳结，收货的那一头画一个扎进盘里的箭头。
+func draw_arrow(at: Vector2, from: Vector2, color: Color) -> void:
+	var dir = (at - from).normalized()
+	var wing = Vector2(-dir.y, dir.x)
+	for side in [1.0, -1.0]:
+		draw_line(at, at - dir * 13.0 + wing * (6.5 * side), color, 3.0, true)
+
 func draw_lines() -> void:
-	if state.stage == "arrival": return
+	if state.stage == "arrival" or state.stage == "complete": return
+	# 货各归其摊之后五条绳就该从街上收掉：留着是从空钩子上垂下一条线，替玩家把已经换完的事撤回去了。
+	var fade = 1.0 - smoothstep(0.0, 0.6, progress) if state.stage == "delivery" else 1.0
+	if fade <= 0.0: return
 	var held = state.hand if state.stage == "puzzle" else -1
 	for entry in line_paths():
-		var color = ROPE_COLOR
-		if state.stage == "exchanging": color = Color(0.98, 0.78, 0.34, 0.95)
-		elif held >= 0 and entry["giver"] == held: color = Color(1.0, 0.94, 0.68, 0.98)
+		var color: Color = ROPE_COLORS[entry["receiver"]]
+		if held == entry["giver"]: color = color.lightened(0.32)
+		color.a *= fade
 		var points: PackedVector2Array = entry["points"]
-		draw_polyline(points, color, 3.0, true)
-		draw_circle(points[points.size() - 1], 6.0, color)
+		draw_polyline(points, color, 4.6 if held == entry["giver"] else 3.2, true)
+		draw_circle(points[0], 4.5, color)
+		draw_arrow(points[points.size() - 1], points[points.size() - 2], color)
 
 func draw_hung_good(giver: int, at: Vector2, swinging: bool) -> void:
 	# 麻绳把货吊在摊位招牌上方；只有还挂在原摊的货才随街风轻轻摆一下。
@@ -163,10 +211,13 @@ func draw_stalls(carried: Dictionary) -> void:
 	for giver in range(Rules.COUNT):
 		var where = good_position(giver, carried)
 		if where["mode"] == "home":
-			draw_hung_good(giver, where["at"], state.stage == "puzzle")
+			# 拿在手里的那一件要一眼认得出：往上抬一截、跟着手腕轻轻晃，脚下光斑也亮一档。
+			var holding = state.stage == "puzzle" and state.hand == giver
+			var at = where["at"] - Vector2(0, 13.0 + 2.5 * sin(clock * 3.6)) if holding else where["at"]
+			draw_hung_good(giver, at, state.stage == "puzzle")
 			# 摊位可牵：光斑只说「这件货还没被许出去」，不判断对面收不收。
 			if state.stage == "puzzle":
-				socket(where["at"] - Vector2(0, 20), Vector2(28, 24), 0.26 + 0.18 * pulse())
+				socket(at - Vector2(0, 20), Vector2(28, 24), (0.6 if holding else 0.26) + 0.18 * pulse())
 			continue
 		var drop = 0.0
 		if where["mode"] == "tray": drop = landing("tray", where["receiver"])
@@ -175,7 +226,9 @@ func draw_stalls(carried: Dictionary) -> void:
 func draw_figure() -> void:
 	var happy = state.stage == "complete" or (state.stage == "delivery" and progress > 0.6)
 	# street 场景没有人物站位：扣扣站在前景柜台正中，背对柜台面向五摊。
-	figure(KOUKOU_WAVE if happy else KOUKOU_TIE, koukou_foot(), 0.52)
+	# 0.5 是全章那一个身位（kit_world.figure 的默认档，MK02–MK08 都按它落位）：
+	# 原先的 0.52 让她比别的关卡高出五像素，脚下的接触圈也大一圈。
+	figure(KOUKOU_WAVE if happy else KOUKOU_TIE, koukou_foot(), 0.5)
 
 # 拆件的挂点公式：世界落点 = 脚点 + (像素 − anchor_px) × scale，缩放只乘一次。
 func kit_point(id: String, foot: Vector2, width: float, px: Vector2) -> Vector2:
@@ -186,7 +239,9 @@ func kit_point(id: String, foot: Vector2, width: float, px: Vector2) -> Vector2:
 func draw_lanterns(strength: float) -> void:
 	if strength <= 0.0: return
 	var foot = string_foot()
-	kit("lantern_string", foot, STRING_WIDTH, 0.4 + 0.6 * strength)
+	# 原先是 0.4 + 0.6*strength：delivery 刚过 progress 0.1 的那一帧 strength 才 0.0001，
+	# 整条串却已经从「什么都没画」跳到四成透明度——灯串是突然出现的，不是慢慢亮起来的。
+	kit("lantern_string", foot, STRING_WIDTH, strength)
 	for index in range(LANTERN_GLASS.size()):
 		var one = clampf(strength * LANTERN_GLASS.size() - index * 0.8, 0.0, 1.0)
 		if one <= 0.0: continue
@@ -199,16 +254,27 @@ func draw_lanterns(strength: float) -> void:
 # 汉字在 Godot 里是一个不断词，plaque 又不换行，超框就会画到牌子外面。
 func signs() -> Array:
 	var boards = []
+	# 交货之后门面那块牌子跟着改口，念这一摊现在手上是哪件：换完了还写着「有布」，
+	# 等于把刚刚演完的那次交换又收回去。牵线阶段货仍挂在自己摊上，照原样写。
+	# 换货那一段里五件货按各自相位落地（最后一件在相位 0.87 落定），牌子就在那一刻一起改口：
+	# 早于这一刻等于把还在空中的货说成已经换了，晚到 delivery 又把已经躺在盘里的货还写在原摊上。
+	var settled: bool = state.stage in ["delivery", "complete"] or (
+		state.stage == "exchanging" and progress >= 0.87)
+	var held = goods_held() if settled else range(Rules.COUNT)
 	for index in range(Rules.COUNT):
-		boards.append({"text": "%s摊 · 有%s" % [Rules.ACTORS[index], Rules.GOODS[index]], "rect": name_rect(index)})
+		boards.append({"text": "%s摊 · 有%s" % [Rules.ACTORS[index], Rules.GOODS[held[index]]],
+			"rect": name_rect(index)})
 		boards.append({"text": Rules.accepts_text(index), "rect": want_rect(index)})
 	if state.stage == "arrival": return boards
 	boards.append({"text": "灯芯街 · 五摊当众换货", "rect": street_rect()})
 	if state.stage == "puzzle":
-		boards.append({"text": "线 %d 条 · 满意 %d 摊" % [Rules.drawn(state.lines), Rules.satisfied(state.lines).size()],
-			"rect": tally_rect()})
+		# 街面上的读数与底栏那一条写成同一句话：分子是阿拉伯数字、分母写成「五」，
+		# 同一屏就会出现「5 摊点头」和「5 / 五」两种记法，玩家会去数哪一个才对。
+		boards.append({"text": "线 %d / %d · 满意 %d / %d" % [Rules.drawn(state.lines), Rules.COUNT,
+			Rules.satisfied(state.lines).size(), Rules.COUNT], "rect": tally_rect()})
 	if state.stage in ["delivery", "complete"]:
-		boards.append({"text": "五摊满意 %d / 五摊" % Rules.satisfied(state.booked).size(), "rect": tally_rect()})
+		boards.append({"text": "满意 %d / %d" % [Rules.satisfied(state.booked).size(), Rules.COUNT],
+			"rect": tally_rect()})
 	return boards
 
 func draw_signs() -> void:

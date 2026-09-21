@@ -25,7 +25,7 @@ func submit_label() -> String: return "一次付清这一单"
 func stage_labels() -> Dictionary:
 	return {"arrival": "继续听他们说" if state.beat < 2 else "走向灯芯摊", "ready": "开始配单", "complete": "重新体验"}
 
-func restart_prompt() -> Array: return ["重新体验灯芯摊这一幕？\n只重置本关，不改其他关卡。", "留在灯芯摊", "重新体验"]
+func restart_prompt() -> Array: return ["重新体验灯芯摊这一幕？", "留在灯芯摊", "重新体验"]
 func reset_prompt() -> Array: return ["把订单上的整包放回摊位？\n筹票还在你手里。", "继续配单", "全部放回摊位"]
 
 func line() -> String:
@@ -45,7 +45,8 @@ func build() -> void:
 			"拿一整包 %d 根（%d 票）· 键盘 %d" % [Rules.STICKS[kind], Rules.PRICES[kind], kind + 1])
 		for slot in range(state.order[kind]):
 			add_hotspot("row_%d_%d" % [kind, slot], world.order_rect(kind, slot), do_return.bind(kind, slot),
-				"放回第 %d 包 %d 根（%d 票）· 订单还没付款" % [slot + 1, Rules.STICKS[kind], Rules.PRICES[kind]])
+				"放回第 %d 包 %d 根（%d 票）· 键盘 %s · 订单还没付款" % [slot + 1, Rules.STICKS[kind],
+					Rules.PRICES[kind], "QWE"[kind]])
 
 # 回执逐行写在这里，交给无头检查量宽度：Label 不会在汉字中间断行，超框就会画到面板外。
 func receipt_lines() -> Array:
@@ -55,10 +56,13 @@ func receipt_lines() -> Array:
 			Rules.STICKS[kind] * state.bought[kind], Rules.PRICES[kind] * state.bought[kind]])
 	lines.append("合计 %d 根 · 用去 %d 票" % [Rules.sticks_of(state.bought), Rules.tickets_of(state.bought)])
 	lines.append("手里筹票 %d 张" % (Rules.BUDGET - Rules.tickets_of(state.bought)))
-	lines.append("第一段暖灯已经挂上檐口")
+	# 末行原先还有一句「第一段暖灯已经挂上檐口」：檐口那块木牌与亮起来的五盏灯已经说了这件事，
+	# 回执留 6 行才装得进这块收进 200 高的面板（18 号汉字行高 30，7 行正好顶到旧下沿）。
 	return lines
 
-func receipt_rect() -> Rect2: return Rect2(486, 396, 300, 210)
+# 面板收进 200 高：`complete` 一幕镜头已经拉回 1:1，旧的下沿 606 与街面「合计」木牌的上沿 606 齐平，
+# 两块板看起来像同一块。上沿 396 不动（三摊的摊板底边在 387），只把下沿让到 596 留出一条缝。
+func receipt_rect() -> Rect2: return Rect2(486, 396, 300, 200)
 func receipt_text_rect() -> Rect2:
 	var board = receipt_rect()
 	return Rect2(board.position + Vector2(16,12), board.size - Vector2(30,20))
@@ -73,7 +77,7 @@ func extra() -> void:
 	paper.add_theme_constant_override("line_spacing", 0)
 
 func exit_buttons() -> void:
-	# 从航图进来时宿主已经给出「返回集市航图」；直接启动本关样板时留一条回航图的路。
+	# 从航图进来时宿主已经给出「返回千灯航图」；直接启动本关样板时留一条回航图的路。
 	if origin == "hub": return
 	add_button("open_hub", "回千灯航图", Rect2(690, 646, 280, 54), go_hub)
 
@@ -88,7 +92,7 @@ func cleared_state() -> Dictionary:
 func hint_texts() -> Array:
 	return ["三种封装的价钱写在摊板上：4 根一包 7 票、3 根一包 6 票、单根 3 票。\n包不拆卖也不退差价，只能整包买。",
 		"先只列「恰好 10 根」的整包摆法：4 根一包最多拿 2 包，\n剩下的根数只能由 3 根一包和单根补齐。",
-		"两包 4 根再补两根散装正好 10 根，却要 20 票：\n散装每根 3 票最贵。局部便宜不等于整单可行，看的是包怎么配。"]
+		"两包 4 根再补两包单根正好 10 根，却要 20 票：\n单根那摊每根合 3 票最贵。局部便宜不等于整单可行，看的是包怎么配。"]
 
 func do_take(kind: int) -> void:
 	if state.stage != "puzzle" or modal or transient > 0: return
@@ -108,6 +112,10 @@ func do_return(kind: int, slot: int) -> void:
 
 func do_return_last(kind: int) -> void:
 	if state.stage != "puzzle": return
+	# 键盘上这一类本来就空着：按下 Q/W/E 不该听到「那一包已经放回摊位了」这种话。
+	if state.order[kind] == 0:
+		message = "%d 根那一类还没有包在订单上。" % Rules.STICKS[kind]
+		refresh(); return
 	do_return(kind, state.order[kind] - 1)
 
 func handle_key(key: int) -> bool:

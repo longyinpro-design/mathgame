@@ -4,20 +4,20 @@ extends RefCounted
 # 雨里只留下三句话，玩家把货签按上订单板；不逐箱开箱，也不靠点击揭示箱里是什么。
 # assign[去处] = 货签编号（-1 表示这一家还空着），一张货签不能同时按在两家。
 const GOODS = ["cloth", "oil", "bell", "paper"]
-const GOODS_CN = ["布", "油", "铃", "纸"]
 const GOODS_FULL = ["布卷", "灯油", "铜铃", "纸卷"]
 const KIT_GOODS = ["cloth_bolt", "oil_bottle", "brass_bell", "paper_roll"]
 # 去处按街上从左到右排：面包铺的炉子在画面最左，邮亭在右边那排挂木牌的货架前。
 const PLACES = ["bakery", "nursery", "bridge", "post"]
 const PLACE_CN = ["面包铺", "育苗铺", "桥头", "邮亭"]
-# 每张订单在雨里剩下的那半句，由世界层画在纸面上；桥头那句全糊了。
+# 每张订单在雨里剩下的那半句，由世界层一字不改地画在残句牌上；桥头那句全糊了。
 const KEPT = ["不收 铜铃", "收 布卷", "被雨冲开了", "收 纸卷"]
 # 三条留下的话：mode 0 = 这一家收这一箱，mode 1 = 这一家不收这一箱。
+# `kept` 直接取 KEPT 的那一项，缺口说明里引号中的字必须和玩家眼前那块牌一模一样。
 # 三条合起来只逼出唯一对应；任何一条被抹掉都会多出第二种配法（见无头检查）。
 const CLUES = [
-	{"mode": 0, "good": 0, "place": 1, "kept": "布去育苗铺"},
-	{"mode": 0, "good": 3, "place": 3, "kept": "纸去邮亭"},
-	{"mode": 1, "good": 2, "place": 0, "kept": "面包铺不收铃"},
+	{"mode": 0, "good": 0, "place": 1, "kept": KEPT[1]},
+	{"mode": 0, "good": 3, "place": 3, "kept": KEPT[3]},
+	{"mode": 1, "good": 2, "place": 0, "kept": KEPT[0]},
 ]
 const HINTS = 3
 const STAGES = ["arrival", "approach", "ready", "puzzle", "delivery", "complete"]
@@ -77,14 +77,16 @@ static func conflict_messages(assign: Array) -> Array:
 	return out
 
 # 缺口必须点名是哪一句留下的话对不上，不能说成「答案错误」。
+# 引号里那半句直接取残句牌上的原文：玩家抬头就能在自己眼前那块牌上找到同一串字。
 static func clue_message(clue: Dictionary, assign: Array) -> String:
 	var good = GOODS_FULL[clue.good]
+	var home = PLACE_CN[clue.place]
 	if clue.mode == 1:
-		return "留下的话：%s。%s按在了%s。" % [clue.kept, good, PLACE_CN[clue.place]]
+		return "订单板上「%s」写着「%s」：%s正按在那儿。" % [home, clue.kept, good]
 	var worn = assign.find(clue.good)
 	if worn >= 0:
-		return "留下的话：%s。%s现在按在%s。" % [clue.kept, good, PLACE_CN[worn]]
-	return "留下的话：%s。%s现在按的是%s。" % [clue.kept, PLACE_CN[clue.place], GOODS_FULL[assign[clue.place]]]
+		return "订单板上「%s」写着「%s」：%s现在按在%s。" % [home, clue.kept, good, PLACE_CN[worn]]
+	return "订单板上「%s」写着「%s」：那一格按的是%s。" % [home, clue.kept, GOODS_FULL[assign[clue.place]]]
 
 static func shortfalls(state: Dictionary) -> Array:
 	var missing = conflict_messages(state.assign)

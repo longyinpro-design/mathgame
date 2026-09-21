@@ -3,6 +3,7 @@ extends SceneTree
 # 检查只用 /tmp 下的落点，绝不去碰 user:// 里的玩家存档。
 const Rules = preload("res://scripts/market/mk10_rules.gd")
 const SceneScript = preload("res://scripts/market/mk10_scene.gd")
+const World = preload("res://scripts/market/mk10_world.gd")
 const Catalog = preload("res://scripts/market/chapter_catalog.gd")
 const Content = preload("res://scripts/content/content_catalog.gd")
 const Bridge = preload("res://scripts/market/market_bridge.gd")
@@ -68,6 +69,60 @@ func settle(game: Node) -> void:
 
 func write_raw(value: String) -> void:
 	var file = FileAccess.open(path, FileAccess.WRITE); file.store_string(value); file.close()
+
+# ---- 遮挡审计：世界层画在哪一块、宿主压住哪一块，两边都只向运行时问一次 ----
+
+# 按拆件包自己的 anchor 公式独立推出「这块画面在世界上占哪一格」：
+# 裁剪图尺寸与锚点取自 manifest（世界层 _ready 时读进来的那一份），脚点与宽度取自关卡给的值。
+func kit_box(world: Node, id: String, foot: Vector2, width: float) -> Rect2:
+	var texture: Texture2D = world.atlases[id]
+	var item: Dictionary = world.parts[id]
+	var scale = width / texture.get_width()
+	return Rect2(foot - Vector2(item.anchor_px[0], item.anchor_px[1]) * scale,
+		Vector2(texture.get_width(), texture.get_height()) * scale)
+
+# 宿主与关卡自己压在场景上的不透明木牌：位置问 Panel 自己，投影问它正在用的那块 StyleBoxFlat。
+# 检查里不出现第二个 (338,98)，宿主把台词板改高改矮都会立刻被这里读到。
+# skip 是把被考察的那块自己排掉——不然回执面板永远和它自己重叠。
+func host_boards(game: Node, skip: Array = []) -> Array:
+	var slabs: Array = []
+	for child in game.ui.get_children():
+		if not (child is Panel): continue
+		var body: Rect2 = child.get_global_rect()
+		if skip.has(body): continue
+		var style: StyleBox = child.get_theme_stylebox("panel")
+		if style is StyleBoxFlat and style.shadow_size > 0:
+			# 牌面的投影是半透明的：落在上面只是被压暗，落在牌面上才是真的看不见。
+			slabs.append({"solid": body, "dimmed": body.merge(
+				Rect2(body.position + style.shadow_offset, body.size).grow(style.shadow_size))})
+		else:
+			slabs.append({"solid": body, "dimmed": body})
+	return slabs
+
+# 世界层的一块画面投到当前这一格画面上：变换读的是宿主刚设好的那一份，镜头怎么动都不再手算。
+# world 与 ui 都挂在关卡根节点的原点上，所以两边量的是同一套 1280x720 逻辑坐标。
+func on_screen(world: Node, box: Rect2) -> Rect2:
+	var placed: Transform2D = world.get_transform()
+	return Rect2(placed * box.position, box.size * placed.get_scale())
+
+# 一块画面被这一排木牌最多盖掉多大比例。
+func buried(placed: Rect2, slabs: Array, key: String) -> float:
+	var area = maxf(placed.get_area(), 0.001)
+	var worst = 0.0
+	for slab in slabs:
+		var part = placed.intersection(slab[key])
+		if part.size.x > 0 and part.size.y > 0:
+			worst = maxf(worst, part.get_area() / area)
+	return worst
+
+# 一批画面块里被盖得最狠的那一块：[压在牌面上的比例, 连投影一起算的比例]。
+func worst_burial(boxes: Array, slabs: Array) -> Array:
+	var solid = 0.0
+	var dimmed = 0.0
+	for box in boxes:
+		solid = maxf(solid, buried(box, slabs, "solid"))
+		dimmed = maxf(dimmed, buried(box, slabs, "dimmed"))
+	return [solid, dimmed]
 
 func run() -> void:
 	create_timer(90).timeout.connect(func(): push_error("MK10 rule watchdog"); quit(1))
@@ -497,6 +552,8 @@ func run() -> void:
 	check(game.world.confirmed_slot() == Rules.CASES.find(game.state.branch), "the confirmed order is the drawn one")
 	check(game.world.crate_alpha(game.world.confirmed_slot()) > game.world.crate_alpha(1 - game.world.confirmed_slot()),
 		"the order that did not come back fades back")
+	check(game.world.goods_still_on_board(0) and game.world.goods_still_on_board(1),
+		"结票与三句订正这两段里两单的封箱都还在各自那一格：货还没开始上船")
 	game.advance(); game.advance()
 	check(game.state.stage == "clarify" and game.state.beat == Rules.CLARIFY_BEATS - 1, "the clarification is player-paced")
 	game.advance()
@@ -510,6 +567,9 @@ func run() -> void:
 	check(game.world.deck_load(game.state.boat).is_empty(), "the deck is still empty in the first half")
 	game.world.progress = 0.9
 	check(game.world.deck_load(game.state.boat).size() == game.state.branch, "the deck carries the confirmed load in the second half")
+	check(not game.world.goods_still_on_board(game.world.confirmed_slot())
+		and game.world.goods_still_on_board(1 - game.world.confirmed_slot()),
+		"后半程被拉走那一单不再画回刚离开的那一格，没被确认那一单的对照还留在板上")
 	check(game.world.tickets_left() == Rules.BUDGET - game.state.paid, "the box holds only the unpaid tickets")
 	check("查询信" in game.line(), "the sailing line carries the query letter toward the gear workshop")
 	check(game.world.sailing() and game.world.sail_amount() > 0.5, "the chosen boat is on its way out")
@@ -536,7 +596,8 @@ func run() -> void:
 	var panel = game.receipt_rect()
 	var covering = 0
 	if panel.position.x < 0 or panel.position.y < 0 or panel.end.x > 1280 or panel.end.y > 720: covering += 1
-	if panel.intersects(Rect2(338, 98, 826, 68)): covering += 1
+	for slab in host_boards(game, [panel]):
+		if panel.intersects(slab["solid"]): covering += 1
 	if panel.intersects(Rect2(690, 646, 280, 54)): covering += 1
 	for slot in range(Rules.SLOTS):
 		if panel.intersects(game.world.cell_rect(slot)): covering += 1
@@ -629,6 +690,88 @@ func run() -> void:
 	game.skip_animation(); settle(game)
 	check(game.state.stage == "complete" and game.state.paid == (7 if other == 3 else 10),
 		"both branches clear the real scene, each paying what its own order costs")
+	game.queue_free(); await process_frame
+	# ---- 14. 演出的筹票、封箱与随船那封信：任何一帧都不许躲进宿主木牌 ----
+	# 无头看不见窗框，但两边都是可以现算的矩形：世界层按 manifest 的 anchor 画出哪一块，
+	# 宿主就在同一格画面上压住哪一块。两条约定、两种箱数都要逐帧量一遍。
+	write_raw(JSON.stringify(sheet(1, "puzzle", 3)))
+	game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame
+	game.paused = true
+	var swept = 0
+	var solid_worst = 0.0
+	var dimmed_worst = 0.0
+	var slabs: Array = []
+	var boxes: Array = []
+	var reading: Array = []
+	for keel in range(Rules.BOATS):
+		for order in Rules.CASES:
+			# 红船这条约定盖不住 6 箱那一单：12 票超出上限，那样的局永远走不到结算。
+			# 所以红船只量它真能结清的那一单，蓝船两条都要量。
+			if Rules.fare(keel, order) > Rules.BUDGET: continue
+			# 结票那一段：镜头钉在 1.10，匣子里的票一张一张飞向泊位前的收费牌。
+			for tick in range(41):
+				var fraction = tick / 40.0
+				game.state = build(Rules.fares(keel), keel, "confirming", order)
+				game.world.progress = fraction
+				settle(game)
+				slabs = host_boards(game)
+				boxes.clear()
+				for flying in game.world.ticket_plan(fraction):
+					boxes.append(on_screen(game.world, kit_box(game.world, "receipt_blank",
+						flying["at"], World.TICKET_WIDTH)))
+				swept += boxes.size()
+				reading = worst_burial(boxes, slabs)
+				solid_worst = maxf(solid_worst, reading[0])
+				dimmed_worst = maxf(dimmed_worst, reading[1])
+			# 装船到离岸：前半程箱子在空中划一道弧，后半程落在甲板上跟船一起缩小、一起走远。
+			for tick in range(41):
+				var crossing = tick / 40.0
+				game.state = build(Rules.fares(keel), keel, "delivery", order)
+				game.world.progress = crossing
+				settle(game)
+				slabs = host_boards(game)
+				boxes.clear()
+				for lifted in game.world.carry_plan(crossing) + game.world.deck_load(keel):
+					boxes.append(on_screen(game.world, kit_box(game.world,
+						World.CRATE_ART[lifted["slot"]], lifted["at"],
+						World.CRATE_WIDTH * game.world.boat_scale(keel))))
+				if not game.world.deck_load(keel).is_empty():
+					boxes.append(on_screen(game.world, kit_box(game.world, "paper_roll",
+						game.world.letter_foot(keel), World.LETTER_WIDTH * game.world.boat_scale(keel))))
+				swept += boxes.size()
+				reading = worst_burial(boxes, slabs)
+				solid_worst = maxf(solid_worst, reading[0])
+				dimmed_worst = maxf(dimmed_worst, reading[1])
+			# 回执阶段船已经走远：货与那封信还在那条缩到四成的船上，镜头退回整片大码头。
+			game.state = build(Rules.fares(keel), keel, "complete", order)
+			game.world.progress = 1.0
+			settle(game)
+			slabs = host_boards(game)
+			boxes.clear()
+			for settled_crate in game.world.deck_load(keel):
+				boxes.append(on_screen(game.world, kit_box(game.world,
+					World.CRATE_ART[settled_crate["slot"]], settled_crate["at"],
+					World.CRATE_WIDTH * game.world.boat_scale(keel))))
+			boxes.append(on_screen(game.world, kit_box(game.world, "paper_roll",
+				game.world.letter_foot(keel), World.LETTER_WIDTH * game.world.boat_scale(keel))))
+			swept += boxes.size()
+			reading = worst_burial(boxes, slabs)
+			solid_worst = maxf(solid_worst, reading[0])
+			dimmed_worst = maxf(dimmed_worst, reading[1])
+	# 反证：把同一块封箱放回原来那条甲板线（世界 y 169）、把一张筹票放回原来的落点（y 189），
+	# 同一套测量立刻报「整块压在牌上」。上面那两个读数不是因为量不到木牌才恰好为 0 的。
+	var armed = host_boards(game)
+	var old_deck = on_screen(game.world, kit_box(game.world, "crate_red", Vector2(460, 169), World.CRATE_WIDTH))
+	var old_ticket = on_screen(game.world, kit_box(game.world, "receipt_blank",
+		Vector2(460, 189), World.TICKET_WIDTH))
+	check(buried(old_deck, armed, "solid") > 0.5 and buried(old_ticket, armed, "solid") > 0.5,
+		"the same measurement buries the old deck line and the old ticket landing: the sweep is armed")
+	check(swept > 400 and not slabs.is_empty(),
+		"the two flights were measured frame by frame against the boards the host really drew")
+	check(solid_worst <= 0.01, "no ticket, crate or letter ever lands on an opaque host board (worst %.1f%%)"
+		% (solid_worst * 100))
+	check(dimmed_worst <= 0.15, "the same flight stays clear of the boards' cast shadow (worst %.1f%%)"
+		% (dimmed_worst * 100))
 	game.queue_free(); await process_frame
 	DirAccess.remove_absolute(path)
 	print("MARKET MK10 RULES ", checks - failures, "/", checks, " PASS")

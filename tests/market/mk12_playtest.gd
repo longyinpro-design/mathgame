@@ -15,7 +15,10 @@ const SOLVED = [[0, 1], [2, 3], [4, 5]]
 # 只装了三个位置不到位的草稿：用来验「台面还剩几壶」这一条缺口先于差额被说出来。
 const PARTIAL = [[0, 1], [2], []]
 # 联合回执的面板位置写在 mk12_scene.gd::extra() 里，本关的审计按它认这块纸。
-const SHEET_PANEL = Rect2(976, 170, 284, 300)
+const SHEET_PANEL = Rect2(984, 198, 284, 296)
+# 台词板是全章最宽的一块常驻板（level_host 画在 338,98,826,86）：任何侧栏压进它的右下角，
+# 收尾那句「三家一起签」就会被自己新摊开的纸啃掉一角。
+const DIALOGUE = Rect2(338, 98, 826, 86)
 var game: Control
 var checks = 0
 var failures = 0
@@ -146,6 +149,15 @@ func covered() -> int:
 	# 回执只在交货完成那一格摊开：它压到需求单、灯串、车帮上的那一纸，或底部出口按钮，就是收尾被自己挡住。
 	if not panel_named(SHEET_PANEL):
 		over += 1; print("COVERED receipt panel missing at ", SHEET_PANEL)
+	if DIALOGUE.intersects(SHEET_PANEL):
+		over += 1; print("COVERED 台词板 ", DIALOGUE, " by receipt ", SHEET_PANEL)
+	# 面板自己那圈投影（skin.gd::panel_style：shadow_size 7、向下 4）是画在矩形外面的，
+	# 只按矩形量就等于放过「板子的木边被纸的影子啃掉一角」这一类真缺陷。
+	var shadow: Rect2 = SHEET_PANEL.grow(7.0)
+	shadow.position += Vector2(0, 4)
+	for board in game.world.signs():
+		if shadow.intersects(on_screen(board["rect"])):
+			over += 1; print("COVERED board ", board["text"], " by receipt shadow ", shadow)
 	for place in range(Rules.PLACES.size()):
 		var cart: Rect2 = on_screen(game.world.cart_rect(place))
 		if SHEET_PANEL.intersects(cart):
@@ -178,11 +190,29 @@ func payoff_covered() -> int:
 		for board in game.world.signs():
 			if board["rect"].intersects(paper):
 				over += 1; print("COVERED 车帮回执 ", place + 1, " by ", board["text"], " ", board["rect"])
-		var bed := Rect2(game.world.cart_station(place) - Vector2(80, 96), Vector2(160, 96))
+		var bed := Rect2(game.world.cart_foot(place) - Vector2(80, 96), Vector2(160, 96))
 		for board in game.world.signs():
 			if is_plaque(board) and board["rect"].intersects(bed):
 				over += 1; print("COVERED 车斗 ", place + 1, " by ", board["text"], " ", board["rect"])
 	return over
+# 车上每一壶的单位读数写在壶脚下（mk12_world::jug_mark_rect）：两壶的读数不许互相叠，
+# 也不许压到车帮那一行合计——一叠，玩家就分不清哪个数属于哪一壶。
+func cart_labels() -> int:
+	var bad = 0
+	for place in range(Rules.PLACES.size()):
+		var rects: Array = []
+		for slot in range(game.state.plan[place].size()):
+			rects.append(game.world.jug_mark_rect(place, slot))
+		for i in range(rects.size()):
+			for j in range(i + 1, rects.size()):
+				if rects[i].intersects(rects[j]):
+					bad += 1; print("OVERLAP 车上的读数 ", place, " ", rects[i], " ", rects[j])
+		var at: Vector2 = game.world.cart_foot(place)
+		var sum := Rect2(at.x - 100, at.y - 26, 200, 20)
+		for r in rects:
+			if r.intersects(sum):
+				bad += 1; print("OVERLAP 车上的读数压到车帮合计 ", place, " ", r, " ", sum)
+	return bad
 # 五盏灯罩的亮心是这一关的收尾信号：镜头抬到 1.10 时它们要是整个钻进台词板底下，
 # 玩家就看不见「都够用了」。灯罩亮心按真实发光点半径 11 的一半来量，光晕被板边蹭到不算藏灯。
 func glass_clear() -> int:
@@ -265,10 +295,11 @@ func run() -> void:
 			"装车时镜头贴着台面与三辆车")
 		check(hotspots() == Rules.JUGS + Rules.PLACES.size(),
 			"开局九个目标（六壶加三辆车）都活着，且每个不小于 48 像素")
-		check(game.status_line() == "车上 0/6 壶 · 台面 6 壶","计数说的就是眼前摆着的东西")
-		check(board_with("每处最多两壶 · 一壶不剩") != "" and board_with("货栈封油 · 六壶都不能拆") != ""
-			and board_with("封油共 15 单位 · 三处共要 15 单位") != "",
-			"三条规则各自刻成一块牌子：边界不需要玩家背台词")
+		check(game.status_line() == "三车已装 0/6 壶 · 台面 6 壶","计数说的就是眼前摆着的东西")
+		check(board_with("货栈封油 · 六壶都不能拆") != ""
+			and board_with("封油共 15 单位 · 三处共要 15 单位") != ""
+			and "每处最多两壶" in game.goal_line() and "4、5、6" in game.goal_line(),
+			"两条边界刻在庭院牌上、最多两壶与三个需求数挂在抬头板：侧板原先画在扣扣身上，已删掉")
 		check(game.state.hint == 0 and off_board() == 0 and spilled_boards() == 0,"摊开的庭院里没有一个字爬出自己的框")
 		check(covered() == 0 and glass_clear() == 0 and offscreen_boards() == 0,"贴紧的镜头没有把牌子或灯罩推进板底，也没有推出画面")
 		await capture(prefix+"03-courtyard")
@@ -295,7 +326,7 @@ func run() -> void:
 		await fill(0, 0); await fill(3, 0)
 		await fill(1, 1); await fill(4, 1)
 		await fill(2, 2); await fill(5, 2)
-		check(game.state.plan == TRAP and game.status_line() == "车上 6/6 壶 · 台面 0 壶",
+		check(game.state.plan == TRAP and game.status_line() == "三车已装 6/6 壶 · 台面 0 壶",
 			"三处各两壶、每处 5 单位：按封装这是一份交得出去的摆法")
 		check(board_with("车上 5 单位") != "" and Rules.totals(game.state.plan) == [5, 5, 5],
 			"车帮上的读数由草稿现算，一处一个")
@@ -355,7 +386,7 @@ func run() -> void:
 			"六壶一壶不剩，三处各自 4、5、6 单位")
 		check(Rules.totals(game.state.plan) == Rules.NEEDS and Rules.stock_of(game.state.plan).is_empty(),
 			"合计与需求单逐处对上，台面上确实一壶不剩")
-		check(game.status_line() == "车上 6/6 壶 · 台面 0 壶","计数读的就是这一份草稿")
+		check(game.status_line() == "三车已装 6/6 壶 · 台面 0 壶","计数读的就是这一份草稿")
 		await click("reset")
 		check(game.modal and game.state.plan == SOLVED,"重摆先问一句，不直接清车")
 		await capture(prefix+"08-reset-asked")
@@ -369,8 +400,9 @@ func run() -> void:
 		await key(KEY_Z)
 		check(game.state.plan == SOLVED,"撤销一步就把六壶重新装回三辆车")
 		check(game.world.state == game.state,"画面读的是提交之后的那一份草稿")
-		check(covered() == 0 and spilled_boards() == 0 and off_board() == 0 and glass_clear() == 0 and offscreen_boards() == 0,
-			"装满的庭院里没有牌子、读数或壶爬出边框，也没被板子压住")
+		check(covered() == 0 and spilled_boards() == 0 and off_board() == 0 and glass_clear() == 0
+			and offscreen_boards() == 0 and cart_labels() == 0,
+			"装满的庭院里没有牌子、读数或壶爬出边框，也没被板子压住；车上的六行单位读数各占各的脚下")
 		await capture(prefix+"09-loaded")
 		await click("deliver")
 		check(game.state.stage == "handing" and game.state.handed == SOLVED and game.state.plan == SOLVED,
@@ -384,19 +416,20 @@ func run() -> void:
 		check((game.world.slot_foot(2,1)-game.world.cart_foot(2)).x > 0.0
 			and (game.world.slot_foot(2,1)-game.world.cart_foot(2)).x < 60.0,
 			"车上的壶跟着车脚走：落点永远从当前车脚算，没有一壶掉回台面")
-		check(board_with("抱着 4 单位上路") != "" and board_with("抱着 6 单位上路") != "",
-			"车帮读数在离场这一段改说路上带着多少单位")
+		check(board_with("抱着 2+2=4 单位上路") != "" and board_with("抱着 3+3=6 单位上路") != "",
+			"车帮读数在离场这一段改说路上带着哪两壶、共多少单位")
 		check(Rules.stock_of(game.world.state.plan).is_empty(),"世界自己数的台面上也剩 0 壶")
 		await capture(prefix+"10-carts-leaving")
 		await click("skip")
 		check(game.state.stage == "delivery" and game.state.handed == SOLVED,
 			"交出去的这一单进入接油点灯那一段")
 		await hold(1.6)
-		check(at_camera(1.10, Vector2(-64,-43)),"抬秤点灯的前半程还贴着庭院前景")
+		check(at_camera(1.0, Vector2.ZERO) and game.world.progress > 0.45,
+			"点灯这一段一开始就把庭院收回到全景：贴着柜台会把挂在庭院上方的灯串顶边切掉")
 		check(game.world.state.stage == "delivery" and Rules.totals(game.world.state.plan) == Rules.NEEDS,
 			"三处接到的单位数是从世界的账上读出来的，不是标签里的字")
-		check(board_with("4 单位 · 正好够用") != "" and board_with("6 单位 · 正好够用") != "",
-			"车帮读数换成「正好够用」：不够用的那一处不会被写出来")
+		check(board_with("2+2=4 · 正好够用") != "" and board_with("3+3=6 · 正好够用") != "",
+			"车帮读数换成算式加「正好够用」：不够用的那一处不会被写出来")
 		check(game.world.progress > 0.4,"三处按各自的顺序亮起来，此刻至少亮起一处")
 		await capture(prefix+"11-lighting")
 		game.paused = false; await create_timer(0.12).timeout
@@ -413,8 +446,8 @@ func run() -> void:
 		check(payoff_covered() == 0,"三张压在车帮上的回执没有被任何庭院木牌压住")
 		check(glass_clear() == 0,"十五盏灯罩都在板子外面")
 		var paper = ui_text("三家联合回执")
-		check(paper != null and "桥头 2+2=4 · 单子要 4" in paper.text
-			and "中街 2+3=5 · 单子要 5" in paper.text and "西坡 3+3=6 · 单子要 6" in paper.text,
+		check(paper != null and "桥头 2+2=4 · 需求单 4" in paper.text
+			and "中街 2+3=5 · 需求单 5" in paper.text and "西坡 3+3=6 · 需求单 6" in paper.text,
 			"回执按玩家真正交出去的那一单复述 2+2 / 2+3 / 3+3")
 		check(paper != null and "台面剩 0 壶 · 封油没拆过" in paper.text,
 			"回执说明六壶都交了、一壶没拆")

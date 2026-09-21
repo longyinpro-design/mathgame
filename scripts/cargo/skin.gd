@@ -102,3 +102,33 @@ static func button(parent: Node, value: String, rect: Rect2, action: Callable, p
 static func hotspot(b: Button, label: String) -> void:
 	b.text = ""; b.tooltip_text = label
 	for key in ["normal","hover","pressed","disabled"]: b.add_theme_stylebox_override(key,StyleBoxEmpty.new())
+	# 悬停原本四态全空，玩家把鼠标移到一壶油上什么也不会变，只有光标变手型——
+	# 对不认字的小孩来说「这个能点」这件事根本没被说出来。只描一圈细金边，
+	# 不填充，免得在像素场景上盖出一块调试框。
+	var hover = StyleBoxFlat.new(); hover.bg_color = Color.TRANSPARENT
+	hover.set_border_width_all(2); hover.border_color = Color(1.0,0.87,0.58,0.72)
+	hover.set_corner_radius_all(7)
+	b.add_theme_stylebox_override("hover",hover)
+	var pressed = StyleBoxFlat.new(); pressed.bg_color = Color(1.0,0.87,0.58,0.14)
+	pressed.set_border_width_all(2); pressed.border_color = Color(1.0,0.82,0.45,0.95)
+	pressed.set_corner_radius_all(7)
+	b.add_theme_stylebox_override("pressed",pressed)
+# 热点自身是隐形按钮，它的中文说明全靠 tooltip。默认主题下 tooltip 用系统字体、灰色无底框，
+# 会直接压在石板和货签上；这里把它收进关卡同一块胡桃木牌里，字体也换成 UI 正在用的那一份。
+static func tooltip_style() -> StyleBoxFlat:
+	var s = sign_style()
+	s.content_margin_left = 12; s.content_margin_right = 12
+	s.content_margin_top = 8; s.content_margin_bottom = 10
+	return s
+static func tooltip_theme() -> Theme:
+	var t = Theme.new()
+	var font = face()
+	t.default_font = font; t.default_font_size = 18
+	t.set_stylebox("panel", "Tooltip", tooltip_style())
+	t.set_font("font", "TooltipLabel", font)
+	t.set_font_size("font_size", "TooltipLabel", 16)
+	t.set_color("font_color", "TooltipLabel", Color("fff0d1"))
+	t.set_color("font_outline_color", "TooltipLabel", Color("382515"))
+	t.set_constant("outline_size", "TooltipLabel", 3)
+	return t
+

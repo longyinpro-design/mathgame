@@ -65,9 +65,10 @@ const FLAG_PLAQUE_WIDTH = 210.0
 const BERTH_DROP = 124.0
 const BERTH_PACK_SHIFT = Vector2(-45, 16)
 const BERTH_PACK_STEP = Vector2(30, 24)
-# 三站的货落在搬运台左翼的货床上：脚点相对 boss_foot，一眼看得出是铜鹭驮走的。
-const BED_FIRST = Vector2(-147, -103)
-const BED_STEP = Vector2(40, -22)
+# 三站的货落在搬运台左翼的货床上：脚点相对 boss_foot，逐格沿甲板前沿那条透视线下沉，
+# 一眼看得出是铜鹭驮走的。画在铜鹭之后（draw_bed），否则整片羽翅会把这三包压得一颗不见。
+const BED_FIRST = Vector2(-147, -113)
+const BED_STEP = Vector2(40, 6)
 const DROP_LIFT = 30.0
 # 交货演出：货从托盘飞到栈位牌前，0.14 起步、0.62 落位。
 const FLY_START = 0.14
@@ -160,7 +161,7 @@ func fly_plan(p: float) -> Array:
 # 已收下的那一包平时钉在哪里：一、二站在栈位牌前，三站在铜鹭左翼的货床上。
 func pack_home(index: int, slot: int) -> Vector2:
 	if index == Rules.KINDS - 1:
-		return boss_foot() + BED_FIRST + Vector2(BED_STEP.x * (slot % 3), BED_STEP.y * int(slot / 3))
+		return boss_foot() + BED_FIRST + BED_STEP * slot
 	return berth_foot(index) + BERTH_PACK_SHIFT + Vector2(BERTH_PACK_STEP.x * (slot % 4), BERTH_PACK_STEP.y * int(slot / 4))
 
 # ---- 绘制 ----
@@ -169,6 +170,7 @@ func draw_level() -> void:
 	draw_berths()
 	if bench_visible(): draw_bench()
 	draw_heron()
+	draw_bed()
 	draw_flag()
 	if bench_visible(): draw_tray()
 	if state.stage in ["delivery", "complete"]: draw_lamplight()
@@ -213,7 +215,16 @@ func berth_rule_color(index: int) -> Color:
 	return INK_LIGHT
 
 # 已交出去的货钉在收货处：一单位都不回收，画面上也一直看得见。
+# 三站那一行不在这里画——它的落点在铜鹭身上，得等羽翅画完才压得住（draw_bed）。
 func draw_delivered(index: int) -> void:
+	if index == Rules.KINDS - 1: return
+	draw_packs(index)
+
+# 三站的货床：整片展翼是同一张原图，先画的包会被后画的翅膀盖得一颗不见，所以这一格排在铜鹭之后。
+func draw_bed() -> void:
+	draw_packs(Rules.KINDS - 1)
+
+func draw_packs(index: int) -> void:
 	var row: Array = state.delivered[index]
 	if Rules.packs_of(row) == 0: return
 	if flying() and index == active_station() - 1:

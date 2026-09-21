@@ -113,6 +113,59 @@ func text_audit(label: String) -> void:
 		check(spoken.count("\n") <= 1 and fits(spoken, 20, 798.0),
 			"%s: a hint fits the sign (%s)" % [label, spoken.left(6)])
 
+# ---- 信纸上的字压在那颗烤死的蓝蜡上：取色验一次托底 ----
+# 共同订单的四行是 draw_string 直接落在信纸原图上的，纸的右下角烤着一颗蓝蜡，
+# 第四行「领航灯 2/1」的尾巴正好压上去。蜡是暗的，浅字加暗描边落在蜡上就分不出笔画，
+# 所以纸上的字改成深墨配浅纸光晕。蜡的位置从原图现算（蓝得比红多就是它），
+# 再按脚点、缩放和宿主镜头换算到屏幕——以后换图或挪纸都还是这一条。
+const PAPER_ART = "res://assets/runtime/market/kit-v1/sprites/receipt_blank.png"
+
+func patch_lumen(image: Image, rect: Rect2) -> float:
+	var total = 0.0
+	var seen = 0
+	for y in range(roundi(rect.position.y), roundi(rect.end.y)):
+		for x in range(roundi(rect.position.x), roundi(rect.end.x)):
+			var c = image.get_pixel(x, y)
+			total += (c.r + c.g + c.b) / 3.0; seen += 1
+	return total * 255.0 / seen if seen > 0 else 0.0
+
+func paper_audit(label: String) -> void:
+	var sprite = Image.load_from_file(ProjectSettings.globalize_path(PAPER_ART))
+	check(sprite != null, "%s: the letter paper art can be read back" % label)
+	if sprite == null: return
+	var wax := Rect2()
+	for y in range(150, sprite.get_height()):
+		for x in range(100, sprite.get_width()):
+			var c = sprite.get_pixel(x, y)
+			if c.a < 0.5 or c.b <= c.r + 0.078 or c.b <= 0.196: continue
+			wax = wax.merge(Rect2(x, y, 1, 1)) if wax.size.x > 0 else Rect2(x, y, 1, 1)
+	var scale = World.PAPER_WIDTH / float(sprite.get_width())
+	var anchor: Array = game.world.parts["receipt_blank"].anchor_px
+	var origin: Vector2 = game.world.order_foot() - Vector2(anchor[0], anchor[1]) * scale
+	game.update_camera()
+	var to_screen = func(box: Rect2) -> Rect2:
+		return Rect2(game.world.position + game.world.scale * box.position,
+			game.world.scale * box.size)
+	var wax_screen = to_screen.call(Rect2(origin + wax.position * scale, wax.size * scale))
+	var top: Vector2 = game.world.order_foot() \
+		+ Vector2(-World.PAPER_WIDTH / 2.0 + 9.0, -World.PAPER_WIDTH * 1.33 + 26.0)
+	var caption = str(Rules.line_caption(Rules.NEEDS_A, 3))
+	var wide = UIStyle.face().get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
+	var ink_screen = to_screen.call(Rect2(top.x, top.y + 19.0 * 4 - 12.0, wide, 15.0))
+	var cross = wax_screen.intersection(ink_screen)
+	check(cross.size.x >= 4.0 and cross.size.y >= 8.0,
+		"%s: 第四行确实压在蓝蜡上（压到 %.0f×%.0f 像素）" % [label, cross.size.x, cross.size.y])
+	var image = root.get_texture().get_image()
+	var control = Rect2(to_screen.call(Rect2(
+		origin + (wax.position + wax.size * 0.5) * scale, Vector2.ZERO)).position - Vector2(4, 4),
+		Vector2(8, 8))
+	var wax_only = patch_lumen(image, control)
+	var lifted = patch_lumen(image, cross)
+	check(wax_only <= 90.0,
+		"%s: 取样点确实在蜡上（蜡心亮度 %.1f，还是一片暗）" % [label, wax_only])
+	check(lifted >= 118.0,
+		"%s: 蜡上那一小块被浅纸光晕托亮，实测 %.1f（改之前只有 %.1f）" % [label, lifted, 103.4])
+
 func run() -> void:
 	create_timer(240).timeout.connect(func(): push_error("MK18 window watchdog"); quit(1))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(CAPTURE))
@@ -156,7 +209,13 @@ func run() -> void:
 				text_audit("%s phase 1" % prefix)
 				check(spilled(game.ui) == 0,
 					"%s: nothing spills out of its box on an empty counter" % prefix)
+			check("键盘 1 2 3" in game.line() and "Q W E" in game.line(),
+				"%s: 开台那一句把两颗键各自管什么都说出来" % prefix)
+			check(game.buttons.pack_0_0.tooltip_text.count("\n") == 1
+				and "键盘 1 加一包" in game.buttons.pack_0_0.tooltip_text,
+				"%s: 每一行封包的说明里写着自己那两颗键" % prefix)
 			await shot(prefix, "03-order", branch, small)
+			if not small: paper_audit(prefix)
 			await click("pack_0_2")
 			check(game.state.order == [3, 0, 0],
 				"%s: one click dials three packs of a kind at once" % prefix)
@@ -236,6 +295,12 @@ func run() -> void:
 			check(game.state.stage == "puzzle" and game.phase() == 3, "%s: the third phase begins" % prefix)
 			check(game.history.is_empty(), "%s: the undo stack starts over with each phase" % prefix)
 			if not small: text_audit("%s phase 3" % prefix)
+			check("键盘 L" in game.line() and "键盘 L" in game.buttons.lamp.tooltip_text,
+				"%s: 领航灯的键位写在台面话里，也写在灯自己的牌上" % prefix)
+			await key(KEY_L)
+			check(game.state.lamp == 1, "%s: 按 L 真把预留的那份装进灯里" % prefix)
+			await click("lamp")
+			check(game.state.lamp == 0, "%s: 再点一下把油芯抽回货台，账一克不动" % prefix)
 			for tier in range(3): await click("hint")
 			check(game.state.hint == Rules.HINT_TIERS, "%s: the third reminder is the last one" % prefix)
 			await click("deliver")

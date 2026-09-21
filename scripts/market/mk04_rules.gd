@@ -37,7 +37,7 @@ static func oil_loose(state: Dictionary) -> int:
 static func bells_loose(state: Dictionary) -> int:
 	return BELLS_PER_GROUP * state.b
 
-# 第三张收据上此刻写着几只铃：没改签之前，一直是扣扣抄来的 3。
+# 转抄件上此刻写着几只铃：没改签之前，一直是扣扣抄来的 3。
 static func bell_claim(state: Dictionary) -> int:
 	return WRITTEN_BELLS if state.correction == 0 else state.correction
 
@@ -72,7 +72,7 @@ static func shortfalls(state: Dictionary) -> Array:
 	elif bells_loose(state) != CORRECT_BELLS:
 		missing.append("两条原约走到这里只剩 %d 只铜铃，柜面上不该有别的数。" % bells_loose(state))
 	elif state.correction == 0:
-		missing.append("第三张收据还写着 %d 只铃：按你实换出的 %d 只改签，再提交。" % [WRITTEN_BELLS, bells_loose(state)])
+		missing.append("转抄件上还写着 %d 只铃：按你实换出的 %d 只改签，再提交。" % [WRITTEN_BELLS, bells_loose(state)])
 	elif bell_claim(state) != bells_loose(state):
 		missing.append("改签写的是 %d 只，可你刚换出来的是 %d 只：%d 卷布 → %d 瓶油 → %d 只铃。" % [
 			bell_claim(state), bells_loose(state), CLOTH, OIL_PER_CLOTH * state.a, bells_loose(state)])

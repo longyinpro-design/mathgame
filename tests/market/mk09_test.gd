@@ -271,7 +271,7 @@ func run() -> void:
 	check(four == ["戊摊还没有接到线：它只认铃。"], "four of five is refused in the player's own words")
 	check(Rules.satisfied(build(plan(3, 2, 0, 4, -1)).lines).size() == 4, "that near miss really pleases four stalls")
 	var cloth = Rules.shortfalls(build(plan(1, 2, 0, 0, -1)))
-	check(cloth[0] == "布卷同时许给了丙摊、丁摊：一件货只能有一个新主人。", "the double promise names the bolt of cloth")
+	check(cloth[0] == "布同时许给了丙摊、丁摊：一件货只能有一个新主人。", "the double promise names the bolt of cloth")
 	check(Rules.unmoved(build(plan(1, 2, 0, 0, -1)).lines) == [3, 4], "and it leaves two goods with no new home")
 	var home = Rules.shortfalls(build(plan(0, 2, 1, 4, 3)))
 	check(home[0] == "甲摊的线绕回了自己：布留在原摊，不算换出去。", "keeping your own good is refused by name")
@@ -400,7 +400,7 @@ func run() -> void:
 	check(game.state.stage == "ready" and game.buttons.has("next"), "ready offers the way to the street")
 	game.advance(); settle(game)
 	check(game.state.stage == "puzzle", "the street opens for drawing")
-	check(game.buttons.has("deliver") and game.buttons["deliver"].text == "一次交上这条线",
+	check(game.buttons.has("deliver") and game.buttons["deliver"].text == "一次交上整条街",
 		"submit commits the whole plan at once")
 	check(game.buttons.has("undo") and game.buttons["undo"].disabled, "undo is idle before the first line")
 	var absent = 0
@@ -434,7 +434,7 @@ func run() -> void:
 	check(game.world.draft().has(0), "the cloth is promised, not yet moved")
 	check(game.world.goods_held() == [0, 1, 2, 3, 4], "the cloth is still hanging at 甲 while drafting")
 	check(game.state.booked == Rules.empty_lines(), "the draft books nothing")
-	check(game.status_line() == "线 1 / 五 · 满意 1 / 五", "the status restates the draft, computed by the rules")
+	check(game.status_line() == "线 1 / 5 · 满意 1 / 5", "the status restates the draft, computed by the rules")
 	game.choose_tray(2); settle(game)
 	check(game.state.lines == Rules.empty_lines() and game.world.line_paths().is_empty(),
 		"tapping the filled tray pulls the line back")
@@ -474,7 +474,7 @@ func run() -> void:
 		"submit refuses four lines and says which tray is still open")
 	game.commit(build(plan(1, 2, 0, 0, -1))); settle(game); game.message = ""
 	game.advance()
-	check(game.state.stage == "puzzle" and game.message.begins_with("布卷同时许给了丙摊、丁摊"),
+	check(game.state.stage == "puzzle" and game.message.begins_with("布同时许给了丙摊、丁摊"),
 		"the double promise is drawable and fails at submit naming the cloth")
 	game.commit(build(RING)); settle(game); game.message = ""
 	game.advance()
@@ -510,7 +510,7 @@ func run() -> void:
 	game.skip_animation(); settle(game)
 	check(game.state.stage == "delivery" and game.world.goods_held() == Rules.SOLUTION,
 		"the street settles with each stall holding what it accepted")
-	check(game.status_line() == "满意 5 / 五摊", "every stall nods once the goods have landed")
+	check(game.status_line() == "满意 5 / 5", "every stall nods once the goods have landed")
 	game.skip_animation(); settle(game)
 	check(game.state.stage == "complete" and game.state.booked == Rules.SOLUTION, "the five stalls are swapped in one go")
 	var on_disk = game.state.duplicate(true)
@@ -556,7 +556,7 @@ func run() -> void:
 	measure(game.goal_line(), UIStyle.text_size(22), 762.0, 1, "题面板")
 	measure("千灯集市  /  " + game.title, UIStyle.text_size(24), 366.0, 1, "标题板")
 	measure(game.submit_label(), 20, 235.0, 1, "提交按钮")
-	for plate in [["回千灯航图", 280.0], ["返回集市航图", 280.0], ["撤销 Z", 124.0], ["重摆", 110.0],
+	for plate in [["回千灯航图", 280.0], ["返回千灯航图", 280.0], ["撤销 Z", 124.0], ["重摆 X", 110.0],
 			["请扣扣提醒", 168.0], ["继续动画", 140.0], ["暂停动画", 140.0], ["跳过当前动画", 176.0]]:
 		measure(plate[0], 20, plate[1], 1, "共用按钮")
 	for draft in [Rules.empty_lines(), plan(3, 2, 0, 4, -1), plan(1, 2, 0, 0, -1), plan(0, 2, 1, 4, 3),

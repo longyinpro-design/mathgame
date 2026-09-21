@@ -82,6 +82,13 @@ static func left_line(state: Dictionary) -> String:
 static func gauge_caption(state: Dictionary) -> String:
 	return "围巾的边 · 要 %d 段 · 已配 %d 段" % [NEED, total(state)]
 
+# 差多少只有一处措辞：摊多了就必须说「多出」，底栏要是照抄「还差」，
+# 13 段那一次会读成「还差 -2 段」。
+static func gap_text(state: Dictionary) -> String:
+	var gap = NEED - total(state)
+	if gap == 0: return "正好够"
+	return "还差 %d 段" % gap if gap > 0 else "多出 %d 段" % -gap
+
 # ---- 验收：缺多少、多多少，全部用玩家自己拿的段数说话 ----
 static func solved(state: Dictionary) -> bool:
 	return valid_hand(state.hand) and total(state) == NEED
@@ -94,12 +101,17 @@ static func shortfalls(state: Dictionary) -> Array:
 	if got == NEED: return []
 	var line = packages_line(state)
 	if got > NEED:
-		return ["%s 是 %d 段，比围巾的边多出 %d 段：多出来的不能从包里掰下来退回去。" % [line, got, got - NEED]]
+		# 「从包里」三个字省掉：这一句连上玩家自己摊的三包名，量到 803，比台词板的 798 内框还宽，
+		# 汉字串中间会被自动折成第二行、压到下边框上。省到 742，一条话说完。
+		return ["%s 是 %d 段，比围巾的边多出 %d 段：多出来的不能掰下来退回去。" % [line, got, got - NEED]]
 	if count == 2 and got == 10:
 		# 这一关的招牌陷阱：最先看中的两包 5 段。合同里的原话照说，不另加训斥。
 		return ["两包 5 段已经 10 段，可是第三包只能整包拿，没有 1 段的。"]
 	if count == MAX_PACKAGES:
 		return ["%s 是 %d 段，还差 %d 段：柜上没有 %d 段的整包，包也不能剪开。" % [line, got, NEED - got, NEED - got]]
+	if count == 1:
+		# 只摊了一包时，「5 段 是 5 段」是同一句话说两遍。
+		return ["一包 %d 段，围巾的边要 %d 段：还差 %d 段，手上还能再拿 %d 包。" % [got, NEED, NEED - got, MAX_PACKAGES - count]]
 	return ["%s 是 %d 段，围巾的边要 %d 段：还差 %d 段，手上还能再拿 %d 包。" % [line, got, NEED, NEED - got, MAX_PACKAGES - count]]
 
 # ---- 玩家动作 ----

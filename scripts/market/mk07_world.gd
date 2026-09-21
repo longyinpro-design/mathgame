@@ -100,7 +100,9 @@ func draw_level() -> void:
 func draw_aid_desk() -> void:
 	var foot := station("stall_middle") + Vector2(16, 4)
 	figure(KOUKOU_WAVE if state.stage == "complete" else KOUKOU_TIE, foot, 0.36)
-	plaque("援助货 · 绳 钉 布 铃 各一件", Rect2(foot.x - 166, foot.y - 150, 320, 28))
+	# 牌子挂在柜台上方的木牌位上。柜台镜头是 1.10 倍、偏移 (-64,-43)，这块牌落在屏幕 y 195 起：
+	# 再往上 18 像素就要钻进出口台词板（屏幕 y 98..184）的底边，牌面第一行会被压住。
+	plaque("援助货 · 绳 钉 布 铃 各一件", Rect2(foot.x - 166, foot.y - 132, 320, 28))
 	if state.stage in ["delivery","complete"]: kit("receipt_blank", foot + Vector2(-84, -6), 54)
 
 func draw_stalls(plan: Array) -> void:

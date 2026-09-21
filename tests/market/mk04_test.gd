@@ -197,7 +197,7 @@ func run() -> void:
 		"the half run says the oil is still owed to the bells")
 	check(Rules.shortfalls(build(3, 1, 0))[0] == "台面上还有 3 瓶油：3 瓶油还能再换 1 只铜铃，先换完。",
 		"one bell group short still reports the leftover oil")
-	check("第三张收据还写着 3 只铃" in Rules.shortfalls(build(3, 2, 0))[0], "a finished run asks for the receipt to be corrected")
+	check("转抄件上还写着 3 只铃" in Rules.shortfalls(build(3, 2, 0))[0], "a finished run asks for the receipt to be corrected")
 	var wrong = Rules.shortfalls(build(3, 2, 3))[0]
 	check("改签写的是 3 只" in wrong and "3 卷布 → 6 瓶油 → 2 只铃" in wrong, "a wrong pick points back at the run just made")
 	check("改签写的是 4 只" in Rules.shortfalls(build(3, 2, 4))[0], "four bells are refused in the player's own terms")
@@ -285,7 +285,7 @@ func run() -> void:
 	fit(scratch.goal_line(), UIStyle.text_size(22), 762.0, 1, "题面板")
 	fit("千灯集市  /  " + scratch.title, UIStyle.text_size(24), 366.0, 1, "标题板")
 	fit(scratch.submit_label(), 20, 235.0, 1, "提交按钮")
-	fit(GameScript.REFUSAL, UIStyle.text_size(20), 798.0, 2, "第三张单的拒绝理由")
+	fit(GameScript.REFUSAL, UIStyle.text_size(20), 798.0, 2, "转抄件的拒绝理由")
 	for note in GameScript.RULE_NOTES:
 		fit(note, UIStyle.text_size(20), 798.0, 2, "原约备注")
 	for tier in scratch.hint_texts():
@@ -294,7 +294,7 @@ func run() -> void:
 		for owed in Rules.shortfalls(account):
 			fit(owed, UIStyle.text_size(20), 798.0, 2, "缺口说明")
 	# 中途也能回航图，重摆/撤销/提示的按钮宽度都写在自己那一格里
-	for plate in ["按第三张换", "换 1 组", "全换完"]:
+	for plate in ["按转抄件换", "换 1 组", "全换完"]:
 		fit(plate, 20, 140.0, 1, "柜台按钮")
 	scratch.free()
 	game.choose_candidate(0)
@@ -359,7 +359,7 @@ func run() -> void:
 		game.advance()
 	check(game.state.stage == "complete" and game.buttons.has("next"), "the key scene ends on the receipt")
 	check(game.buttons.has("open_hub") and not game.buttons.has("back_hub"), "a standalone sample still has a way to the chart")
-	check(has_label(game.ui, "第三张改签：3 卷布换 2 只铜铃"), "the receipt restates the run the player performed")
+	check(has_label(game.ui, "转抄件改签：3 卷布换 2 只铜铃"), "the receipt restates the run the player performed")
 	check(has_label(game.ui, "抄错不是偷货：原单 2、转抄 3"), "the receipt keeps the two kinds of evidence apart")
 	var receipt = label_in(game.ui, "回执 · 育苗铺")
 	check(receipt != null and receipt.text.split("\n").size() == 6, "the receipt is six authored lines")

@@ -48,6 +48,39 @@ func named(lines: Array, word: String) -> bool:
 		if word in line: return true
 	return false
 
+func settle(game: Node) -> void:
+	game.transient = 0.0
+	game.refresh()
+
+# 「· 键盘 X」这半句是热点对自己说的话：按那个键要做出跟点这下一模一样的动作才算数，
+# 否则玩家照着提示按键，等来的却是把砝码请到另一头。逐条按键与点击各演一遍，比状态。
+func advertised_audit(game: Node, ids: Array) -> Array:
+	var advertised = {"1": KEY_1, "2": KEY_2, "3": KEY_3}
+	var told = 0
+	var lied = 0
+	for id in ids:
+		var before = game.state.duplicate(true); var book = game.history.duplicate(true)
+		settle(game)
+		var tip: String = game.buttons[id].tooltip_text
+		var at = tip.find("键盘 ")
+		if at < 0: continue
+		told += 1
+		var key = advertised.get(tip.substr(at + 3).strip_edges(), -1)
+		if key == -1:
+			lied += 1; print("UNKNOWN key advertised by ", id, ": ", tip)
+		else:
+			for conn in game.buttons[id].get_signal_connection_list("pressed"):
+				conn["callable"].call()
+			var by_click = game.state.duplicate(true)
+			game.apply_committed(before, book); settle(game)
+			game.handle_key(int(key))
+			var by_key = game.state.duplicate(true)
+			game.apply_committed(before, book); settle(game)
+			if by_click != by_key:
+				lied += 1
+				print("KEY MISMATCH ", id, " tip 「", tip, "」 click ", by_click, " key ", by_key)
+	return [told, lied]
+
 # 用真动作把现场摆成指定那一式：摆不出来就说明这一步玩家根本点不到。
 func walk_to(goods: Array, far: Array) -> Dictionary:
 	var value = pose(Rules.empty_pan(), Rules.empty_pan())
@@ -397,6 +430,18 @@ func run() -> void:
 	check(game.buttons.has("deliver") and not game.buttons.deliver.disabled, "the lift button is live on an untouched rack")
 	check(game.buttons.has("undo") and game.buttons.undo.disabled, "nothing to undo on a fresh rack")
 	check(game.buttons.has("reset") and game.buttons.has("hint"), "the stall offers 重摆 and 请扣扣提醒")
+	# 架上的三种现场各量一遍：这格空着、这枚站在对面那盘、这枚站在货盘，提示话术都不一样。
+	var told = 0
+	var mistaken = 0
+	for layout in [[Rules.empty_pan(), Rules.empty_pan()],
+			[Rules.empty_pan(), [1, 0, 0]], [[1, 0, 0], Rules.empty_pan()]]:
+		game.apply_committed(pose(layout[0], layout[1]), [])
+		settle(game)
+		var verdict = advertised_audit(game, hotspots)
+		told += int(verdict[0]); mistaken += int(verdict[1])
+	check(mistaken == 0 and told == Rules.COUNT * 3,
+		"砝码热点写出的快捷键，按下去就是点它那一下（%d 枚，%d 处说错）" % [told, mistaken])
+	game.apply_committed(pose(Rules.empty_pan(), Rules.empty_pan()), []); settle(game)
 	# ---- 每一幕真的重画一遍：绘制代码一崩就会带着 SCRIPT ERROR 退出来 ----
 	var looks := []
 	for stage in Rules.STAGES:
@@ -474,6 +519,74 @@ func run() -> void:
 		var point: Vector2 = spot
 		if point.x < 40 or point.y < 40 or point.x > 1240 or point.y > 700: placed = false
 	check(placed, "the scale, the rack, the souvenir and the keeper all stand inside the courtyard")
+	# ---- 贴脸镜头下的扣扣：不能被窗框切掉，也不能踩上摊子上的货 ----
+	# 镜头是宿主每帧算出来的派生值，这里先叫它按新那一幕换算一次，再读它自己写回的 scale。
+	game.apply_committed(pose(FIVE_GOODS, FIVE_FAR, "puzzle"), [])
+	game.update_camera()
+	var leaned: Vector2 = game.world.position
+	var close_up: float = game.world.scale.x
+	check(absf(close_up - 1.10) < 0.002 and leaned.distance_to(Vector2(-64, -43)) < 0.002,
+		"配秤这一幕镜头真的贴到铜秤跟前")
+	var keeper: Rect2 = game.world.keeper_rect()
+	check(keeper.position.x * close_up + leaned.x >= 0.0
+		and keeper.end.x * close_up + leaned.x <= 1280.0
+		and keeper.position.y * close_up + leaned.y >= 0.0,
+		"扣扣在贴脸镜头下整只都还在画面里，左边那半个圆码没被窗框切掉")
+	# 谁盖住谁与镜头无关：她在世界坐标里挨着砝码架，就量这一格。
+	var clear := true
+	var crowded := ""
+	for index in range(Rules.COUNT):
+		var seat: float = game.world.rack_spot(index).x - game.world.weight_width(index) / 2.0
+		if game.world.keeper_rect().end.x > seat:
+			clear = false; crowded = "第 %d 格砝码在 %.1f，她画到 %.1f" % [index + 1, seat, keeper.end.x]
+	check(clear, "扣扣没有压到架上那三枚砝码（%s）" % crowded)
+	# ---- 车顶板上那句「在哪儿」与货真正站的那一格是同一件事 ----
+	# 交付那一幕两单同时在场：本单从秤盘飞回交货车、下一单从车上推上秤。
+	# 牌子只跟着 parcel_leg 的落点走，才不会对着已经落定的货说反话。
+	var pitches := {0: [FIVE_GOODS, FIVE_FAR], 1: [EIGHT_GOODS, EIGHT_FAR]}
+	var mismatch := 0
+	var seen := 0
+	var wrong := ""
+	for look in [["arrival", 0], ["approach", 0], ["puzzle", 0], ["delivery", 0],
+			["approach", 1], ["puzzle", 1], ["delivery", 1], ["complete", 1]]:
+		for step in range(9):
+			var stage: String = look[0]
+			var order: int = int(look[1])
+			var pitch: Array = pitches[order] if stage not in ["arrival", "approach"] \
+				else [Rules.empty_pan(), Rules.empty_pan()]
+			var scene = pose(pitch[0], pitch[1], stage, order)
+			if not Rules.validate(scene): continue
+			game.apply_committed(scene, [])
+			game.world.progress = step / 8.0
+			seen += 1
+			for index in range(Rules.ORDERS.size()):
+				var spot: int = game.world.parcel_spot(index)
+				var want := " · 在车上"
+				if spot == game.world.SPOT_PAN: want = " · 上秤了"
+				elif spot == game.world.SPOT_DONE: want = " · 已交货"
+				var plank: String = game.world.cart_caption(index)
+				if not plank.ends_with(want):
+					mismatch += 1
+					wrong = "%s %d 成 · %s 写着「%s」，货却算 %d" % [stage, int(step * 100 / 8), plank, want, spot]
+	check(mismatch == 0 and seen == 63,
+		"每一块车顶板说的都是那单货此刻真站的地方（%d 个现场，%s）" % [seen, wrong])
+	# 交付那一幕的头一格里，两单货正同时被搬：一块说「已交货」的时机与一块说「上秤了」的时机
+	# 都得落在飞行过半之后，且两单各自的说法互不串台。
+	game.apply_committed(pose(FIVE_GOODS, FIVE_FAR, "delivery", 0), [])
+	game.world.progress = 1.0
+	check(game.world.parcel_spot(0) == game.world.SPOT_DONE
+		and game.world.parcel_spot(1) == game.world.SPOT_PAN
+		and game.world.cart_caption(0).ends_with("已交货")
+		and game.world.cart_caption(1).ends_with("上秤了"),
+		"交付收势时本单已停进交货车、下一单已经站上秤盘，两块牌各说各的")
+	# ---- 重摆那一句只说此刻真在账上的事 ----
+	game.apply_committed(pose(Rules.empty_pan(), Rules.empty_pan(), "puzzle", 0), [])
+	check(game.reset_prompt()[0].contains("这一单还没交出去")
+		and not game.reset_prompt()[0].contains("不会重来"),
+		"第一单还没交出去时，重摆不承诺「已经交出去的那一单」")
+	game.apply_committed(pose(EIGHT_GOODS, EIGHT_FAR, "puzzle", 1), [])
+	check(game.reset_prompt()[0].contains("已经配平交出去的那一单不会重来"),
+		"第二单在秤前时，重摆说清前一单不退回来")
 	# ---- 实际操作：摆 → 抬 → 交 → 挪 → 再抬 → 再交 ----
 	game.apply_committed(pose(Rules.empty_pan(), Rules.empty_pan()), [])
 	game.do_cycle(0); game.do_cycle(0)

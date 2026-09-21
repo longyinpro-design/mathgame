@@ -21,7 +21,9 @@ const CRATE_WIDTH = 30.0
 const TILE_WIDTH = 40.0
 const TICKET_WIDTH = 26.0
 const LANTERN_WIDTH = 100.0
-const LETTER_WIDTH = 44.0
+# 查询信是船上的小件：44 宽时这张纸有 34 高，站在甲板上正好钻进台词板那条带子，
+# 收到 36 之后连船带货都还留在台词板下缘之外。
+const LETTER_WIDTH = 36.0
 const CARD_W = 180.0
 const CARD_H = 26.0
 const INK_DIM = Color("b6a98d")
@@ -29,6 +31,18 @@ const INK_DIM = Color("b6a98d")
 const CRATE_COLUMNS = 3
 const CRATE_STEP = Vector2(34, 30)
 const CRATE_DROP = 40.0
+# 甲板线取在吃水线上方 10 像素：船身只有脚下那 52 像素露在台词板下面（红船 175..227），
+# 原来钉在 -58（世界 y 169）——整批封箱落在台词板底下，玩家只看到箱子飞进那块木头里。
+const DECK_LIFT = 10.0
+const DECK_PITCH = 26.0
+# 随船那封查询信站在甲板右舷、往下钉 4 像素贴在船帮上：宽 36 的纸有 28 高，
+# 脚点正好落在甲板线上时纸顶会爬进宿主台词板的投影里那几条（装船刚收尾那几帧镜头才回到 1.0）。
+# 它什么时候才出现，看的是货上没上齐（draw_boats 里跟着 deck_load 走）。
+const LETTER_SHIFT = Vector2(48, 4)
+# 结清的筹票落到这条船泊位前的收费牌上（牌在世界 y 239 起）：船身那一段在台词板底下，
+# 票匣又正好在船的右下方，只有这块木头是 1.10 倍镜头下也全程看得见的落点。
+const BERTH_LIFT = 24.0
+const BERTH_PITCH = 6.0
 const TILE_STEP = 48.0
 const TILE_LIFT = 24.0
 const TILE_FONT = 15
@@ -84,9 +98,14 @@ func boat_spot(boat: int) -> Vector2: return station(BOAT_STATIONS[boat])
 func boat_rect(boat: int) -> Rect2: return target(boat_spot(boat) + Vector2(0, 50), 120, 78)
 func card_rect(boat: int, line: int) -> Rect2:
 	return Rect2(boat_spot(boat).x - CARD_W / 2, boat_spot(boat).y + 12 + line * (CARD_H + 2), CARD_W, CARD_H)
-func deck_foot(boat: int) -> Vector2: return boat_foot(boat) + Vector2(0, -58 * boat_scale(boat))
-func deck_spot(boat: int, index: int) -> Vector2:
-	return deck_foot(boat) + Vector2(-26 + (index % 3) * 26, -13 * int(index / 3)) * boat_scale(boat)
+func deck_foot(boat: int) -> Vector2: return boat_foot(boat) + Vector2(0, -DECK_LIFT * boat_scale(boat))
+# 船上的货按一条横排摆：一单几箱就占几个位置，整排以船身为中线。
+# 原来分两行（层高 -13），第二行的脚点在世界 y 156——比台词板下缘（1.0 倍时 184）还高 28 像素，
+# 六箱那一单有一半货从来没露过面；缩到一横排之后每一箱都站在看得见的那条船板上。
+func deck_spot(boat: int, index: int, load: int) -> Vector2:
+	return deck_foot(boat) + Vector2((index - (load - 1) / 2.0) * DECK_PITCH, 0) * boat_scale(boat)
+# 随船那封查询信站在甲板右舷：审计量的就是这一格，画与量不会各说一套。
+func letter_foot(boat: int) -> Vector2: return deck_foot(boat) + LETTER_SHIFT * boat_scale(boat)
 
 func tile_spots() -> Array:
 	if _tiles.is_empty():
@@ -164,9 +183,10 @@ func carry_plan(p: float) -> Array:
 	var slot = confirmed_slot()
 	var phase = clampf(p / 0.5, 0, 1)
 	var spots = crate_spots(slot)
-	for index in range(Rules.CASES[slot]):
+	var load = Rules.CASES[slot]
+	for index in range(load):
 		var home: Vector2 = spots[index]
-		plan.append({"slot": slot, "home": home, "at": home.lerp(deck_spot(state.boat, index), phase)
+		plan.append({"slot": slot, "home": home, "at": home.lerp(deck_spot(state.boat, index, load), phase)
 			- Vector2(0, sin(phase * PI) * CRATE_DROP), "phase": phase})
 	return plan
 
@@ -176,19 +196,25 @@ func deck_load(boat: int) -> Array:
 	if boat != state.boat or state.boat < 0 or not sailing(): return load
 	if state.stage == "delivery" and progress < 0.5: return load
 	var slot = confirmed_slot()
-	for index in range(Rules.CASES[slot]): load.append({"slot": slot, "at": deck_spot(boat, index)})
+	var count = Rules.CASES[slot]
+	for index in range(count): load.append({"slot": slot, "at": deck_spot(boat, index, count)})
 	return load
 
-# 付出去的筹票：交单确认之后才离开票匣，末端淡出表示已经收讫。
+# 付出去的筹票：交单确认之后一张一张离开票匣，落到这条船泊位前的收费牌上才算收讫。
+# 每张错开 0.03 出发、各走 0.55——匣子里的张数与牌上的「付讫」都跟着一张张走，不会一帧清空。
+func ticket_phase(p: float, step: int) -> float:
+	return clampf((p - step * 0.03) / 0.55, 0, 1)
+
 func ticket_plan(p: float) -> Array:
 	var plan: Array = []
 	if state.stage != "confirming" or state.boat < 0 or not state.has("paid"): return plan
-	var phase = clampf(p / 0.7, 0, 1)
-	if phase <= 0.0: return plan
 	var spots = ticket_spots()
 	for step in range(state.paid):
+		var phase = ticket_phase(p, step)
+		if phase <= 0.0: continue
 		var home: Vector2 = spots[Rules.BUDGET - 1 - step]
-		var to = boat_spot(state.boat) + Vector2(-16 + (step % 4) * 9, -30 - 4 * int(step / 4))
+		var to = boat_spot(state.boat) + Vector2(-16 + (step % 4) * 9,
+			BERTH_LIFT + BERTH_PITCH * int(step / 4))
 		plan.append({"home": home, "at": home.lerp(to, phase), "phase": phase})
 	return plan
 
@@ -201,6 +227,14 @@ func tickets_left() -> int:
 func paid_tickets() -> int:
 	return state.paid if state.stage in Rules.SETTLED else 0
 
+# 已经落到收费牌上的那几张：只有它们能被「付讫」那块牌念出来，在半空的不算收讫。
+func paid_landed() -> int:
+	if state.stage != "confirming": return paid_tickets()
+	var done = 0
+	for entry in ticket_plan(progress):
+		if float(entry["phase"]) >= 1.0: done += 1
+	return done
+
 # ---- 绘制 ----
 func draw_boats() -> void:
 	for boat in range(Rules.BOATS):
@@ -211,11 +245,19 @@ func draw_boats() -> void:
 		kit(BOAT_ART[boat], foot, width, dim)
 		for entry in deck_load(boat):
 			kit(CRATE_ART[entry["slot"]], entry["at"], CRATE_WIDTH * boat_scale(boat), dim)
-		if state.stage in ["clarify", "delivery", "complete"] and boat == state.boat:
-			kit("paper_roll", deck_spot(boat, 0) + Vector2(30, -8) * boat_scale(boat), LETTER_WIDTH * boat_scale(boat), dim)
+		if not deck_load(boat).is_empty():
+			# 查询信是货上齐那一刻才交上船的：装船的前半程这条船还泊在岸上、镜头收在 1.10，
+			# 整个船身都压在宿主那块对白板底下，信摆上去就是给玩家看一个看不见的东西。
+			kit("paper_roll", letter_foot(boat), LETTER_WIDTH * boat_scale(boat), dim)
 		if state.stage == "puzzle":
 			var strength = 0.62 if state.boat == boat else 0.24 + 0.16 * pulse()
 			socket(foot + Vector2(0, -12), Vector2(width * 0.28, 12), strength)
+
+# 被拉走那一单的封箱此刻还该不该画在预测板上：货一旦离格（飞在半空、已经上船、船已离岸），
+# 格子里就不该再留第二份——原来装船后半程它们会凭空回到刚离开的那一格，与船上一眼看去是两批货。
+func goods_still_on_board(slot: int) -> bool:
+	return not (state.stage in ["delivery", "complete"] and state.boat >= 0
+		and slot == confirmed_slot())
 
 func draw_cells() -> void:
 	var hidden = hide_while_moving(carry_plan(progress))
@@ -223,7 +265,7 @@ func draw_cells() -> void:
 		var dim = crate_alpha(slot)
 		kit("receipt_blank", paper_foot(slot), PAPER_WIDTH, 0.55 + 0.45 * dim)
 		for foot in crate_spots(slot):
-			if foot in hidden: continue
+			if foot in hidden or not goods_still_on_board(slot): continue
 			contact(foot, CRATE_WIDTH * 0.5, 0.22 * dim)
 			kit(CRATE_ART[slot], foot, CRATE_WIDTH, dim)
 		if state.stage == "puzzle" and slot == picked:
@@ -242,13 +284,12 @@ func draw_tiles() -> void:
 			socket(foot - Vector2(0, 18), Vector2(23, 10), 0.5 if on_sheet else 0.18 + 0.12 * pulse())
 
 func draw_box() -> void:
+	# 匣子里只画还没交出去的那几张。收讫的那一叠原来另画在扣扣爪子上，位置落在她自己的身体
+	# 范围里（0.5 倍身位有 163×122，那块纸正好在她肚子上），而 draw_figures() 在 draw_box()
+	# 之后——一张都没露过面，只留下「匣外多出一叠」的幻影计数；落定的读数交给「付讫」那块牌。
 	var spots = ticket_spots()
 	for index in range(tickets_left()):
 		kit("receipt_blank", spots[index], TICKET_WIDTH)
-	if paid_tickets() > 0:
-		var keeper = keeper_foot() + Vector2(6, -44)
-		for step in range(mini(paid_tickets(), 4)):
-			kit("receipt_blank", keeper + Vector2(-10 + step * 7, -3 * step), 30, 0.9)
 
 func draw_lantern() -> void:
 	var foot = lantern_foot()
@@ -265,8 +306,11 @@ func draw_lantern() -> void:
 	draw_circle(glass, 6.0 * lit, Color(1.0, 0.95, 0.78, 0.9 * lit))
 
 func draw_flight(carried: Array, tickets: Array) -> void:
+	# 封箱一落到甲板上就跟着船一起缩：船的宽度按 boat_scale 收，货还按 30 画，
+	# 后半程就成了「一条 73 宽的船上驮着六只 30 宽的箱」。
 	for entry in carried:
-		kit(CRATE_ART[entry["slot"]], entry["at"], CRATE_WIDTH, 1.0 - clampf((entry["phase"] - 0.85) / 0.15, 0, 1) * 0.3)
+		kit(CRATE_ART[entry["slot"]], entry["at"], CRATE_WIDTH * boat_scale(state.boat),
+			1.0 - clampf((entry["phase"] - 0.85) / 0.15, 0, 1) * 0.3)
 	for entry in tickets:
 		kit("receipt_blank", entry["at"], TICKET_WIDTH, 1.0 - clampf((entry["phase"] - 0.75) / 0.25, 0, 1))
 
@@ -310,10 +354,13 @@ func signs() -> Array:
 		boards.append({"text": "正在写这一格", "rect": note_rect(picked)})
 	if state.stage in Rules.SETTLED:
 		boards.append({"text": "本局确认：运 %d 箱" % state.branch, "rect": note_rect(confirmed_slot())})
-		boards.append({"text": "付讫 %d 票" % paid_tickets(), "rect": paid_rect()})
+		# 结票那一段是「一张一张落定」的进行读数：牌面从 0/N 数到 N/N，
+		# 一上来就报 N 会把还在半空的筹票说成已经收讫。
+		boards.append({"text": "付讫 %d/%d 票" % [paid_landed(), state.paid] if state.stage == "confirming"
+			else "付讫 %d 票" % paid_tickets(), "rect": paid_rect()})
 	if state.stage in ["delivery", "complete"]:
 		# 查询信随船去齿轮工坊：这句话挂在离岸那条船右舷外的海面上。
-		# 两排船底收费牌已经占了 x 370..740、y 239..306 这一整条带子，牌子压牌子就会咬掉字；
+		# 两摞船底收费牌（每摞三条）已经占了 x 370..740、y 239..334 这一整条带子，牌子压牌子就会咬掉字；
 		# 取 sail_point 右 145、下 3：左缘 760 离蓝船牌右缘 740 留 20 像素，牌底 242.5
 		# 离蓝船牌上缘 252 留 9.5 像素；离岸前半程镜头还收在 1.10（世界要整体往左上放大），
 		# 投影到屏幕之后牌顶是 195，刚好还在宿主对白板下缘（184 再加 7 像素投影）之外 4 像素。

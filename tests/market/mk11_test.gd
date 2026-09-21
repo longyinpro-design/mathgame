@@ -67,6 +67,36 @@ func settle(game: Node) -> void:
 	game.transient = 0.0
 	game.refresh()
 
+# 「· 键盘 X」这半句是热点对自己说的话：按那个键要做出跟点这下一模一样的动作才算数，
+# 否则玩家照着提示按键，等来的却是把砝码请到另一头。逐条按键与点击各演一遍，比状态。
+func advertised_audit(game: Node, ids: Array) -> Array:
+	var advertised = {"1": KEY_1, "2": KEY_2, "3": KEY_3, "Q": KEY_Q, "W": KEY_W, "E": KEY_E,
+		"A": KEY_A, "S": KEY_S}
+	var named = 0
+	var lied = 0
+	for id in ids:
+		var before = game.state.duplicate(true); var book = game.history.duplicate(true)
+		settle(game)
+		var tip: String = game.buttons[id].tooltip_text
+		var at = tip.find("键盘 ")
+		if at < 0: continue
+		named += 1
+		var key = advertised.get(tip.substr(at + 3).strip_edges(), -1)
+		if key == -1:
+			lied += 1; print("UNKNOWN key advertised by ", id, ": ", tip)
+		else:
+			for conn in game.buttons[id].get_signal_connection_list("pressed"):
+				conn["callable"].call()
+			var by_click = game.state.duplicate(true)
+			game.apply_committed(before, book); settle(game)
+			game.handle_key(int(key))
+			var by_key = game.state.duplicate(true)
+			game.apply_committed(before, book); settle(game)
+			if by_click != by_key:
+				lied += 1
+				print("KEY MISMATCH ", id, " tip 「", tip, "」 click ", by_click, " key ", by_key)
+	return [named, lied]
+
 # 三枚砝码、每枚三个去处：27 种摆法，全部由规则层的记法生成。
 func placements() -> Array:
 	var all: Array = []
@@ -496,6 +526,16 @@ func run() -> void:
 		if rect.size.x < 48 or rect.size.y < 48: drifted += 1
 		if rect.position.x < 0 or rect.position.y < 166 or rect.end.x > 1280 or rect.end.y > 646: drifted += 1
 	check(drifted == 0, "the zoomed hotspots stay tappable and clear of the boards and the button row")
+	# 三种台面各量一遍：空着的格、站着砝码的格、要挪去另一头的格，提示话术都不一样。
+	var told = 0
+	var mistaken = 0
+	for layout in [[EMPTY_PAN, EMPTY_PAN], [[1, 0, 0], EMPTY_PAN], [EMPTY_PAN, [0, 1, 0]]]:
+		game.apply_committed(pose(layout[0], layout[1], 0, "puzzle", 0), [])
+		settle(game)
+		var verdict = advertised_audit(game, ids)
+		told += int(verdict[0]); mistaken += int(verdict[1])
+	check(mistaken == 0 and told >= 12, "every shortcut a hotspot advertises is the one it really answers to")
+	game.apply_committed(pose(EMPTY_PAN, EMPTY_PAN, 0, "puzzle", 0), []); settle(game)
 	game.do_place(0, Rules.FAR); settle(game)
 	check(game.state.far == [1, 0, 0] and not game.buttons["undo"].disabled, "a weight called onto the far pan is saved")
 	check(game.world.land_place == "pan" and game.world.land_slot == 20, "the landing knows which weight just dropped")
@@ -586,10 +626,16 @@ func run() -> void:
 			widest = maxf(widest, width(Rules.equation(pose(pick[0], pick[1], amount)), 15))
 	check(widest <= 314.0, "the longest arrangement still fits the equation board")
 	game.apply_committed(pose(GOOD, FAR, 7, "complete", 2), [])
+	# 预算跟着纸面走：挪动验看单的宽度时不必再回来改一个写死的数。
+	var sheet = game.receipt_text_rect().size.x
 	var receipt = 0
 	for line in game.receipt_lines():
-		if not fits(line, 16, 314.0): receipt += 1
-	check(receipt == 0 and game.receipt_lines().size() == 6, "the 衡伯 slip fits its panel and restates both pans")
+		if not fits(line, 16, sheet): receipt += 1
+	check(receipt == 0 and game.receipt_lines().size() == 6,
+		"the 衡伯 slip fits its panel and restates both pans")
+	# 纵向同理：六行的总高（extra() 把行距覆盖成 0，就只剩字形高）不许越过纸面下沿。
+	check(game.receipt_lines().size() * face.get_height(UIStyle.text_size(16))
+		<= game.receipt_text_rect().size.y, "all six lines of the slip stay on the paper")
 	check("灯油 7 + 砝码 3 = 10 单位" in game.receipt_lines()[2], "the slip reads the goods pan the way it was pressed")
 	check("砝码 1 + 砝码 9 = 10 单位" in game.receipt_lines()[3], "the slip reads the far pan the way it was pressed")
 	var lines_ok = true
@@ -638,10 +684,20 @@ func run() -> void:
 	check(game.world.beam_angle() > 0.0, "the naive arrangement tips the far side down")
 	game.apply_committed(pose(GOOD, FAR, 8, "weighing", 3), [])
 	check(game.world.beam_angle() < 0.0, "overfilling tips the goods side down")
+	game.apply_committed(pose(GOOD, FAR, 7, "result", 3), [])
+	var booked = game.world.boards()[2]["text"]
 	game.apply_committed(pose(GOOD, FAR, 7, "delivery", 3), [])
 	game.world.progress = 0.9
 	check(game.world.shown_oil() == 0 and game.world.delivery_plan(0.9).size() == 1,
 		"the jar leaves the pan and flies to the shelf")
+	# 收走盘上那一格油只是演出：木牌说的还得是玩家抬过秤的那份摆法，
+	# 读数不能在半路改成「灯油 0」，两头也不许跟着抹平成 0 单位。
+	check(game.world.boards()[2]["text"] == booked and "灯油 7" in booked,
+		"the equation board keeps naming the 7 units that were weighed while the jar flies")
+	var readouts = ""
+	for note in game.world.notes(): readouts += note["text"] + "|"
+	check("货盘 10 单位" in readouts and "对面 10 单位" in readouts,
+		"both pan readouts still press 10 units after the oil is poured into the jar")
 	game.apply_committed(pose(GOOD, FAR, 7, "puzzle", 3), [])
 	check(game.world.delivery_plan(0.5).is_empty(), "nothing flies while the table is open")
 	game.queue_free(); await process_frame

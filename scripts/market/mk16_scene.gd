@@ -25,6 +25,10 @@ func goal_line() -> String:
 	return "恰好 3 种不同纪念物 · 总重不超过 7 斤 · 必带绿叶章和信纸"
 
 func status_line() -> String:
+	# 封箱之后台面已经空了：底栏再念「已选 0/3 · 共 0 斤」，说的是玩家刚交出去的那张空台，
+	# 而不是正在裹进包裹、正被红船带走的那三样（宿主现在每一幕演出都会画这一行）。
+	if state.stage in Rules.PACKED:
+		return "已封箱 %d 样 · 共 %d 斤" % [state.gift.size(), Rules.total(state.gift)]
 	return "已选 %d/%d · 共 %d 斤" % [state.table.size(), Rules.PICKS, Rules.total(state.table)]
 
 func submit_label() -> String: return "封箱上红船"
@@ -72,7 +76,7 @@ func receipt_text() -> String:
 		Rules.REPLY_LEAD + reply[0], reply[1], Rules.REWARD])
 
 func exit_buttons() -> void:
-	# 从航图进来的场合由宿主给出「返回集市航图」；单独启动本关时也要有一条回去的路。
+	# 从航图进来的场合由宿主给出「返回千灯航图」；单独启动本关时也要有一条回去的路。
 	if origin != "hub": add_button("open_hub", "回千灯航图", Rect2(690, 646, 280, 54), go_hub)
 
 func snapshot(value: Dictionary) -> Dictionary:

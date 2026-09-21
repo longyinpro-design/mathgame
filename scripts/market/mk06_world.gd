@@ -10,8 +10,11 @@ const KOUKOU_WAVE = preload("res://assets/runtime/market/characters/koukou-v1/wa
 # 三种封装分别落在 manifest `street` 的三座摊位站位上；面包铺在 stall_left，摊主的票匣在 stall_right。
 const STALLS = ["stall_midleft", "stall_middle", "stall_midright"]
 # [封包拆件, 封包显示宽, 灯芯束显示宽, 灯芯束抬高]
-const STALL_ART = [["parcel_large", 78.0, 46.0, 44.0], ["parcel_medium", 68.0, 40.0, 28.0], ["", 0.0, 34.0, 0.0]]
-const ROW_ART = [["parcel_large", 54.0, 30.0, 30.0], ["parcel_medium", 48.0, 26.0, 20.0], ["", 0.0, 26.0, 0.0]]
+# 三摊分别是 大／中／小 三只封包（`parcel_small` 与 MK17 的第三种封装同一件拆件），束口按根数递减：
+# 早先单根那一摊只画一束灯芯，三摊摆在一起看不出「这也是一整包」，只能靠摊板上的字认。
+const STALL_ART = [["parcel_large", 78.0, 46.0, 44.0], ["parcel_medium", 68.0, 40.0, 28.0], ["parcel_small", 54.0, 20.0, 30.0]]
+# 订单板每类最多摆 6 包、行距只有 50：封包画到 54 宽会压住邻包，也会露在 48 宽的热点之外。
+const ROW_ART = [["parcel_large", 46.0, 30.0, 30.0], ["parcel_medium", 44.0, 26.0, 20.0], ["parcel_small", 34.0, 14.0, 18.0]]
 # 灯串拆件上五盏灯的玻璃中心（裁剪图像素），按 manifest 的 attachment 公式换算到世界坐标。
 const LANTERN_GLASS = [Vector2(47, 124), Vector2(136, 163), Vector2(225, 173), Vector2(316, 163), Vector2(402, 125)]
 const STRING_WIDTH = 240.0
@@ -52,7 +55,8 @@ func string_foot() -> Vector2: return station("stall_left") + Vector2(0, -104)
 func paid_foot() -> Vector2: return station("stall_right") + Vector2(0, -22)
 func counter_at(dx: float, dy: float) -> Vector2: return station("counter") + Vector2(dx, dy)
 # 付清的那张单据摊在摊主的柜台上，正好在收讫那一叠的下面：票匣的位置留给票，不压任何摊板。
-func paid_slip_foot() -> Vector2: return counter_at(425, 44)
+# 让到 x 960 是因为扣扣站在 counter_at(500,58)，她的框从世界 x 1058.25 起，旧位置会被她整个人压住。
+func paid_slip_foot() -> Vector2: return counter_at(320, 44)
 
 func ticket_spots() -> Array:
 	# 19 张票排成 3 行（7+7+5），24 宽的票实际高 32 像素，所以行距压在票高之内，
@@ -111,18 +115,13 @@ func ticket_plan(p: float) -> Array:
 	return plan
 
 # ---- drawing ----
-# 每种封装 = 一只封包 + 一束灯芯；散装只画灯芯。根数与票数永远写在摊板上，画面不靠猜。
+# 每种封装 = 一只封包 + 一束从包口探出来的灯芯，束口越细根数越少。根数与票数永远写在摊板上，画面不靠猜。
 func pack(foot: Vector2, kind: int, art: Array, alpha: float = 1.0) -> void:
 	var spec: Array = art[kind]
-	if spec[0] != "":
-		kit("wick_bundle", foot - Vector2(0, spec[3]), spec[2], alpha)
-		kit(spec[0], foot, spec[1], alpha)
-	else:
-		kit("wick_bundle", foot, spec[2], alpha)
+	kit("wick_bundle", foot - Vector2(0, spec[3]), spec[2], alpha)
+	kit(spec[0], foot, spec[1], alpha)
 
-func pack_width(kind: int, art: Array) -> float:
-	var spec: Array = art[kind]
-	return spec[1] if spec[0] != "" else spec[2]
+func pack_width(kind: int, art: Array) -> float: return art[kind][1]
 
 func draw_stalls() -> void:
 	for kind in range(Rules.KINDS):
@@ -150,7 +149,8 @@ func draw_tickets() -> void:
 	for index in range(tickets_left()):
 		kit("receipt_blank", spots[index], TICKET_WIDTH)
 	if state.stage in ["delivery", "complete"]:
-		# 摊主收讫的那一叠：张数由玩家实际买下的包算出，不是写死的。
+		# 收讫的那一叠只是「票已经交到摊主手里」的实物凭据，张数不报账——
+		# 真正付了多少票写在旁边那块「摊主收讫 %d 票」的木牌上，由 paid_tickets() 现算。
 		var pile = paid_foot()
 		for step in range(4):
 			kit("receipt_blank", pile + Vector2(-10 + step * 7, -3 * step), 30, 0.9)
@@ -196,9 +196,18 @@ func draw_flight(carried: Array, tickets: Array) -> void:
 		kit("receipt_blank", entry["at"], TICKET_WIDTH, 1.0 - clampf((entry["phase"] - 0.75) / 0.25, 0, 1))
 
 func draw_figure() -> void:
-	var happy = state.stage == "complete" or (state.stage == "delivery" and progress > 0.5)
-	# street 场景没有人物站位，扣扣落在前景柜台的右端（由 counter 站位推出，不另立坐标）。
-	figure(KOUKOU_WAVE if happy else KOUKOU_TIE, counter_at(550, 58), 0.5)
+	figure(KOUKOU_WAVE if happy() else KOUKOU_TIE, koukou_foot(), 0.5)
+
+# 扣扣的脚点与她的画面框：基类 figure() 以脚点水平居中、向上长一个身位，这里复算同一份几何给检查用。
+func happy() -> bool: return state.stage == "complete" or (state.stage == "delivery" and progress > 0.5)
+# street 场景没有人物站位，扣扣落在前景柜台的右端（由 counter 站位推出，不另立坐标）。
+# dx 500 是上限：再往右，1.10 贴脸镜头下她右半边身子会被裁到画面外（550 时超出 54.9 像素）；
+# 她的框也从世界 x 1058.25 起，正好让开筹票匣（最后一列票到 1014）与柜面上的付清单据。
+func koukou_foot() -> Vector2: return counter_at(500, 58)
+func koukou_rect() -> Rect2:
+	var texture: Texture2D = KOUKOU_WAVE if happy() else KOUKOU_TIE
+	var dims = Vector2(texture.get_width(), texture.get_height()) * 0.5
+	return Rect2(koukou_foot() - Vector2(dims.x / 2, dims.y), dims)
 
 # 摊板与订单牌集中在这里列出，画之前先被无头检查逐条量过宽度：
 # 汉字在 Godot 里是一个不断词，plaque 又不会换行，超框就会画到牌子外面。

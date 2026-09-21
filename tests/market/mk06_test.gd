@@ -3,6 +3,7 @@ const Rules = preload("res://scripts/market/mk06_rules.gd")
 const Catalog = preload("res://scripts/market/chapter_catalog.gd")
 const Bridge = preload("res://scripts/market/market_bridge.gd")
 const Scene = preload("res://game/market_mk06.tscn")
+const World = preload("res://scripts/market/mk06_world.gd")
 var checks = 0
 var failures = 0
 var path = "/tmp/pixel-mk06-rules-" + str(Time.get_ticks_usec()) + ".json"
@@ -256,6 +257,13 @@ func run() -> void:
 	check(small == 0, "every drop target is at least 48x48 logical pixels")
 	check(outside == 0, "every hit target stays inside the 1280x720 frame")
 	check(overlap == 0, "no two hit targets overlap")
+	# 贴脸镜头（1.10、整体偏移 -64/-43）下扣扣不能被窗框切掉，也不能压住柜面上的票匣与付清单据。
+	game.state.stage = "puzzle"; game.world.state = game.state; game.world.progress = 0.0
+	var keeper = game.world.koukou_rect()
+	check(keeper.end.x * 1.10 - 64 <= 1280.0 and keeper.position.x * 1.10 - 64 >= 0.0,
+		"the counter keeper stays inside the frame under the close-up camera")
+	check(keeper.position.x > 1014.0 and keeper.position.x > game.world.paid_slip_foot().x + World.PAID_SLIP_WIDTH / 2.0,
+		"she stands clear of the ticket box and of the paid slip on the counter")
 	game.do_take(0); settle(game)
 	check(game.state.order == [1, 0, 0] and not game.buttons["undo"].disabled, "taking a pack writes the sheet and enables undo")
 	check(game.buttons.has("row_0_0"), "the ordered pack becomes its own return target")
@@ -267,6 +275,10 @@ func run() -> void:
 	check(game.state.order == [1, 0, 2], "undo rewinds through the host")
 	game.undo(); settle(game); game.undo(); settle(game); game.undo(); settle(game)
 	check(game.state.order == [0, 0, 0] and game.history.is_empty(), "the rewind consumes every recorded step")
+	# 空行上按 Q/W/E：不能听到「那一包已经放回摊位了」——这一摊什么都没拿过。
+	game.handle_key(KEY_Q)
+	check(game.message == "%d 根那一类还没有包在订单上。" % Rules.STICKS[0] and game.state.order == [0, 0, 0],
+		"returning from an empty row names the row instead of inventing a returned pack")
 	game.do_take(0); settle(game); game.do_take(1); settle(game); game.do_take(1); settle(game)
 	game.do_reset()
 	check(game.state.order == [0, 0, 0] and game.state.stage == "puzzle", "重摆 clears the sheet without leaving the stall")
@@ -317,7 +329,7 @@ func run() -> void:
 	var receipt = 0
 	for line in game.receipt_lines():
 		if not fits(line, 16, 270.0): receipt += 1
-	check(receipt == 0 and game.receipt_lines().size() == 7, "the receipt fits its panel and restates the paid order")
+	check(receipt == 0 and game.receipt_lines().size() == 6, "the receipt fits its panel and restates the paid order")
 	check("×1" in game.receipt_lines()[1] and "×2" in game.receipt_lines()[2], "the receipt counts what the player bought")
 	var lines_ok = true
 	for stage in Rules.STAGES:

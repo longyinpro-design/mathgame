@@ -3,6 +3,7 @@ extends SceneTree
 # 在 1280×720 与 960×540 各拍一次，并检查街面上的木牌、柜台上的纸与回执有没有互相压住。
 const Scene = preload("res://game/market_mk05.tscn")
 const Rules = preload("res://scripts/market/mk05_rules.gd")
+const World = preload("res://scripts/market/mk05_world.gd")
 const Bridge = preload("res://scripts/market/market_bridge.gd")
 const UIStyle = preload("res://scripts/cargo/skin.gd")
 const Focus = preload("res://tests/forest/window_focus.gd")
@@ -83,15 +84,26 @@ func carved(text: String, board: float, where: String) -> bool:
 	if need <= board: return false
 	print("SPILL street ", where, " ", text, " needs ", need, " in ", board); return true
 # 街面上此刻画着的每一句：残句牌、店名/「收 X」牌、订单板牌头、柜台牌、摊着的货签名。
+# 牌面文字一律向 world 要（name_plate/counter_plate/board_head_plate），实窗不再自己抄一遍文案；
+# 门口那块牌有两副面孔、柜台那块牌会跟着签数少下去，所以把所有会出现的样子一次量齐。
 func carved_over() -> int:
 	var over = 0
+	var saved = game.world.state
 	for place in range(Rules.PLACES.size()):
 		over += 1 if carved(Rules.KEPT[place], KEPT_BOARD, "kept") else 0
-		var held: int = game.state.assign[place]
-		var caption = Rules.PLACE_CN[place] if held < 0 else "%s · 收 %s" % [Rules.PLACE_CN[place], Rules.GOODS_FULL[held]]
-		over += 1 if carved(caption, NAME_BOARD, "caption") else 0
-	over += 1 if carved("订单板 · 三句留下的话", NAME_BOARD, "board head") else 0
-	over += 1 if carved("柜台 · 四张货签", NAME_BOARD, "counter") else 0
+		over += 1 if carved(game.world.name_plate(place, -1), NAME_BOARD, "caption") else 0
+		for good in range(Rules.GOODS.size()):
+			over += 1 if carved(game.world.name_plate(place, good), NAME_BOARD, "caption") else 0
+	over += 1 if carved(game.world.board_head_plate(), NAME_BOARD, "board head") else 0
+	for placed in range(Rules.PLACES.size() + 1):
+		var sweep = saved.duplicate(true)
+		var slots: Array = []
+		for index in range(Rules.PLACES.size()):
+			slots.append(index if index < placed else -1)
+		sweep.assign = slots
+		game.world.state = sweep
+		over += 1 if carved(game.world.counter_plate(), NAME_BOARD, "counter") else 0
+	game.world.state = saved
 	for good in range(Rules.GOODS.size()):
 		if game.state.assign.has(good): continue
 		over += 1 if carved(Rules.GOODS_FULL[good], TAG_BOARD, "tag face") else 0
@@ -118,10 +130,14 @@ func cramped(parent: Node) -> int:
 		if need > child.size.y + 1:
 			over += 1; print("CRAMP ", lines, " lines of ", px, "px need ", need, " in ", child.size, " ", child.text)
 	return over
+# 谁压住谁、谁点得着，都按各自真实的画布变换量：世界层那一份带着镜头此刻的 1.10 与偏移，
+# 宿主 ui 与热点那一份是恒等。四处共用一个问法，才不会各算各的。
+func ui_view(source: CanvasItem) -> Transform2D:
+	return source.get_global_transform_with_canvas()
 # 回执之类的纸面板不能盖住它正在复述的那四张订单（含残句牌与店名牌）。
 func covering() -> int:
 	var over = 0
-	var xform: Transform2D = game.world.get_global_transform_with_canvas()
+	var xform: Transform2D = ui_view(game.world)
 	var zoom: Vector2 = Vector2(xform.x.x, xform.y.y)
 	for child in game.ui.get_children():
 		if not child is Panel: continue
@@ -137,11 +153,32 @@ func clipped() -> int:
 	var over = 0
 	for id in game.buttons:
 		var b: Control = game.buttons[id]
-		var xform: Transform2D = b.get_global_transform_with_canvas()
+		var xform: Transform2D = ui_view(b)
 		var box = Rect2(xform * Vector2.ZERO, b.size * Vector2(xform.x.x, xform.y.y))
 		if box.position.x < 0 or box.position.y < 0 or box.end.x > 1280.0 or box.end.y > 720.0:
 			over += 1; print("CLIP ", id, " ", box)
 	return over
+# 世界里的东西换算到屏幕：镜头拉近时位置与尺寸一起缩，Control 自己的 size 却不缩，
+# 所以热点也要按同一种算法量，不然 1.10 倍之下两边差出 10%。
+func on_board(rect: Rect2) -> Rect2:
+	var xf: Transform2D = ui_view(game.world)
+	return Rect2(xf * rect.position, rect.size * Vector2(xf.x.x, xf.y.y))
+func hotspot_of(id: String) -> Rect2:
+	var xf: Transform2D = ui_view(game.buttons[id])
+	return Rect2(xf * Vector2.ZERO, (game.buttons[id] as Control).size * Vector2(xf.x.x, xf.y.y))
+# 纸面按 manifest 的真锚点独立算一遍（`receipt_blank` 237×316、anchor 118.5/308），
+# 不从 world.label_rect()/card_rect() 取：那正是被审的那份代码，抄过来就成了自证。
+func sheet(foot: Vector2, width: float) -> Rect2:
+	var texture: Texture2D = game.world.atlases["receipt_blank"]
+	var scale = width / texture.get_width()
+	var anchor: Array = game.world.parts["receipt_blank"].anchor_px
+	return Rect2(foot - Vector2(anchor[0], anchor[1]) * scale,
+		Vector2(texture.get_width(), texture.get_height()) * scale)
+func covers_sheet(hot: Rect2, paper: Rect2) -> bool:
+	return (hot.position.x <= paper.position.x + 0.5 and hot.position.y <= paper.position.y + 0.5
+		and hot.end.x >= paper.end.x - 0.5 and hot.end.y >= paper.end.y - 0.5)
+func covers_paper(id: String, foot: Vector2, width: float, label: String) -> void:
+	check(covers_sheet(hotspot_of(id), on_board(sheet(foot, width))), label)
 # 四只箱子各走各的：同一帧里两件货的脚点挨得太近，屏幕上就是两张糊在一起的图。
 func closest_flight() -> float:
 	var nearest := 9999.0
@@ -198,6 +235,25 @@ func run() -> void:
 			if b.size.x < 48 or b.size.y < 48: small_target += 1
 		check(small_target == 0, "all four labels and four order cards are 48 pixel targets or bigger")
 		check(clipped() == 0 and covering() == 0, "no target hides behind the dialogue board or the button row")
+		# 热点就是玩家看得见的那面纸：正方框比纸矮一截，照着纸尖去点就会落空。
+		for good in range(Rules.GOODS.size()):
+			covers_paper("good_%d" % good, game.world.label_spots()[good], World.TAG_WIDTH,
+				"label %d can be clicked from the paper tip to the tail" % (good + 1))
+		for place in range(Rules.PLACES.size()):
+			covers_paper("place_%d" % place, game.world.stall(place), World.CARD_WIDTH,
+				"%s 的订单从纸尖到纸尾都点得着" % Rules.PLACE_CN[place])
+		var resting = hotspot_of("good_2")
+		await key(KEY_3)
+		var lifted = hotspot_of("good_2")
+		var zoom: float = game.world.get_global_transform_with_canvas().x.x
+		check(lifted.position.y < resting.position.y
+			and absf((resting.position.y - lifted.position.y) - World.HELD_LIFT * zoom) < 1.0,
+			"the clickable frame rises with the tag the player is holding")
+		covers_paper("good_2", game.world.label_spots()[2] - Vector2(0, World.HELD_LIFT), World.TAG_WIDTH,
+			"the lifted tag is still clickable over its whole sheet")
+		await key(KEY_3)
+		check(game.state.hand == -1 and game.state.assign == EMPTY,
+			"putting the tag straight back leaves the counter as full as it was")
 		check(spilled(game.ui) == 0 and cramped(game.ui) == 0 and carved_over() == 0 and boards_fit() == 0,
 			"the empty street keeps every carved line inside its board")
 		check(game.state.assign == EMPTY and game.buttons.undo.disabled,
@@ -219,9 +275,12 @@ func run() -> void:
 		await key(KEY_4); await key(KEY_R)
 		check(game.state.assign == TRAP, "布与纸按读得清的那两句各就各位，铜铃还糊在面包铺")
 		await click("deliver")
-		check(game.state.stage == "puzzle" and "面包铺不收铃" in game.message
-			and "铜铃按在了面包铺" in game.message and "还有 1 处" in game.message,
-			"the refused hand-over names the sentence the board breaks and how many are left")
+		check(game.state.stage == "puzzle"
+			and game.message == "订单板上「面包铺」写着「不收 铜铃」：铜铃正按在那儿。（还有 1 处没有归位）",
+			"the refused hand-over quotes the board verbatim and counts the shop still open")
+		# 拒绝理由里引号中的那半句，必须是玩家抬头就能在那家门口那块残句牌上找到的一串字。
+		check(("「%s」" % Rules.KEPT[0]) in game.message and ("「%s」" % Rules.PLACE_CN[0]) in game.message,
+			"the refusal cites the sentence and the shop the street actually painted")
 		check(spilled(game.ui) == 0 and cramped(game.ui) == 0 and boards_fit() == 0, "the refusal still fits inside its dialogue board")
 		await capture(prefix+"04-refused")
 		for n in range(4): await click("hint")

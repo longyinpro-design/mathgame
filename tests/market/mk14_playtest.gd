@@ -213,6 +213,18 @@ func offscreen_boards() -> int:
 		if shown.position.x < 0 or shown.position.y < 0 or shown.end.x > 1280 or shown.end.y > 720:
 			cut += 1; print("OFFSCREEN board ", board["text"], " at ", shown)
 	return cut
+# 扣扣是画在摊子上的人，不是牌子：贴脸镜头下她整只都得留在画面里；
+# 她排在砝码架之后落笔，框一压过架格，玩家要点的那枚砝码就藏在她身子底下。
+# 两块几何都按当前镜头换算到屏幕上再比，1.10 那一档才量得准。
+func keeper_off() -> int:
+	var shown: Rect2 = on_screen(game.world.keeper_rect())
+	var cut = 0
+	if shown.position.x < 0 or shown.position.y < 0 or shown.end.x > 1280 or shown.end.y > 720:
+		cut += 1; print("OFFSCREEN 扣扣 ", shown)
+	for index in range(Rules.COUNT):
+		if shown.intersects(on_screen(game.world.rack_rect(index))):
+			cut += 1; print("COVERED 砝码架 ", index + 1, " by 扣扣 ", shown)
+	return cut
 
 func run() -> void:
 	create_timer(90).timeout.connect(func(): push_error("MK14 window watchdog"); quit(1))
@@ -260,6 +272,8 @@ func run() -> void:
 		await click("skip")
 		check(game.state.stage == "ready","走位停下来才交给玩家")
 		check(game.buttons.next.text == "开始配秤","简报先说清点架上那一格就是挪砝码")
+		check(off_board() == 0 and "Q、W、E" in game.line(),
+			"简报两行都装在自己的板里，顺手把「放回架上」的快捷键交给玩家")
 		await click("next")
 		check(game.state.stage == "puzzle" and at_camera(1.10, Vector2(-64,-43)),
 			"配秤时镜头贴着铜秤与砝码架")
@@ -271,10 +285,11 @@ func run() -> void:
 		check(not "平" in board_with("货 5 = 空盘") and not "差" in board_with("货 5 = 空盘"),
 			"读数板从不判分：既不说平也不说差")
 		check(board_with("订单一 · 5 单位 · 上秤了") != "" and board_with("订单二 · 8 单位 · 在车上") != "",
-			"两单各在自己的车上，车顶板说的是眼前这一步")
+			"这一单的货已经站上秤盘，下一单还压在自己的车上：两块牌各说各的")
 		check(game.world.state == game.state,"画面读的就是提交之后的那一份账")
 		check(covered() == 0 and payoff_covered() == 0 and offscreen_boards() == 0,
 			"贴紧的镜头下没有牌被压住，也没有牌被推出画面")
+		check(keeper_off() == 0,"贴脸镜头下扣扣整只都在画面里，也没压住架上那三枚砝码")
 		await capture(prefix+"03-scale")
 		# ---- 只念不动：点盘与点车都把玩家自己摆出来的东西照念一遍 ----
 		await click("pan_2")
@@ -388,6 +403,13 @@ func run() -> void:
 			and Rules.difference(game.world.state) == 0,
 			"两盘的数是从世界的账上读出来的：9 对 9，差 0")
 		await capture(prefix+"12-migration")
+		await hold(3.6)
+		check(game.world.parcel_spot(0) == game.world.SPOT_DONE
+			and game.world.parcel_spot(1) == game.world.SPOT_PAN
+			and board_with("订单一 · 5 单位 · 已交货") != ""
+			and board_with("订单二 · 8 单位 · 上秤了") != "" and keeper_off() == 0,
+			"交付收势：两单都落定了，两块车顶板跟着改口，扣扣也没被窗框切掉")
+		await capture(prefix+"12b-handover-settled")
 		game.paused = false; await create_timer(0.12).timeout
 		paused_at = game.elapsed
 		game._notification(NOTIFICATION_APPLICATION_FOCUS_OUT)
@@ -447,6 +469,7 @@ func run() -> void:
 		check(off_board() == 0 and spilled_boards() == 0 and boards_clear() == 0,"收尾没有越框的字，两块纸也不互相压角")
 		check(covered() == 0 and payoff_covered() == 0 and offscreen_boards() == 0,
 			"回执不压秤盘、砝码架或出口，纪念物也没被任何牌子盖住")
+		check(keeper_off() == 0,"收尾镜头拉回整院时，挥手的扣扣照样在画面里、也没站上架格")
 		await capture(prefix+"14-receipt")
 		var on_disk = game.state.duplicate(true)
 		game.queue_free(); await process_frame
@@ -508,7 +531,8 @@ func run() -> void:
 		check(again != null and "3 从货盘挪到砝码架" in again.text,
 			"重放的回执复述的还是玩家真正挪过的那一枚")
 		check(off_board() == 0 and spilled_boards() == 0 and covered() == 0
-			and payoff_covered() == 0 and boards_clear() == 0 and offscreen_boards() == 0,
+			and payoff_covered() == 0 and boards_clear() == 0 and offscreen_boards() == 0
+			and keeper_off() == 0,
 			"重放的收尾没有溢出、越框、被压住或两块纸互相压角")
 		await capture(prefix+"16-replay-clean")
 		game.queue_free(); await process_frame

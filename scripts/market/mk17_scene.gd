@@ -46,7 +46,8 @@ func line() -> String:
 	match state.stage:
 		"arrival": return LINES[state.beat]
 		"approach": return "铜鹭踏着栈桥走过来，检查旗还收在翼下。"
-		"ready": return "铜鹭：三张货单都钉在栏上，随时能看。\n先决定怎么封，再决定交哪几包。"
+		# 简报把两条路都说全：鼠标点牌，键盘上 1—4 走封装、Q W E 上货、R 请回最后一包、F 看旗。
+		"ready": return "铜鹭：先决定怎么封，再决定交哪几包，货单随时能看。\n点牌或按键都行：1—4 重封，Q W E 上货，R 放回，F 看旗。"
 		"puzzle": return puzzle_line()
 		"flag": return "铜鹭翻出本局固定的那面验货旗。"
 		"lift": return "二站的货吊上蓝船。已交出去的货不回收。"
@@ -70,30 +71,33 @@ func build() -> void:
 		add_hotspot("take_%d" % kind, world.stock_row_rect(kind), do_take.bind(kind), take_tip(kind))
 	var kinds = Rules.tray_kinds(state)
 	for slot in range(kinds.size()):
-		add_hotspot("tray_%d" % slot, world.tray_rect(slot), do_unload.bind(slot), unload_tip(kinds[slot]))
+		add_hotspot("tray_%d" % slot, world.tray_rect(slot), do_unload.bind(slot), unload_tip(slot, kinds[slot]))
 	for index in range(Rules.KINDS):
 		add_hotspot("berth_%d" % index, world.berth_rect(index), read_berth.bind(index), berth_tip(index))
 	add_hotspot("flag", world.flag_rect(), look_flag, flag_tip())
 
 func op_tip(index: int) -> String:
 	var op: Dictionary = Rules.OPS[index]
-	return "重新封装「%s」· 花 1 次机会，剩 %d 次\n%s" % [op.name, state.chances,
+	return "重新封装「%s」· 花 1 次机会，剩 %d 次 · 键盘 %d\n%s" % [op.name, state.chances, index + 1,
 		"这一步现在走得通，点一下就走" if Rules.can_apply(state, index) else "现在走不通：点了只会告诉你为什么"]
 
 func take_tip(kind: int) -> String:
-	return "把 1 个%s（%d 单位）放上验货托盘 · 台上还有 %d 个\n托盘上的货还没离手，点它可以放回" % [
-		Rules.PACK_NAMES[kind], Rules.UNITS[kind], state.stock[kind]]
+	return "把 1 个%s（%d 单位）放上验货托盘 · 台上还有 %d 个 · 键盘 %s\n托盘上的货还没离手，点它可以放回" % [
+		Rules.PACK_NAMES[kind], Rules.UNITS[kind], state.stock[kind], ["Q", "W", "E"][kind]]
 
-func unload_tip(kind: int) -> String:
-	return "把这一包%s放回台面 · 交货之前随时可以反悔" % Rules.PACK_NAMES[kind]
+# 键盘上只有 R 这一颗，管的是最后放上托盘的那一包：其余格子按它不放回东西，就不写这句话。
+func unload_tip(slot: int, kind: int) -> String:
+	return "把这一包%s放回台面 · 交货之前随时可以反悔%s" % [Rules.PACK_NAMES[kind],
+		" · 键盘 R" if slot == Rules.packs_of(state.tray) - 1 else ""]
 
 func berth_tip(index: int) -> String:
 	return "看 %s 的货单：%s" % [Rules.STATION_NAMES[index], Rules.rule_caption(state, index)]
 
 func flag_tip() -> String:
 	if state.shown == 1:
-		return "本局固定的是 %s（%s）· 重新读档也不会换旗" % [Rules.FLAG_SHORT[state.flag], Rules.FLAG_RULE[state.flag]]
-	return "旗还没翻：第一站交完才翻面\n两种可能开局就写在牌上，没人替你猜"
+		return "本局固定的是 %s（%s）· 重新读档也不会换旗 · 键盘 F" % [
+			Rules.FLAG_SHORT[state.flag], Rules.FLAG_RULE[state.flag]]
+	return "旗还没翻：第一站交完才翻面\n两种可能开局就写在牌上，没人替你猜 · 键盘 F"
 
 # ---- 回执：只复述玩家真正交出去的包与真正翻出来的那面旗 ----
 func receipt_lines() -> Array:
@@ -135,7 +139,7 @@ func tune_undo() -> void:
 		else "本站还没有摆过货：上一站的货不回收，要重来请用「退回上一站的货」或「回到关前规划」"
 
 func exit_buttons() -> void:
-	# 从航图进来的场合由宿主给出「返回集市航图」；单独启动本关时也要有一条回去的路。
+	# 从航图进来的场合由宿主给出「返回千灯航图」；单独启动本关时也要有一条回去的路。
 	if origin != "hub": add_button("open_hub", "回千灯航图", Rect2(690, 646, 280, 54), go_hub)
 
 func snapshot(value: Dictionary) -> Dictionary:

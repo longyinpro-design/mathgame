@@ -4,6 +4,7 @@ extends SceneTree
 # 检查只读 Rules/Scene/Catalog 的公开说法，另附一份手工拼现场的 pose()，
 # 这样「旗固定」「机会不退」「已交不回收」这三条都能在无头里被真的按一遍。
 const Rules = preload("res://scripts/market/mk17_rules.gd")
+const World = preload("res://scripts/market/mk17_world.gd")
 const Catalog = preload("res://scripts/market/chapter_catalog.gd")
 const Content = preload("res://scripts/content/content_catalog.gd")
 const Bridge = preload("res://scripts/market/market_bridge.gd")
@@ -59,6 +60,49 @@ func with_tray(row: Array, stock: Array, chances: int, station: int = 1,
 func opened(flag: int) -> Dictionary:
 	return pose("puzzle", flag, 1, Rules.START_STOCK.duplicate(), Rules.empty_packs(),
 		Rules.empty_deliveries(), Rules.CHANCES)
+
+# 「· 键盘 X」这半句是热点对自己说的话：按那个键要做出跟点这下一模一样的动作才算数，
+# 否则玩家照着提示按键，等来的却是另一件事。逐条按键与点击各演一遍，比状态。
+func advertised_audit(game: Node, ids: Array) -> Array:
+	var keys := {"1": KEY_1, "2": KEY_2, "3": KEY_3, "4": KEY_4,
+		"Q": KEY_Q, "W": KEY_W, "E": KEY_E, "R": KEY_R, "F": KEY_F}
+	var told = 0
+	var lied = 0
+	for id in ids:
+		if not game.buttons.has(id): continue
+		var before = game.state.duplicate(true)
+		var book = game.history.duplicate(true)
+		ready_input(game)
+		var tip: String = game.buttons[id].tooltip_text
+		var at = tip.find("键盘 ")
+		if at < 0: continue
+		told += 1
+		# 「· 键盘 X」可能写在说明的第一行中间，取到行尾就得停，不能把下一句一起当键名。
+		var key: int = keys.get(tip.substr(at + 3).split("\n")[0].strip_edges(), -1)
+		if key == -1:
+			lied += 1; print("牌上写着认不出的键：", id, " 「", tip, "」")
+			continue
+		for conn in game.buttons[id].get_signal_connection_list("pressed"):
+			conn["callable"].call()
+		ready_input(game)
+		var by_click = game.state.duplicate(true)
+		game.apply_committed(before, book); ready_input(game)
+		game.handle_key(key)
+		ready_input(game)
+		var by_key = game.state.duplicate(true)
+		game.apply_committed(before, book); ready_input(game)
+		if by_click != by_key:
+			lied += 1
+			print("键与点不是一回事 ", id, " 「", tip, "」 点了 ", by_click, " 按了 ", by_key)
+	return [told, lied]
+
+# 口条的内框只有 798 宽（Rect2(338,98,826,86) 去掉 14/28 边距），汉字不会自己断行。
+func line_fits(value: String, width: float) -> bool:
+	var widest = 0.0
+	for line in value.split("\n"):
+		widest = maxf(widest, UIStyle.face().get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1,
+			UIStyle.text_size(20)).x)
+	return widest <= width
 
 # 只把动画一幕一幕推过去，不依赖计时器：等价于玩家按「跳过当前动画」。
 func settle(state: Dictionary) -> Dictionary:
@@ -433,8 +477,8 @@ func run() -> void:
 			probe_scene.state.stock = [2, 0, 0]
 		check("站" in probe_scene.puzzle_line(), "%d 站的台上话点得出是哪一站" % station)
 	probe_scene.state = stage_pose("lift")
-	for tip in [probe_scene.op_tip(0), probe_scene.take_tip(L), probe_scene.unload_tip(M), probe_scene.berth_tip(1),
-			probe_scene.flag_tip()]:
+	for tip in [probe_scene.op_tip(0), probe_scene.take_tip(L), probe_scene.unload_tip(0, M),
+			probe_scene.berth_tip(1), probe_scene.flag_tip()]:
 		check(not tip.is_empty() and tip.count("\n") <= 1, "热点说明 %s 不超过两行" % tip.left(6))
 	check("花 1 次机会" in probe_scene.op_tip(0), "封装牌上先写清这一步要花一次机会")
 	check("重新读档也不会换旗" in probe_scene.flag_tip(), "翻出来的旗上写明重读不换")
@@ -478,6 +522,66 @@ func run() -> void:
 	check(game.buttons.undo.disabled and "上一站的货不回收" in game.buttons.undo.tooltip_text,
 		"没有本站摆法时撤销不亮，说明里指清退的是哪一段")
 	check(game.buttons.has("reset") and game.buttons.has("hint"), "码头给得出「重摆」与「请扣扣提醒」")
+	# ---- 键盘层：牌上写的那颗键，按下去必须和点这一下做出同一个动作 ----
+	var told = 0
+	var mistaken = 0
+	# 四种现场：托盘空着、只一包、最后一包不是选中的那种、摆满六包。
+	for layout in [[[0, 0, 0], [6, 0, 0], 3], [[1, 0, 0], [5, 0, 0], 3],
+			[[1, 1, 0], [4, 0, 1], 2], [[3, 2, 1], [1, 0, 1], 1]]:
+		var arranged = with_tray(layout[0], layout[1], layout[2])
+		if not Rules.validate(arranged):
+			check(false, "键盘审计的现场本身不合法：%s" % layout)
+			continue
+		game.apply_committed(arranged, []); ready_input(game)
+		var ids = hotspots.duplicate(true)
+		for slot in range(Rules.packs_of(layout[0])): ids.append("tray_%d" % slot)
+		var verdict = advertised_audit(game, ids)
+		told += int(verdict[0]); mistaken += int(verdict[1])
+	check(mistaken == 0 and told == 35,
+		"牌上写出的快捷键，按下去就是点它那一下（%d 处写着，%d 处说错）" % [told, mistaken])
+	# ---- 口条只有两行的位置：每一幕的台词都得在自己的板子里说完 ----
+	var too_wide = 0
+	var longest = ""
+	for stage in Rules.STAGES:
+		for beat in range(3 if stage == "arrival" else 1):
+			var look = stage_pose(stage)
+			if stage == "arrival": look.beat = beat
+			if not Rules.validate(look): continue
+			game.apply_committed(look, []); ready_input(game)
+			var spoken = game.line()
+			if not line_fits(spoken, 798.0): too_wide += 1; longest = spoken
+	check(too_wide == 0, "九幕台词与开场三句都出不了口条（挤不下的：「%s」）" % longest)
+	# ---- 三站的货床：三包落在展翼的实心甲板上，一格压不上一格，也不出画面 ----
+	game.apply_committed(stage_pose("carrying"), []); ready_input(game)
+	var atlas: Texture2D = game.world.atlases["parcel_medium"]
+	var pinned: Array = game.world.parts["parcel_medium"].anchor_px
+	var anchor := Vector2(pinned[0], pinned[1])
+	var bed_scale: float = World.BERTH_PACK_WIDTH[M] / atlas.get_width()
+	var dims := Vector2(atlas.get_width(), atlas.get_height()) * bed_scale
+	var plate: Texture2D = World.HERON_PLATFORM
+	var plate_dims := Vector2(plate.get_width(), plate.get_height()) * World.HERON_SCALE
+	var plate_rect := Rect2(game.world.boss_foot() - Vector2(plate_dims.x / 2, plate_dims.y), plate_dims)
+	var bed: Array = []
+	var doubled = 0
+	var off_deck = 0
+	for slot in range(Rules.MAX_PACKS[2]):
+		var rect := Rect2(game.world.pack_home(2, slot) - anchor * bed_scale, dims)
+		for other: Rect2 in bed:
+			if rect.intersects(other): doubled += 1
+		if not plate_rect.encloses(rect): off_deck += 1
+		bed.append(rect)
+	check(doubled == 0, "货床上的三包各占一格，后一包不会压住前一包")
+	check(off_deck == 0, "货床整排都还在搬运台的甲板里，没有一包飘在台外")
+	# 包的正中心落在搬运台原图的实心木色上：这一格若画在铜鹭之前，玩家一颗也看不见。
+	var plate_image: Image = plate.get_image()
+	var on_plate = 0
+	for rect: Rect2 in bed:
+		var at: Vector2 = rect.position + rect.size / 2.0
+		var pixel := Vector2i(int((at.x + 0.5 - plate_rect.position.x) / World.HERON_SCALE),
+			int((at.y + 0.5 - plate_rect.position.y) / World.HERON_SCALE))
+		if plate_image.get_pixelv(pixel).a > 0.99: on_plate += 1
+	check(on_plate == bed.size(), "三包的中心都压在展翼的实心甲板上（画在铜鹭之后才看得见）")
+	game.apply_committed(stuck, []); ready_input(game)
 	# ---- 每一幕真的重画一遍：绘制代码一崩就会带着 SCRIPT ERROR 退出来 ----
 	for stage in Rules.STAGES:
 		for look in [stage_pose(stage), stage_pose(stage).duplicate(true)]:

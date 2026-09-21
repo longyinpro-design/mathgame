@@ -310,6 +310,16 @@ func run() -> void:
 		check(game.world.stamped(game.world.progress).is_empty(),
 			"nothing is stamped off at the dock before the hand-over starts")
 		await capture(prefix+"11-filing")
+		# 两半张抄件在前半程就落位了：后半程还把它们当在飞的件，`draw_board()` 会为让位把整行藏掉，
+		# 归档动画有一半时长板面上是缺货的——11-filing 拍到的就是这个空档。
+		# `hold()` 的秒数是这一格的绝对时刻，从 1.2 再往前走到 1.7（归档共 2.8 秒，进度已过 0.5）。
+		await hold(1.7)
+		var settled = game.world.filing_plan(game.world.progress)
+		check(settled.is_empty() and game.world.hide_while_moving(settled).is_empty()
+			and not game.world.line_goods(2, game.world.board()).is_empty()
+			and covered() == 0,
+			"the rewrite has landed: the row keeps its own goods and no street board hides them")
+		await capture(prefix+"11b-filing-settled")
 		await click("skip")
 		check(game.state.stage == "delivery" and game.state.filed == SOLVED,
 			"the filed board goes out to the dock as one record")
@@ -317,6 +327,8 @@ func run() -> void:
 		check(game.world.stamped(game.world.progress).size() == 2
 			and game.world.dock_count() == 10,
 			"two rows are stamped off and the dock counts those rows, not the old 16")
+		check(board_with("点收中 10/13 瓶") != "" and spilled_boards() == 0,
+			"the dock board reads 已点收 / 实收 while the stamps are still landing, inside its own wood")
 		check(stamp_covered() == 0,"the two rows signed off at the dock are not hidden by any street board")
 		check(board_with("换算") == "","the frozen board stops advertising controls it can no longer take")
 		check(game.state.stage == "delivery","the scene is still mid-hand-over")

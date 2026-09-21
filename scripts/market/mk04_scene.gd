@@ -1,18 +1,18 @@
 extends "res://scripts/market/level_host.gd"
 const Rules = preload("res://scripts/market/mk04_rules.gd")
 const World = preload("res://scripts/market/mk04_world.gd")
-# 开场三句、澄清四句逐句由玩家推进；第三张单的拒绝理由常显在这一份文案里。
+# 开场三句、澄清四句逐句由玩家推进；转抄件的拒绝理由常显在这一份文案里。
 const LINES = [
 	"衡伯：这批货的收据对不上，铃少了一只。扣扣，你数过没有？",
-	"扣扣：我是照着第三张换的……要不要我再赔一点？",
+	"扣扣：我是照着抄来的那张换的……要不要我再赔一点？",
 	"小岚：先别赔。三条单子并排放好，用真货物换一遍再说。"]
 const CLARIFY = [
 	"正确的货物摆在原单下，扣扣把自己抄的那张货签翻了过来。",
 	"扣扣：这个三，是我写的。可我没有藏起来那只铃。",
 	"衡伯：是两回事。我把它们当成了一回事。",
 	"扣扣：那……下一次，能不能和我一起看一遍？"]
-# 对白板的内框只有 798×56：一行 22 像素的字刚好，两行就会从板子下沿爬出去。理由压成一句。
-const REFUSAL = "第三张是抄来的，柜面上没人认这一条：按它换会凭空多出铃，还能反复刷货。"
+# 台词条的内框是 798×74（宿主把板子抬到 826×86 之后）：两行 22 号字放得下，第三行就爬出板底。
+const REFUSAL = "这张转抄件是扣扣抄来的，柜面上没人认这一条：按它换会凭空多出铃，还能反复刷货。"
 const RULE_NOTES = ["原约一：两家各留一张原章，1 卷布换 2 瓶油。",
 	"原约二：两家各留一张原章，3 瓶油换 1 只铜铃。"]
 
@@ -30,7 +30,7 @@ func duration() -> float:
 	if state.stage == "correcting": return 1.2
 	return durations[state.stage]
 
-func goal_line() -> String: return "实换 3 卷布：布 → 油 → 铃，再给第三张改签"
+func goal_line() -> String: return "实换 3 卷布：布 → 油 → 铃，再给转抄件改签"
 func submit_label() -> String: return "核对收据"
 
 func status_line() -> String:
@@ -47,16 +47,17 @@ func stage_labels() -> Dictionary:
 
 func restart_prompt() -> Array: return ["重新体验收据这一幕？", "留在柜面", "重新体验"]
 func reset_prompt() -> Array:
-	return ["把换出去的货全部退回原处？\n第三张也回到扣扣抄来的那个数。", "继续核对", "全部退回原处"]
+	return ["把换出去的货全部退回原处？\n转抄件也回到扣扣抄来的那个数。", "继续核对", "全部退回原处"]
 
 func line() -> String:
 	match state.stage:
 		"arrival": return LINES[state.beat]
 		"approach": return "两张原约并排钉上柜面，扣扣把 3 卷布搬到左边。"
 		"ready": return "只有两边都盖了章的约定能执行：1 卷布换 2 瓶油，3 瓶油换 1 只铜铃。"
-		"puzzle": return "把 3 卷布沿两条原约换到底，再和第三张对照，给它改签。"
-		"exchanging": return "扣扣一件件搬货……这一组是按原约换的，已经记上了。"
-		"correcting": return "扣扣把数字写回第三张：写几只，得看你刚换出来的铃。"
+		"puzzle": return "把 3 卷布沿两条原约换到底，再和柜面上那张转抄件对照，给它改签。"
+		# 三件货是同一批一起飞的（carry_plan 共用一个相位），说「一件件」和画面对不上。
+		"exchanging": return "扣扣把这一批一起搬过去……这一组是按原约换的，已经记上了。"
+		"correcting": return "扣扣把数字写回转抄件：写几只，得看你刚换出来的铃。"
 		"delivery": return "衡伯：铃是两只，收据写的却是三只……我把两回事当成了一回事。"
 		"clarify": return CLARIFY[state.beat]
 		"complete": return "小岚：数字不对只说明收据不一致，抄错不等于偷货。"
@@ -74,12 +75,14 @@ func build() -> void:
 		var pool = Rules.cloth_left(state) if rule == 0 else Rules.oil_loose(state)
 		UIStyle.text(ui, "%s %d %s · 可换 %d 组" % ["布" if rule == 0 else "油", pool, "卷" if rule == 0 else "瓶", times],
 			Rect2(x, 608, 240, 32), 16)
-	# 三张单都要点得动：两张原约念出条款，第三张念出「为什么现在不能按它换」。
+	# 三张单都要点得动：两张原约念出条款，转抄件念出「为什么现在不能按它换」。
+	# 按钮与热点都说「转抄件」——那是这张纸自己写着的名字。它钉在最左边，
+	# 只说「第三张」的话，从左边数过来的玩家会去点最右边那张原约二。
 	for index in range(2):
 		add_hotspot("card_%d" % index, world.card_rect(index), read_rule.bind(index),
 			"原约%s：双方都留有原章，可以执行" % ["一", "二"][index])
-	add_hotspot("card_third", world.card_rect(2), try_third, "第三张：扣扣的转抄件，点它按这一条换一次")
-	add_button("third_try", "按第三张换", Rect2(52, 596, 140, 44), try_third)
+	add_hotspot("card_third", world.card_rect(2), try_third, "转抄件（剧情里的第三张）：扣扣抄来的那一张，点它按这一条换一次")
+	add_button("third_try", "按转抄件换", Rect2(52, 596, 140, 44), try_third)
 	for index in range(Rules.CANDIDATES.size()):
 		var value: int = Rules.CANDIDATES[index]
 		add_hotspot("cand_%d" % index, world.cand_rect(index), choose_candidate.bind(index),
@@ -90,7 +93,7 @@ func extra() -> void:
 	# 回执按玩家真的做过的那一遍复述：两条原约各几组、换出多少，以及第三张最后写成几。
 	# 这块纸只占柜面左下：三张单、扣扣、两只铃与右半的台面牌都要留在眼睛看得见地方。
 	UIStyle.panel(ui, Rect2(24, 412, 486, 232))
-	UIStyle.text(ui, "回执 · 育苗铺 第 4 单\n原约一 ×%d：%d 卷布 → %d 瓶油\n原约二 ×%d：%d 瓶油 → %d 只铜铃\n第三张改签：%d 卷布换 %d 只铜铃\n收据不一致：两条原约实换证明\n抄错不是偷货：原单 2、转抄 3" % [
+	UIStyle.text(ui, "回执 · 育苗铺 第 4 单\n原约一 ×%d：%d 卷布 → %d 瓶油\n原约二 ×%d：%d 瓶油 → %d 只铜铃\n转抄件改签：%d 卷布换 %d 只铜铃\n收据不一致：两条原约实换证明\n抄错不是偷货：原单 2、转抄 3" % [
 		state.a, Rules.CLOTH, Rules.OIL_PER_CLOTH * state.a, state.b, Rules.OIL_PER_BELL * state.b,
 		Rules.bells_loose(state), Rules.CLOTH, state.correction], Rect2(40, 424, 456, 208), 18)
 
@@ -137,7 +140,7 @@ func choose_candidate(index: int) -> void:
 	if index < 0 or index >= Rules.CANDIDATES.size(): return
 	var value: int = Rules.CANDIDATES[index]
 	if state.a != Rules.CLOTH:
-		message = "先按两条原约把 %d 卷布换完，再决定第三张写几只。" % Rules.CLOTH
+		message = "先按两条原约把 %d 卷布换完，再看转抄件上该写几只。" % Rules.CLOTH
 		refresh(); return
 	if state.correction == value:
 		place(Rules.clear_correction(state)); return

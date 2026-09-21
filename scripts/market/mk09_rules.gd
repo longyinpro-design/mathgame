@@ -142,7 +142,9 @@ static func shortfalls(state: Dictionary) -> Array:
 		var homes = []
 		for receiver in range(COUNT):
 			if lines[receiver] == giver: homes.append(ACTORS[receiver] + "摊")
-		missing.append("%s同时许给了%s：一件货只能有一个新主人。" % [GOODS_FULL[giver], "、".join(homes)])
+		# 缺口那句要说得进扣扣正在说的那块板：全称「捆货绳」加上两家摊名会把这一句顶到 798 的
+		# 内框之外，而街上五块门面上写的本来就是短名。
+		missing.append("%s同时许给了%s：一件货只能有一个新主人。" % [GOODS[giver], "、".join(homes)])
 	for receiver in self_lines(lines):
 		missing.append("%s摊的线绕回了自己：%s留在原摊，不算换出去。" % [ACTORS[receiver], GOODS[receiver]])
 	# 五摊挤成一条大环是规格点名的错法：结构先说，再逐摊说清谁拿到的不是自己要的那件。

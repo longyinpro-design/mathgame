@@ -67,10 +67,15 @@ func koukou_foot() -> Vector2: return counter_at(-430, 62)
 func sign_rect() -> Rect2:
 	return Rect2(station("stall_right") + Vector2(-SIGN_SIZE.x / 2.0, -96), SIGN_SIZE)
 func sign_target() -> Rect2:
+	# 热点跟着牌沿走：`target()` 只给正方框，120 见方比 234 宽的牌左右各短 57 像素，
+	# 玩家照着牌的两头点下去什么也不会发生（提示也不弹）。高度按 48 的下限抬到 52。
 	var rect = sign_rect()
-	return target(Vector2(rect.position.x + rect.size.x / 2.0, rect.end.y + 8), 120, 46)
+	return Rect2(rect.position.x, rect.position.y - 8, rect.size.x, 52.0)
 func chime_foot() -> Vector2: return station("stall_right") + Vector2(0, -132)
-func honest_rect() -> Rect2: return Rect2(955, 300, 220, 30)
+# 拆穿之后那句真话挂在谎话原来那块牌上：同一位置、同一尺寸，玩家不必在两处之间找对应。
+# 旧落点 (955,300,220,30) 正压在风铃那一圈里——环脚在 stall_right 上方 132（y 303），
+# 环半径 52、纵向压扁 0.42（y 281..325），铃在 y 319，三件货的脚点低到 y 337。
+func honest_rect() -> Rect2: return sign_rect()
 func chime_rect() -> Rect2: return Rect2(940, 452, 250, 28)
 # 回执贴在左边空出来的街面上：不与白板（338 起）、三条合同牌（411 起）与底部短牌（596 起）重叠。
 func receipt_rect() -> Rect2: return Rect2(24, 196, 360, 232)

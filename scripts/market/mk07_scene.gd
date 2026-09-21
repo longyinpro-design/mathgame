@@ -25,7 +25,7 @@ func configure() -> void:
 func goal_line() -> String: return "把绳、钉、布、铃各分一件，让四位居民都拿到用得上的那一件"
 func submit_label() -> String: return "整批试交"
 func status_line() -> String:
-	return "已分 %d/4 · 台面 %d 件"%[Rules.assigned(state),Rules.free_goods(state).size()]
+	return "已分 %d/4 · 待分 %d 件"%[Rules.assigned(state),Rules.free_goods(state).size()]
 
 func stage_labels() -> Dictionary:
 	return {"arrival":"继续听他们说" if state.beat < Rules.BEATS - 1 else "走上前去",
@@ -51,7 +51,12 @@ func line() -> String:
 		"arrival": return LINES[state.beat]
 		"approach": return "四位居民各守一个摊位，能用什么已经写在牌子上。"
 		"ready": return "先点柜台上的一件货，再点一位居民；点已分出去的货就收回柜台。"
-		"puzzle": return report_line() if has_report() else "四件货都在柜台上：照每家能用的排，排满四户再整批试交。"
+		"puzzle":
+			if has_report(): return report_line()
+			# 柜台上的货会被一件件预定走：这句读数得跟着现场变，不能一直说「四件都在柜台上」。
+			var loose = Rules.free_goods(state).size()
+			if loose == 0: return "四件都预定好了：点「整批试交」，看是不是每家都用得上。"
+			return "柜台上还有 %d 件没预定：照每家牌子上的分，分满四户再整批试交。" % loose
 		"handover": return "扣扣抱着四件货挨家递过去……"
 		"delivery": return "帆匠接住绳，修桥人接住钉，乐手摇响铃，医护把布抱进怀里。"
 		"complete": return "这一场的四件货，每家都拿到了一件用得上。下一场怎么分，还得再对着账看。"

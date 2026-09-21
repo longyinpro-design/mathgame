@@ -20,12 +20,23 @@ func configure() -> void:
 	durations = {"approach": 1.6, "handing": 2.6, "delivery": 3.4}
 	rules = Rules; world_script = World
 	# 装车时贴近台面与三辆车；车离场与点灯都退回整个庭院。
-	zoom_stages = ["puzzle"]
+	# ready 也要贴着：approach 收尾已经把镜头推到 1.10，把 ready 漏在档位外会让它先弹回
+	# 1.0、点「开始装车」再弹回 1.10，两下硬跳（MK07／MK08 都把 ready 收在档位里）。
+	# handing 同理：提交那一帧从 1.10 弹到 1.0，而 delivery 开头又是 1.0→1.10→1.0，
+	# 交接这一下连着跳两次。收在档位里之后，只有点灯那一段往外拉一次。
+	zoom_stages = ["ready", "puzzle", "handing"]
 
-func goal_line() -> String: return "三处已确认要 4、5、6 单位 · 六壶一壶不剩 · 每处最多两壶"
+func goal_line() -> String:
+	# 三个需求数从 Rules.NEEDS 现算：这块抬头板和庭院里的三张单子必须永远说同一份数。
+	var needs := []
+	for need in Rules.NEEDS: needs.append("%d" % need)
+	return "三处已确认要 %s 单位 · 六壶一壶不剩 · 每处最多两壶" % "、".join(needs)
 func submit_label() -> String: return "三处一起交货"
 func status_line() -> String:
-	return "车上 %d/%d 壶 · 台面 %d 壶" % [Rules.assigned(state.plan), Rules.JUGS,
+	# 装车与离场这两幕才数草稿；approach 还没进庭院、delivery 已经在点灯，
+	# 那时候再报「车上几壶」就是把一张已经交出去的草稿挂在算式板旁边。
+	if not (state.stage in ["puzzle", "handing"]): return ""
+	return "三车已装 %d/%d 壶 · 台面 %d 壶" % [Rules.assigned(state.plan), Rules.JUGS,
 		Rules.stock_of(state.plan).size()]
 
 func stage_labels() -> Dictionary:
@@ -33,14 +44,16 @@ func stage_labels() -> Dictionary:
 		"ready": "开始装车", "complete": "重新体验"}
 
 func restart_prompt() -> Array:
-	return ["重新体验分油这一幕？\n只重置本关，不改其他关卡。", "留在庭院", "重新体验"]
+	# 宿主在 confirm_restart 里自己会补一句「只重置本关，不改变其他关卡与森林岛进度」，
+	# 这里再写一遍就把同一句话在同一块板子上说了两次。
+	return ["重新体验分油这一幕？", "留在庭院", "重新体验"]
 func reset_prompt() -> Array:
 	return ["把三辆车上的封油全部放回台面？\n壶没拆过，也一壶没交出去。", "继续装车", "全部放回台面"]
 
 func line() -> String:
 	match state.stage:
 		"arrival": return LINES[state.beat]
-		"approach": return "三辆车停在庭院里，车帮上钉着各自确认过的需求单。"
+		"approach": return "三辆车停在庭院里，每一辆前面摆着自己确认过的需求单。"
 		"ready": return "先点台面上的一壶封油，再点接它的那辆车；再点车上的壶就放回台面。"
 		"puzzle": return "每处最多两壶，六壶全交完，还要每一处刚好按自己的单子接满。"
 		"handing": return "三辆车各自载着两壶封油驶向街口。壶没有拆开——路上也不用拆。"
@@ -65,7 +78,7 @@ func build() -> void:
 		for slot in range(row.size()):
 			add_hotspot("slot_%d_%d" % [place, slot], world.slot_rect(place, slot),
 				do_unload.bind(place, slot),
-				"%s车上的 %d 单位封油：点一下放回台面，一壶都还没交出去" %
+				"%s · 车上的 %d 单位封油：点一下放回台面，一壶都还没交出去" %
 					[Rules.PLACES[place], Rules.JUG_UNITS[row[slot]]])
 
 # 联合回执只复述真正交出去的那一单：哪一壶上了哪辆车、各是多少单位，都从 handed 读回。
@@ -76,7 +89,7 @@ func receipt_lines() -> Array:
 		var row: Array = state.handed[place]
 		var marks := []
 		for jug in row: marks.append("%d" % Rules.JUG_UNITS[jug])
-		lines.append("%s %s=%d · 单子要 %d" % [Rules.PLACES[place], "+".join(marks),
+		lines.append("%s %s=%d · 需求单 %d" % [Rules.PLACES[place], "+".join(marks),
 			Rules.units_of(row), Rules.NEEDS[place]])
 	lines.append("台面剩 %d 壶 · 封油没拆过" % Rules.stock_of(state.handed).size())
 	lines.append("六壶共 %d 单位" % Rules.jug_total())
@@ -88,8 +101,13 @@ func receipt_lines() -> Array:
 func extra() -> void:
 	if state.stage != "complete": return
 	# 回执栏贴着西坡车的右手边：不压灯串、不压需求单、也不压宿主底部的按钮。
-	UIStyle.panel(ui, Rect2(976, 170, 284, 300))
-	UIStyle.text(ui, "\n".join(receipt_lines()), Rect2(992, 184, 254, 272), 16)
+	# 顶边必须留在台词板（338,98,826,86）下面：这张纸原先从 y=170 起，左上角正好啃掉
+	# 台词板的右下角（实窗拍到的缺口），而它自己那圈投影也压在板子上。
+	# 976→984、192→198 是同一件事的另外两头：面板的投影（skin.gd 的 shadow_size 7、
+	# 下移 4）会往外多伸 11 像素，压在「西坡 · 需求单 6 单位」那块木牌的木边上
+	# （牌右端 974，旧投影左沿 969），也压在台词板自己的投影下沿（191）上。
+	UIStyle.panel(ui, Rect2(984, 198, 284, 296))
+	UIStyle.text(ui, "\n".join(receipt_lines()), Rect2(1000, 212, 254, 268), 16)
 
 func exit_buttons() -> void:
 	# 从航图进来时宿主已经挂好返回按钮；单独启动本关时补一个同样的出口。

@@ -77,7 +77,7 @@ func extra() -> void:
 	UIStyle.text(ui, Rules.receipt(state), Rect2(rect.position + Vector2(18, 12), rect.size - Vector2(36, 24)), 16)
 
 func exit_buttons() -> void:
-	# 从航图进来的场合由宿主给出「返回集市航图」；单独启动本关时也要有一条回去的路。
+	# 从航图进来的场合由宿主给出「返回千灯航图」；单独启动本关时也要有一条回去的路。
 	if origin != "hub": add_button("open_hub", "回千灯航图", Rect2(690, 646, 280, 54), go_hub)
 
 func snapshot(value: Dictionary) -> Dictionary:

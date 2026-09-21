@@ -67,6 +67,15 @@ static func grid(from: Vector2, step: Vector2, columns: int, count: int) -> Arra
 static func target(foot: Vector2, size: float, lift: float) -> Rect2:
 	return Rect2(foot + Vector2(-size / 2.0, -lift), Vector2(size, size))
 
+# 但正方框只够得着方形物件。`receipt_blank` 是 237×316、anchor (118.5, 308) 的瘦高裁剪图：
+# 缩到 width 之后纸面从脚点往上 width×308/237、往下 width×8/237。
+# 一张 120 宽的纸有 160 高，120 见方的 `target()` 会漏掉纸尖那 36 像素，
+# 玩家照着纸尖去点就落空——凡是把这张纸当按钮的关卡，热点都该用这里算出来的那面纸。
+const PAPER_TOP = 308.0 / 237.0
+const PAPER_TALL = 316.0 / 237.0
+static func paper_rect(foot: Vector2, width: float) -> Rect2:
+	return Rect2(foot - Vector2(width / 2.0, width * PAPER_TOP), Vector2(width, width * PAPER_TALL))
+
 # anchor_px is measured in cropped-image pixels and the scale is applied exactly once.
 func kit(id: String, foot: Vector2, width: float, alpha: float = 1.0, drop: float = 0.0) -> void:
 	var texture: Texture2D = atlases[id]
@@ -82,9 +91,11 @@ func contact(foot: Vector2, radius: float, alpha: float = 0.26) -> void:
 	draw_set_transform(Vector2.ZERO)
 
 # Characters are source-sheet crops anchored at their own feet, not manifest kit parts.
+# 脚下那圈阴影跟着人物一起缩：原来固定 34 半径，MK07 的 0.36 与 MK09 的 0.52 用的是同一圈，
+# 小个子站在地上像被涂了一块比身子还宽的墨。0.5 时仍是 34，与既有各关的画面一致。
 func figure(texture: Texture2D, foot: Vector2, scale: float, alpha: float = 1.0) -> void:
 	var dims = Vector2(texture.get_width(), texture.get_height()) * scale
-	contact(foot, 34, 0.2 * alpha)
+	contact(foot, 68.0 * scale, 0.2 * alpha)
 	draw_texture_rect(texture, Rect2(foot - Vector2(dims.x / 2, dims.y), dims), false, Color(1, 1, 1, alpha))
 
 func words(text: String, at: Vector2, size_px: int = 17, color: Color = INK_LIGHT) -> void:

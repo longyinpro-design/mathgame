@@ -1,5 +1,5 @@
 extends "res://scripts/market/kit_world.gd"
-# MK12 分油庭院：三处街口的接货车就是三个收货位，车帮上钉着各自的已确认需求单；
+# MK12 分油庭院：三处街口的接货车就是三个收货位，每一辆车前面摆着各自的已确认需求单；
 # 六壶封油摆在前景的接货台面上，壶没拆开过，也不需要拆开。
 # 底景、封油壶、接货车、灯串与回执全部来自 kit-v1 拆件包；坐标只来自 manifest `oil` 场景
 # （cart_left / cart_middle / cart_right / scale_foot）与 delivery_cart 自己的
@@ -57,9 +57,14 @@ func cargo_px() -> Array:
 func cart_station(place: int) -> Vector2: return station(CARTS[place])
 
 # 交货演出里车会整体平移，车上的壶跟着车走，所以落点永远从当前的车脚算。
+# 只在 handing 一幕里加这个偏移，换到 delivery 的那一帧三辆车会整排弹回庭院原位（实窗拍到的跳），
+# 所以点灯那一段用一条从 1 回到 0 的曲线把它们接回来：车驶向街口、在镜头拉远的路上回到庭院，
+# 收尾那一格车、车帮上的收讫纸与联合回执栏才都待在审计量过的位置上（西坡车一旦停在街口，
+# 它的车斗与车帮算式就会整块滑到回执栏底下）。
 func cart_foot(place: int) -> Vector2:
 	var at: Vector2 = cart_station(place)
-	if state.stage == "handing": at += ROLL[place] * smoothstep(0.0, 0.85, progress)
+	if state.stage == "handing": return at + ROLL[place] * smoothstep(0.0, 0.85, progress)
+	if state.stage == "delivery": return at + ROLL[place] * (1.0 - smoothstep(0.0, 0.6, progress))
 	return at
 
 func slot_foot(place: int, slot: int) -> Vector2:
@@ -80,12 +85,16 @@ func stock_spot(jug: int) -> Vector2: return stock_spots()[jug]
 
 # 台面上的一壶：命中方框盖住画出来的壶身，不越到车上。
 func stock_rect(jug: int) -> Rect2: return target(stock_spot(jug), 56, 52)
+# 车上一壶的单位读数就写在壶脚下：审计与画面共用这一个方框，改一处不会漏改另一处。
+func jug_mark_rect(place: int, slot: int) -> Rect2:
+	var at = slot_foot(place, slot)
+	return Rect2(at.x - 30, at.y + 28, 60, 18)
 # 一整辆车的接货框：贴着车斗与车身，落在壶的命中框下面，两者不抢。
 func cart_rect(place: int) -> Rect2: return target(cart_station(place), 150, 64)
 func slot_rect(place: int, slot: int) -> Rect2:
 	return target(kit_point("delivery_cart", cart_station(place), CART_WIDTH, cargo_px()[slot]) - Vector2(0, 6), 52, 52)
-func string_foot(place: int) -> Vector2: return cart_station(place) + Vector2(0, -128)
-func sheet_foot(place: int) -> Vector2: return cart_station(place) + Vector2(74, 46)
+func string_foot(place: int) -> Vector2: return cart_foot(place) + Vector2(0, -128)
+func sheet_foot(place: int) -> Vector2: return cart_foot(place) + Vector2(74, 46)
 # oil 场景没有人物站位，扣扣站在接货台面的左手边（由 scale_foot 推出，不另立坐标）。
 func keeper_foot() -> Vector2: return station("scale_foot") + Vector2(-268, 96)
 
@@ -95,12 +104,17 @@ func jug_width(jug: int, on_cart: bool) -> float:
 
 # ---- derived reading of the loading draft ----
 # 车上的合计永远由 plan 现算：画面自己不留任何一份计数。
+# 离场与交货那两幕把算式写在车帮上——这一关的收尾就是「不一样多，也都够用」这笔账，
+# 而回执那张纸只有 44 像素宽，塞不下 18 号字，算式只能读在车斗下方这一行。
 func cart_mark(place: int) -> String:
-	var got: int = Rules.units_of(state.plan[place])
+	var row: Array = state.plan[place]
+	var marks := []
+	for jug in row: marks.append("%d" % Rules.JUG_UNITS[jug])
+	var sum = "+".join(marks)
 	match state.stage:
-		"handing": return "抱着 %d 单位上路" % got
-		"delivery", "complete": return "%d 单位 · 正好够用" % got
-	return "车上 %d 单位" % got if not state.plan[place].is_empty() else "车上还空着"
+		"handing": return "抱着 %s=%d 单位上路" % [sum, Rules.units_of(row)]
+		"delivery", "complete": return "%s=%d · 正好够用" % [sum, Rules.units_of(row)]
+	return "车上 %d 单位" % Rules.units_of(row) if not row.is_empty() else "车上还空着"
 
 # 封油壶不拆封：三辆车各自载着自己的两壶离开，接油的是这一处的灯具。
 func light_string(foot: Vector2, strength: float) -> void:
@@ -120,8 +134,9 @@ func draw_strings() -> void:
 		var foot = string_foot(place)
 		match state.stage:
 			"delivery":
-				var rise = smoothstep(0.05 + 0.2 * place, 0.45 + 0.2 * place, progress)
-				kit("lantern_string", foot, STRING_WIDTH, 0.45 + 0.55 * rise)
+				# 车离场那一幕灯串已经满透明度挂着了：这里再乘一个 0.45 起步的系数，
+				# 换幕那一帧绳子会突然暗掉一半，而真正亮起来的应该是灯芯的光晕。
+				kit("lantern_string", foot, STRING_WIDTH)
 				light_string(foot, smoothstep(0.3 + 0.2 * place, 1.0, progress))
 			"complete":
 				kit("lantern_string", foot, STRING_WIDTH)
@@ -129,7 +144,8 @@ func draw_strings() -> void:
 			_:
 				kit("lantern_string", foot, STRING_WIDTH)
 		if state.stage in ["delivery", "complete"]:
-			# 三家把确认过的需求单一起递出去：回执压在车帮上，数量是玩家实际交的。
+			# 三家把确认过的需求单一起递回来：车帮上这一纸是这一处收讫的凭证。
+			# 纸面只有 44 像素宽，装不下任何 18 号字，所以算式读在车斗下方那一行，不写在纸上。
 			kit("receipt_blank", sheet_foot(place), SHEET_WIDTH)
 
 func draw_carts() -> void:
@@ -145,9 +161,17 @@ func draw_carts() -> void:
 			var drop = landing("jug", jug)
 			contact(at, jug_width(jug, true) * 0.5, 0.2 * (1.0 - drop))
 			kit(Rules.JUG_KITS[jug], at - Vector2(0, 38 * drop), jug_width(jug, true), 1.0 - drop * 0.7)
-		# 空车位只标「这里还能放一壶」，不判断放哪一壶才对。
-		if state.stage == "puzzle" and row.size() < Rules.MAX_PER_PLACE:
-			socket(slot_foot(place, row.size()) - Vector2(0, 12), Vector2(26, 11), 0.26 * beat)
+			# 壶一上车不改名字：台面上写着几单位，车上就写着几单位。装车这一段玩家要对着
+			# 壶身想「这两壶合不够那张单子」，读数不能一下车就消失。
+			# 交货之后由车帮那一行算式接手，壶身不再叠字。
+			if state.stage in ["ready", "puzzle", "handing"]:
+				mark("%d 单位" % Rules.JUG_UNITS[jug], jug_mark_rect(place, slot), 16)
+		# 空车位各标一个「这里还能放一壶」：两壶的上限画在车上，不用玩家去数台词。
+		# 手里拿着壶时这一圈要亮起来——不然「哪辆车还接得下」只能靠记忆。
+		if state.stage == "puzzle":
+			for slot in range(row.size(), Rules.MAX_PER_PLACE):
+				socket(slot_foot(place, slot) - Vector2(0, 12), Vector2(26, 11),
+					(0.62 if picked >= 0 else 0.26) * beat)
 		if state.stage == "delivery" and progress > 0.2 + 0.2 * place:
 			socket(foot - Vector2(0, 96), Vector2(40, 16), 0.5 + 0.5 * pulse())
 
@@ -175,17 +199,22 @@ func signs() -> Array:
 	var boards = []
 	for place in range(Rules.PLACES.size()):
 		var at: Vector2 = cart_station(place)
+		# 车帮那一行算式说的是「这一辆车正带着什么」，所以它跟着车脚走；需求单是钉在庭院里
+		# 的那张纸，车驶向街口时它留在原位。
+		var cart: Vector2 = cart_foot(place)
+		# 需求单宽 230 而不是 240：西坡那张的右端要留在联合回执栏（x=984，投影再往里 7）的左手边，
+		# 收尾一摊纸就把「西坡 · 需求单 6 单位」的木边啃掉一角（审计量出来的 3 像素）。
 		boards.append({"text": "%s · 需求单 %d 单位" % [Rules.PLACES[place], Rules.NEEDS[place]],
-			"rect": Rect2(at.x - 120, at.y + 92, 240, 28), "plaque": true, "size": 16})
-		boards.append({"text": cart_mark(place), "rect": Rect2(at.x - 100, at.y - 26, 200, 20),
+			"rect": Rect2(at.x - 115, at.y + 92, 230, 28), "plaque": true, "size": 16})
+		boards.append({"text": cart_mark(place), "rect": Rect2(cart.x - 100, cart.y - 26, 200, 20),
 			"plaque": false, "size": 16})
 	if state.stage == "arrival": return boards
-	# 三块规则板各占一条空带：封油板压在车脚与需求单之间，另两块贴着台面两侧。
 	# 装车那一格镜头把庭院抬到 1.10 并左移 64：屏幕横坐标 = 世界 × 1.1 − 64，
-	# 所以两块侧板的世界边界必须留在 58.2 与 1221.8 之间，否则「每处最多两壶」的首字
-	# 会被窗框切掉、右边那块也会从右沿外溢出去（实窗审计拍到的真缺陷）。
+	# 所以侧板的世界边界必须留在 58.2 与 1221.8 之间，否则首字会被窗框切掉、
+	# 右边那块也会从右沿外溢出去（实窗审计拍到的真缺陷）。
+	# 「每处最多两壶」这块侧板已经删掉：它原先就画在扣扣的左臂与封包上（世界 x 290.2 起，
+	# 板子右端到 328），而同一句话在抬头目标板上一直挂着，宿主那块板不会被人物挡住。
 	boards.append({"text": "货栈封油 · 六壶都不能拆", "rect": Rect2(512, 440, 256, 26), "plaque": true, "size": 16})
-	boards.append({"text": "每处最多两壶 · 一壶不剩", "rect": Rect2(68, 596, 260, 28), "plaque": true, "size": 16})
 	boards.append({"text": "封油共 %d 单位 · 三处共要 %d 单位" % [Rules.jug_total(), Rules.need_total()],
 		"rect": Rect2(900, 596, 314, 28), "plaque": true, "size": 16})
 	return boards

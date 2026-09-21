@@ -10,6 +10,8 @@ static var FRUIT_SPOTS := grid(Vector2(371, 492), Vector2(36, -34), 4, 8)
 static var TABLE_SPOTS := grid(Vector2(591, 488), Vector2(36, -28), 4, 12)
 const RACK_SPOTS = [Vector2(830, 496), Vector2(878, 496), Vector2(926, 496), Vector2(854, 444), Vector2(902, 444)]
 const BENCH = [Vector2(1096, 492), Vector2(1160, 492)]
+# 柜面前沿那一排木牌共用的底线：回执板压在 ui 层，谁盖住谁要看镜头，两边都从这一个数出发。
+const PLAQUE_ROW_Y = 514.0
 
 func ready_level() -> void:
 	scene_id = "nursery"; backdrop = BACKDROP
@@ -84,11 +86,22 @@ func in_flight_homes() -> Array:
 	for entry in carry_plan(progress): homes.append(entry["home"])
 	return homes
 
+# 交货那一段的三条量出曲线：扣扣抱着线卷走到台前（walk）、线卷离钩落到她爪边（hand_off）、
+# 灯芯离架被码头接走（shipped）。complete 一律取 1.0：动画最后一帧已经把货交出去了，
+# 下一帧不该整批摆回原处——原先正是这样，五捆灯芯凭空回到刚清空的托盘，两卷线也回了挂钩。
+func walk_off() -> float:
+	return smoothstep(0.45, 1, progress) if state.stage == "delivery" else (1.0 if state.stage == "complete" else 0.0)
+
+func hand_off() -> float:
+	return smoothstep(0.5, 0.95, progress) if state.stage == "delivery" else (1.0 if state.stage == "complete" else 0.0)
+
+func shipped() -> float:
+	return smoothstep(0.05, 0.55, progress) if state.stage == "delivery" else (1.0 if state.stage == "complete" else 0.0)
+
 func draw_level() -> void:
 	# 扣扣 stands at the nursery's resident station; goods in front of it belong to the table.
 	var happy = state.stage == "complete" or (state.stage == "delivery" and progress > 0.6)
-	var feet = station("resident")
-	if state.stage == "delivery": feet += Vector2(lerpf(0, 34, smoothstep(0.45, 1, progress)), 0)
+	var feet = station("resident") + Vector2(lerpf(0, 34, walk_off()), 0)
 	figure(KOUKOU_WAVE if happy else KOUKOU_TIE, feet, 0.5)
 	var placed = shown_state()
 	var layout = goods_layout(placed)
@@ -111,15 +124,14 @@ func draw_level() -> void:
 	for entry in layout.hook:
 		var rise = landing("hook", entry[1])
 		# 扣扣's two spools leave the bench only once the order is being handed over.
-		var give = smoothstep(0.5, 0.95, progress) if state.stage == "delivery" else 0.0
+		var give = hand_off()
 		var hook_foot: Vector2 = entry[0].lerp(feet + Vector2(-48 + entry[1] * 52, -8), give)
 		contact(hook_foot, GOODS["spool"][1] * 0.42, 0.26 * (1.0 - rise) * (1.0 - give))
-		kit("rope_spool", hook_foot - Vector2(0, 38 * rise), GOODS["spool"][1], (1.0 - rise * 0.75) * (1.0 - give * 0.6))
+		kit("rope_spool", hook_foot - Vector2(0, 38 * rise), GOODS["spool"][1], 1.0 - rise * 0.75)
 	for entry in layout.rack:
 		var foot: Vector2 = entry[0]
 		var drop = landing("rack", entry[1])
-		var drift = 0.0
-		if state.stage == "delivery": drift = smoothstep(0.05, 0.55, progress)
+		var drift = shipped()
 		contact(foot, GOODS["wick"][1] * 0.42, 0.26 * (1.0 - drift) * (1.0 - drop))
 		kit("wick_bundle", foot + Vector2(drift * 300, -drift * drift * 120 - 38 * drop), GOODS["wick"][1],
 			(1.0 - drift) * (1.0 - drop * 0.75))
@@ -141,9 +153,9 @@ func draw_level() -> void:
 	if state.stage == "complete": kit("receipt_blank", Vector2(150, 496), 84)
 
 func draw_signs(placed: Dictionary) -> void:
-	plaque("约定一 · 2 铜果 → 3 线卷", Rect2(330, 514, 192, 28))
-	plaque("约定二 · 2 线卷 → 1 灯芯", Rect2(550, 514, 192, 28))
-	plaque("码头交付架 · %d / %d 根灯芯" % [placed.rack.count(1), Rules.WICK_ORDER], Rect2(776, 514, 206, 28),
+	plaque("约定一 · 2 铜果 → 3 线卷", Rect2(330, PLAQUE_ROW_Y, 192, 28))
+	plaque("约定二 · 2 线卷 → 1 灯芯", Rect2(550, PLAQUE_ROW_Y, 192, 28))
+	plaque("码头交付架 · %d / %d 根灯芯" % [placed.rack.count(1), Rules.WICK_ORDER], Rect2(776, PLAQUE_ROW_Y, 206, 28),
 		16, INK_GOLD if placed.rack.count(1) == Rules.WICK_ORDER else INK_LIGHT)
-	plaque("扣扣的修补台 · %d / %d 卷线" % [placed.hook.count(1), Rules.SPOOL_ORDER], Rect2(1004, 514, 206, 28),
+	plaque("扣扣的修补台 · %d / %d 卷线" % [placed.hook.count(1), Rules.SPOOL_ORDER], Rect2(1004, PLAQUE_ROW_Y, 206, 28),
 		16, INK_GOLD if placed.hook.count(1) == Rules.SPOOL_ORDER else INK_LIGHT)

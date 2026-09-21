@@ -29,8 +29,9 @@ func stage_labels() -> Dictionary:
 	return {"arrival": "继续听他们说" if state.beat < Rules.BEATS - 1 else "走到柜台前",
 		"ready": "开始归档", "complete": "重新体验"}
 
+# 宿主在 `confirm_restart()` 里自己会补一句「只重置本关，不改变其他关卡与森林岛进度」，这里再写一遍就是重复。
 func restart_prompt() -> Array:
-	return ["重新体验老货栈这一幕？\n只重置本关，不改其他关卡。", "留在柜台", "重新体验"]
+	return ["重新体验老货栈这一幕？", "留在柜台", "重新体验"]
 func reset_prompt() -> Array:
 	return ["把板上的三行全部撤下？\n架上的原单一张都不会少。", "继续归档", "全部撤下"]
 
@@ -84,7 +85,7 @@ func extra() -> void:
 	UIStyle.text(ui, "\n".join(receipt_lines()), receipt_text_rect(), 16)
 
 func exit_buttons() -> void:
-	# 从航图进来时宿主已经给出「返回集市航图」；直接启动本关样板时留一条回航图的路。
+	# 从航图进来时宿主已经给出「返回千灯航图」；直接启动本关样板时留一条回航图的路。
 	if origin != "hub":
 		add_button("open_hub", "回千灯航图", Rect2(690, 646, 280, 54), go_hub)
 

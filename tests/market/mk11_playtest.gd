@@ -163,14 +163,20 @@ func spill_of(container: Node) -> int:
 func off_board() -> int:
 	return spill_of(game.ui) + spill_of(game.overlay)
 # 街面与 UI 在同一个逻辑平面上：先按当前镜头换算（puzzle/weighing 把整座庭院抬到 1.10，
-# 木牌会整体压向上方，只看未放大坐标就会漏掉「描边读数钻进口述板底下」这一类真机才看得见的遮挡），
-# 再除掉窗口自己的画布缩放，好让 960×540 那遍量的还是同一套逻辑矩形。
+# 木牌会整体压向上方，只看未放大坐标就会漏掉「描边读数钻进口述板底下」这一类真机才看得见的遮挡）。
 func on_screen(rect: Rect2) -> Rect2:
-	var xf: Transform2D = game.world.get_global_transform_with_canvas() \
-		* game.ui.get_global_transform_with_canvas().affine_inverse()
+	var xf: Transform2D = game.world.get_global_transform_with_canvas()
 	var a = xf*rect.position
 	var b = xf*(rect.position+rect.size)
 	return Rect2(a, b-a)
+# kit() 的落点公式：画出来的矩形 = 脚点 − 挂点×缩放，尺寸 = 原图像素×缩放。
+# 油车与车上的货都是带大片透明边缘的裁剪图，量遮挡只能按真正落笔的那一块算。
+func kit_rect(id: String, foot: Vector2, width: float) -> Rect2:
+	var tex: Texture2D = game.world.atlases[id]
+	var item: Dictionary = game.world.parts[id]
+	var scale = width / float(tex.get_width())
+	return Rect2(foot - Vector2(float(item.anchor_px[0]), float(item.anchor_px[1])) * scale,
+		Vector2(float(tex.get_width()), float(tex.get_height())) * scale)
 func papers() -> Array:
 	var list := []
 	for child in game.ui.get_children():
@@ -196,6 +202,11 @@ func covered() -> int:
 		if not game.buttons.has(id): continue
 		if sheet.intersects(Rect2(game.buttons[id].position, game.buttons[id].size)):
 			over += 1; print("COVERED exit ", id, " by receipt ", sheet)
+	# 验看单是最后摊开的一层，压到别的板上就是别的板没了半张：台词板尤其要说得出话。
+	for paper in papers():
+		if paper == sheet: continue
+		if sheet.intersects(paper):
+			over += 1; print("COVERED paper ", paper, " by receipt ", sheet)
 	for rect in payoff_rects(true):
 		if sheet.intersects(on_screen(rect["rect"])):
 			over += 1; print("COVERED payoff ", rect["at"], " by receipt ", sheet)
@@ -225,8 +236,17 @@ func payoff_rects(wide: bool = false) -> Array:
 	if game.state.stage in ["delivery", "complete"]:
 		# 封坛与接货盘落在铜秤右边的台面上：只量真正画出来的那一段，不吞掉左边那行读数。
 		rects.append({"at": "封坛落点", "rect": Rect2(game.world.shelf_foot() + Vector2(-56, -64), Vector2(112, 80))})
+	# 车上的高油壶与油瓶也是这一关的「货」：钉在车帮上的木牌一拦腰就会把壶切成两截。
+	# 44.0／34.0 与 draw_carts 同源，改造型要一起改。
+	rects.append({"at": "车上的高油壶",
+		"rect": kit_rect("oil_jug_tall", game.world.cart_cargo(0, "cargo_left"), 44.0)})
+	rects.append({"at": "车上的油瓶",
+		"rect": kit_rect("oil_bottle", game.world.cart_cargo(0, "cargo_right"), 34.0)})
 	if wide:
-		rects.append({"at": "陶姨的油车", "rect": Rect2(game.world.cart_foot(0) - Vector2(110, 96), Vector2(220, 118))})
+		# 收尾那一格摊开的验看单：三辆车实实在在画出来的那一片都不许被纸压住。
+		for index in range(3):
+			rects.append({"at": "油车 %d" % (index + 1),
+				"rect": kit_rect("delivery_cart", game.world.cart_foot(index), game.world.cart_width(index))})
 	return rects
 func payoff_covered() -> int:
 	var over = 0
@@ -497,14 +517,18 @@ func run() -> void:
 		await click("skip")
 		check(game.state.stage == "delivery" and Rules.solved(game.state),
 			"a level beam with the promise kept goes straight to the sealing")
+		check(at_camera(1.10, Vector2(-64,-43)),
+			"the sealing opens still leaning in on the scale, where the player was just looking")
 		await hold(1.9)
 		check(game.world.shown_oil() == 0 and game.state.oil == 7,
 			"past half the pour the pot reads empty while the booked seven stays on record")
 		var flight: Array = game.world.delivery_plan(game.world.progress)
 		check(flight.size() == 1 and flight[0]["at"].distance_to(game.world.pot_foot()) > 30.0,
 			"the sealed jar has left the goods pan and is on its way to the bench")
-		check(at_camera(1.10, Vector2(-64,-43)) or game.world.scale.x > 1.0,
-			"the delivery starts close on the scale and only then pulls back")
+		# 宿主的交货镜头从第一格就往回收，四成五的时长回到整院：坛子还在天上飞时，
+		# 整条街（上方的灯串、右边的封坛台）就已经给玩家看全了。
+		check(at_camera(1.0, Vector2.ZERO) and game.world.progress < 1.0,
+			"the courtyard is already back to the whole scene while the jar is still in the air")
 		guards("pour")
 		await capture(prefix+"12-pour")
 		await create_timer(0.12).timeout

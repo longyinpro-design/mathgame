@@ -26,7 +26,7 @@ func stage_labels() -> Dictionary:
 		"ready": "开始配对货签", "complete": "重新体验"}
 
 func reset_prompt() -> Array:
-	return ["把四张货签全部取回柜台？\n已经按好的格子会一起空出来。", "继续摆放", "全部取回"]
+	return ["把货签全部取回柜台？\n已经按好的格子会一起空出来。", "继续摆放", "全部取回"]
 func restart_prompt() -> Array:
 	return ["重新体验灯芯街这一幕？", "留在街上", "重新体验"]
 
@@ -35,7 +35,7 @@ func line() -> String:
 		"arrival": return LINES[state.beat]
 		"approach": return "雨停了。四张货签摊在柜台上，四家铺子各自还钉着一张订单。"
 		"ready": return "小岚：先按读得清的那两句，剩下的两家自己就分出来了。"
-		"puzzle": return "点货签拿在手里，再点一家铺子的订单按下；点已按好的格子取回。"
+		"puzzle": return "点货签拿在手里，再点一家铺子的订单按下；点已按好的格子取回或换下。"
 		"delivery": return "扣扣：箱子跟着货签走，一家一家送过去。"
 		"complete": return "小岚：面包铺那一张也定了。灯串的订单，明天直接去领。"
 	return ""
@@ -53,7 +53,10 @@ func build() -> void:
 	for place in range(Rules.PLACES.size()):
 		var held = state.assign[place]
 		var kept = "空着，按上手里那张 [%s]" % KEYS[place]
-		if held >= 0: kept = "%s · 点一下取回 [%s]" % [Rules.GOODS_FULL[held], KEYS[place]]
+		if held >= 0:
+			# 手里空着点这一格是取回，手里有签点它是换下、原来那张回柜台：两种说法不能混成一个。
+			kept = "%s · %s [%s]" % [Rules.GOODS_FULL[held],
+				"换下它，那张回柜台" if Rules.holding(state) else "点一下取回", KEYS[place]]
 		add_hotspot("place_%d" % place, world.card_rect(place), choose_place.bind(place),
 			"%s的订单：%s" % [Rules.PLACE_CN[place], kept])
 

@@ -206,7 +206,7 @@ func crowded_boards() -> int:
 				trouble += 1
 				print("UNDER ", board["text"], " ", shown, " under ", panel)
 	return trouble
-# 镜头是缩放+平移，世界的方框要换算到屏幕像素上才比得了截图（与 tap() 用的是同一套变换）。
+# 镜头是缩放+平移，世界的方框要换算到屏幕像素上才比得了截图与宿主的板（与 tap() 用的是同一套变换）。
 func on_screen(rect: Rect2) -> Rect2:
 	var t: Transform2D = game.world.get_global_transform_with_canvas()
 	return Rect2(t * rect.position, rect.size * t.get_scale())
@@ -226,6 +226,24 @@ func flight_over(first: Array, second: Array, shape: Callable) -> Array:
 				var cut: Rect2 = box.intersection(plank)
 				if cut.size.x >= 3.0 and cut.size.y >= 3.0: boxes.append(cut)
 	return boxes
+# 演出的货还躲不躲得起宿主的板：flight_over 只跟街面木牌比，那块对白板是不透明的，
+# 落在它底下就等于没演。原来七张筹票与抬上船的封箱正是整批藏在那块板后面（实窗两张中帧可证）。
+# shrink 是这批货此刻按多大比例画出来：封箱跟着离岸那条船一起缩，量它的人也得一起缩，
+# 不然一条缩到四成的船上会量出一排「比箱子还大一圈」的假埋没。
+func under_boards(plan: Array, shape: Callable, shrink: float = 1.0) -> int:
+	var planks: Array = []
+	for child in game.ui.get_children():
+		if child is Panel: planks.append(Rect2(child.position, child.size))
+	var buried = 0
+	for entry in plan:
+		var drawn: Rect2 = shape.call(entry["at"])
+		var box: Rect2 = on_screen(Rect2(entry["at"] + (drawn.position - entry["at"]) * shrink,
+			drawn.size * shrink))
+		for plank in planks:
+			if box.intersection(plank).get_area() > box.get_area() * 0.25:
+				buried += 1
+				print("BURIED ", box, " under ", plank)
+	return buried
 # 把两件姿态的真像素逐点比一遍：货如果画在木头前面，它离开之后那块牌面必然留下变化；
 # 一个像素都不差，就说明这批货从头到尾被木牌盖着，玩家根本看不见它被抬上船。
 func changed_pixels(earlier: String, later: String, boxes: Array) -> int:
@@ -462,8 +480,9 @@ func run() -> void:
 		var paid_now = game.state.paid
 		check(paid_now == Rules.fare(1, boxes) and paid_now in [7, 10],
 			"一次性结清的只能是本局那一张订单的票额")
-		check(game.world.paid_tickets() == paid_now and game.world.tickets_left() == Rules.BUDGET - paid_now,
-			"匣子里剩下的张数由规则现算，画面不另存计数")
+		check(game.world.paid_tickets() == paid_now
+			and game.world.tickets_left() == Rules.BUDGET - game.world.ticket_plan(game.world.progress).size(),
+			"匣子里的张数是现算的：承诺付掉 %d 张一分不少，剩下几张跟着它们离匣一张张走，画面不另存计数" % paid_now)
 		check(not game.buttons.has("tile_0") and not game.buttons.has("deliver")
 			and not game.buttons.has("reset") and game.buttons.has("skip"),
 			"交单之后热点全部收起：不存在先付一半再改主意")
@@ -492,15 +511,23 @@ func run() -> void:
 			if float(entry["phase"]) > 0.0 and float(entry["phase"]) < 1.0: airborne += 1
 		check(airborne == paid_now and game.world.tickets_left() == Rules.BUDGET - flying.size(),
 			"这一刻它们还在空中：匣子按离匣的张数现减，船头也还没收到")
+		check(under_boards(flying, Callable(self,"ticket_board")) == 0,
+			"半空里的筹票一张都不在宿主那块板底下：它们离匣是看得见的")
+		var paying = game.world.paid_landed()
+		check(paying < paid_now and board_with("付讫 %d 票" % paid_now) == "",
+			"还有票在半空：付讫牌这一刻不能先把整单报满")
 		check(game.world.confirmed_slot() == Rules.CASES.find(boxes)
-			and board_with("本局确认：运 %d 箱" % boxes) != "" and board_with("付讫 %d 票" % paid_now) != "",
-			"确认牌与付讫牌念的都是本局真正的数，不是另一张订单的")
+			and board_with("本局确认：运 %d 箱" % boxes) != ""
+			and board_with("付讫 %d/%d 票" % [paying, paid_now]) != "",
+			"确认牌念的是本局真正的箱数，付讫牌念的是此刻已经落定的那几张，不是把整单一次报清")
 		clean_screens("结票演出里两块新牌子也不越框")
 		await capture(prefix+"12-ticket-flight")
 		var flight_pose = prefix+"12-ticket-flight"
 		await hold(1.5)
 		var landed = game.world.ticket_plan(game.world.progress)
 		await capture(prefix+"12b-ticket-crossing")
+		check(game.world.paid_landed() > paying and under_boards(landed, Callable(self,"ticket_board")) == 0,
+			"过半程已经有票落到收费牌上：付讫那个数跟着往前走，还在飞的那几张也没一张躲进板里")
 		check(changed_pixels(flight_pose, prefix+"12b-ticket-crossing",
 			flight_over(flying, landed, Callable(self,"ticket_board"))) > 0,
 			"筹票飞过船底那两排收费牌时画在木头前面：两帧在牌面上确实留下了变化")
@@ -530,12 +557,16 @@ func run() -> void:
 		check(game.world.hide_while_moving(carried).size() == boxes
 			and game.world.deck_load(game.state.boat).is_empty(),
 			"前半程格子里那份被遮住：板上还有一份＋船上又一份的双影是要不得的")
+		check(under_boards(carried, Callable(self,"crate_board")) == 0,
+			"刚离开订单格的封箱还在看得见的那一段路上：一头栽进台词板底下的装船不算装船")
 		clean_screens("装船中帧上订单格与船底牌都还各就各位")
 		await capture(prefix+"14-crating")
 		var crate_pose = prefix+"14-crating"
 		await hold(1.6)
 		var lifted = game.world.carry_plan(game.world.progress)
 		await capture(prefix+"14b-crate-high")
+		check(under_boards(lifted, Callable(self,"crate_board")) == 0,
+			"快落到甲板上的封箱还整只露着：落在船帮上而不是落在台词板里")
 		check(changed_pixels(crate_pose, prefix+"14b-crate-high",
 			flight_over(carried, lifted, Callable(self,"crate_board"))) > 0,
 			"封箱被抬过船底那两排收费牌时画在木头前面，不是藏在牌子底下")
@@ -546,9 +577,12 @@ func run() -> void:
 			and game.world.boat_foot(1 - game.state.boat) == game.world.boat_spot(1 - game.state.boat),
 			"另一条船一动不动：离岸的是一条约定撑起的这一单")
 		check(game.world.deck_load(game.state.boat).size() == boxes
-			and game.world.deck_spot(game.state.boat, 0).distance_to(
+			and game.world.deck_spot(game.state.boat, 0, boxes).distance_to(
 				game.world.carry_plan(game.world.progress)[0]["at"]) < 1.0,
 			"后半程甲板上的箱数与演出落点重合，同一份货不画两遍")
+		check(under_boards(game.world.deck_load(game.state.boat), Callable(self,"crate_board"),
+			game.world.boat_scale(game.state.boat)) == 0,
+			"落在甲板上的那一横排整只都在台词板下面：这一单的货看得见才叫装上船")
 		check(board_with("随船 · 一封查询信") == "随船 · 一封查询信",
 			"离岸的船上钉着那句查询信，与章末欠着的几封回信对上")
 		clean_screens("离岸与查询信那块牌都留在自己位置上")
@@ -604,7 +638,7 @@ func run() -> void:
 		check(game.buttons.has("back_hub") and not game.buttons.has("open_hub"),
 			"从航图进来只给回去那一条路，不留第二条出口")
 		var back: Control = game.buttons.back_hub
-		check(back.size.x >= 48 and back.size.y >= 48,"返回集市航图那颗不小于 48 像素")
+		check(back.size.x >= 48 and back.size.y >= 48,"返回千灯航图那颗不小于 48 像素")
 		if not small: await capture("17-from-chart")
 		game.queue_free(); await process_frame
 		game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame

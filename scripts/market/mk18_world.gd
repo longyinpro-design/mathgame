@@ -325,8 +325,15 @@ func draw_paper(foot: Vector2, title: String, lines: Array, stamped: bool) -> vo
 	var top = foot + Vector2(-PAPER_WIDTH / 2.0 + 9, -PAPER_WIDTH * 1.33 + 26)
 	words(title, top, 13, INK_GOLD)
 	for index in range(lines.size()):
-		words(str(lines[index]), top + Vector2(0, 19.0 * (index + 1)), 12)
+		paper_words(str(lines[index]), top + Vector2(0, 19.0 * (index + 1)), 12)
 	if stamped: stamp(foot)
+
+# 信纸右下角那颗封蜡是原图里烤死的，第四行「领航灯 2/1」的尾巴正好压在它身上。
+# 世界层的字一律是浅字加深描边，落在蓝蜡上就糊成一片；纸上反过来描——浅纸色光晕托着深墨字，
+# 落在米色纸上看不见，压在蜡上就把字托出来。
+func paper_words(text: String, at: Vector2, size_px: int) -> void:
+	draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, 3, PAPER)
+	draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, Color("40291a"))
 
 func stamp(foot: Vector2) -> void:
 	var at = foot + Vector2(24, -26)

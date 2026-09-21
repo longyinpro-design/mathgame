@@ -19,7 +19,18 @@ const FOLD_TIME = 0.34
 # 每类封箱认得的重签造型固定：红箱用阶梯砝码、蓝箱用六角砝码，挂上后与签架上的是同一枚。
 const TAG_SPRITE = ["weight_stepped", "weight_hex"]
 # 记录纸内部按纸底脚点相对排布：纸宽 100 时三只封箱正好排满一行，蓝蜡封在右下不被压住。
-const CARD_LABEL_Y = -124.0
+# 纸面从脚下往上 130 像素（receipt_blank 237×316 缩到 100 宽），牌头那三个字是基线，
+# 原先抬到 -124 时字的上半截正好骑出纸边，读起来像贴在空气里。
+const CARD_LABEL_Y = -108.0
+# 牌夹压住纸顶往下约 100 像素（receipt_blank 的夹子在源图 8..72 那一行）。记录纸的牌头是
+# 这张纸上唯一的一行字，往下让到夹子下沿就够了——压在夹子上时「记录一」最后那一横会融进
+# 黄铜色里，玩家永远只读得到「记录」。差量卡还得在牌头下面塞一行算式，纸高只有 130，两行
+# 让不开，只能让金字牌头继续骑在夹子上（笔画够密，读得出来）。
+const CLIP_BOTTOM = -100.0
+const CARD_TITLE_Y = -84.0
+# receipt_blank 是 237×316、anchor 118.5/308：缩到 100 宽之后纸面从脚下往上 130。
+# 牌头、点击框与实窗检查找纸心都从这一个数出发。
+const PAPER_LIFT = 130.0
 const CARD_CRATE_Y = -52.0
 const CARD_TOTAL_Y = -34.0
 var tag_seen = [-1, -1]
@@ -43,15 +54,24 @@ func tag_foot(kind: int, tag: int) -> Vector2:
 func tag_rect(kind: int, tag: int) -> Rect2:
 	return target(tag_foot(kind, tag), TAG_SLOT, TAG_SLOT / 2.0)
 
+# 一张记录纸的点击框：纸面从脚下往上 130，左右各 50，再让出牌头那一行。
+func card_at(foot: Vector2) -> Rect2:
+	return target(foot, 124.0, 150.0)
+
 func card_rect(index: int) -> Rect2:
-	return target(record_foot(index), 124.0, 150.0)
+	return card_at(record_foot(index))
 
-# 叠好之后两张纸一起成为热点：再点一下就分开重摆。
+# 叠好之后两张纸一起成为热点：再点一下就分开重摆。上层纸停在左下角那块纸的右上方，
+# 两块框合起来才盖得住玩家看得见的那两角纸。
+# 这里只能用落定后的脚点：热点框在 build() 里算一次，拿动画途中的 fold_foot() 会把
+# 一整段行程都框进来，右侧空台上那张「差量签」也跟着被框住，点它就等于把记录分开了。
 func stack_rect() -> Rect2:
-	return target(record_foot(0) + Vector2(8, -26), 150.0, 176.0)
+	return card_rect(0).merge(card_at(folded_foot()))
 
+# 钩子上那一串（号码牌、吊着的重签、样本箱）整串都要点得着：62 见方的框原本只到样本箱，
+# 「5 号」那块牌的上沿有 14 像素落在外面，玩家照着牌去点就落空。
 func crate_rect(kind: int) -> Rect2:
-	return target(pan_cargo(kind) + Vector2(0, -12), 62.0, 50.0)
+	return Rect2(pan_cargo(kind) + Vector2(-31, -80), Vector2(62, 94))
 
 # ---- 铜秤组装：梁绕 pivot 旋转，盘只跟着梁端平移、自身保持水平 ----
 func part_width(id: String, factor: float) -> float:
@@ -87,10 +107,16 @@ func beam_angle() -> float:
 # 宿主的 land_place 在 begin_land 里看不到刚提交的状态（那时 world.state 仍是上一份），
 # 所以本关的下落改用世界自己的时钟计时，不去占用宿主的落地锁。
 func track_changes() -> void:
+	# 第一次看见这份状态是读档，不是「刚刚落下」：动画只留给真正发生过变化的那一次。
+	# 原先读档进柜台的那一格里，两张记录纸会自己从叠着的状态分开、挂好的重签会自己从下面升上来。
 	for kind in range(2):
 		var value: int = Rules.hung(state, kind)
-		if tag_seen[kind] != value: tag_at[kind] = clock; tag_seen[kind] = value
-	if fold_seen != state.stacked: fold_at = clock; fold_seen = state.stacked
+		if tag_seen[kind] == -1: tag_at[kind] = clock - FALL_TIME
+		elif tag_seen[kind] != value: tag_at[kind] = clock
+		tag_seen[kind] = value
+	if fold_seen == -1: fold_at = clock - FOLD_TIME
+	elif fold_seen != state.stacked: fold_at = clock
+	fold_seen = state.stacked
 
 func rise(kind: int) -> float:
 	return clampf(1.0 - (clock - tag_at[kind]) / FALL_TIME, 0.0, 1.0)
@@ -98,9 +124,15 @@ func rise(kind: int) -> float:
 func fold_progress() -> float:
 	return clampf((clock - fold_at) / FOLD_TIME, 0.0, 1.0)
 
+# 两张纸叠好之后上层纸的落脚处：左下角那张往右上挪一点，两角都露在外面。
+# 横向至少要让出下层纸的「记录一」牌头（脚点左 40 起、约 48 宽），挪少了上层纸的左沿
+# 会正好压住后两个字，叠完只剩一个「记」，看着像画崩了。
+func folded_foot() -> Vector2:
+	return record_foot(0) + Vector2(58, -54)
+
 func fold_foot() -> Vector2:
 	var from = record_foot(1)
-	var to = record_foot(0) + Vector2(16, -54)
+	var to = folded_foot()
 	return from.lerp(to, fold_progress()) if Rules.folded(state) else to.lerp(from, fold_progress())
 
 # ---- 绘制 ----
@@ -140,7 +172,7 @@ func cancelled_slots(index: int) -> Array:
 
 func draw_card(index: int, foot: Vector2) -> void:
 	kit("receipt_blank", foot, CARD_WIDTH)
-	words("记录" + ("一" if index == 0 else "二"), foot + Vector2(-40, CARD_LABEL_Y), 16)
+	words("记录" + ("一" if index == 0 else "二"), foot + Vector2(-40, CARD_TITLE_Y), 16)
 	var group = card_group(index)
 	var pitch = CRATE_WIDTH + 2.0
 	var first = foot + Vector2(-pitch * (group.size() - 1) / 2.0, CARD_CRATE_Y)
@@ -171,7 +203,8 @@ func draw_racks() -> void:
 			var foot = tag_foot(kind, tag) + Vector2(0, 18)
 			var used = Rules.hung(state, kind) == tag
 			contact(foot, 17, 0.14)
-			kit(TAG_SPRITE[kind], foot, WEIGHT_WIDTH - 4.0, 0.68 if used else 1.0)
+			# 已经挂出去的那一枚要一眼看出「不在架上了」：0.68 与 1.0 在黄铜色上几乎分不出。
+			kit(TAG_SPRITE[kind], foot, WEIGHT_WIDTH - 4.0, 0.42 if used else 1.0)
 			words(str(tag), foot + Vector2(-5, -32), 16, INK_GOLD if used else INK_LIGHT)
 		if Rules.hung(state, kind) == 0:
 			socket(record_foot(kind) + Vector2(0, TAG_ROW_LIFT - 32), Vector2(152, 13), 0.3 + 0.22 * beat)
@@ -227,25 +260,38 @@ func draw_hung_tag(kind: int) -> void:
 		INK_GOLD if tag > 0 else INK_LIGHT)
 	if tag > 0: kit(TAG_SPRITE[kind], at + Vector2(0, 20), WEIGHT_WIDTH - 6.0, 0.94)
 
-func draw_signs() -> void:
-	if state.stage in ["arrival", "approach"]: return
-	plaque(Rules.record_caption(0), Rect2(286, 506, 244, 28), 16)
-	plaque(Rules.difference_caption() if Rules.folded(state) else Rules.record_caption(1),
-		Rect2(742, 506, 244, 28), 16, INK_GOLD if Rules.folded(state) else INK_LIGHT)
+# 柜面上钉着的牌：文字、框与字号一起交出来，实窗检查才能按真实字号量每一句。
+# 汉字从不折行，一句超长的话会横着画到旁边的货上。
+func sign_boards() -> Array:
+	var boards: Array = []
+	# 结幕那两份记录已经收进回执，柜面上不该再留两块说不着话的牌。
+	if state.stage in ["arrival", "approach", "complete"]: return boards
+	boards.append({"text":Rules.record_caption(0), "rect":Rect2(286, 506, 244, 28), "size":16})
+	boards.append({"text":Rules.difference_caption() if Rules.folded(state) else Rules.record_caption(1),
+		"rect":Rect2(742, 506, 244, 28), "size":16, "gold":Rules.folded(state)})
 	if state.stage == "puzzle":
-		plaque("红箱重签 · 点一枚挂上", Rect2(257, 540, 220, 24), 15)
-		plaque("蓝箱重签 · 点一枚挂上", Rect2(709, 540, 220, 24), 15)
-		plaque("已制动 · 提交后才复秤", Rect2(538, 506, 190, 28), 15)
+		boards.append({"text":"红箱重签 · 点一枚挂上", "rect":Rect2(257, 540, 220, 24), "size":15})
+		boards.append({"text":"蓝箱重签 · 点一枚挂上", "rect":Rect2(709, 540, 220, 24), "size":15})
+		boards.append({"text":"已制动 · 提交后才复秤", "rect":Rect2(538, 506, 190, 28), "size":15})
 	if state.stage == "reweigh":
 		var index := 0 if progress < 0.5 else 1
-		plaque("复秤 %d 斤 = 记录 %d 斤" % [Rules.reading(state, index), Rules.published(index)],
-			Rect2(538, 506, 196, 28), 14, INK_GOLD)
-	if state.stage == "delivery" and progress > 0.35:
-		# 原单从柜台下翻出来：重量签回来了，那批货的单号也就对上了。
-		# 纸必须落在台面上（counter 的脚点），挂在 resident 之内的空中读起来像一张没贴住的标签。
-		var foot = station("counter_right") + Vector2(150, 0)
-		kit("receipt_blank", foot, 100)
-		words("原单", foot + Vector2(-42, -96), 15, INK_GOLD)
-		words("2红+1蓝 14 斤", foot + Vector2(-42, -76), 12)
-		words("1红+2蓝 13 斤", foot + Vector2(-42, -58), 12)
-		words("红 %d · 蓝 %d" % [state.red, state.blue], foot + Vector2(-42, -40), 12)
+		boards.append({"text":"复秤 %d 斤 = 记录 %d 斤" % [Rules.reading(state, index), Rules.published(index)],
+			"rect":Rect2(538, 506, 196, 28), "size":14, "gold":true})
+	return boards
+
+# 原单从柜台下翻出来：重量签回来了，那批货的单号也就对上了。
+# 纸必须落在台面上（counter 的脚点），挂在 resident 之内的空中读起来像一张没贴住的标签。
+func draw_original_order() -> void:
+	var foot = station("counter_right") + Vector2(150, 0)
+	kit("receipt_blank", foot, 100)
+	words("原单", foot + Vector2(-42, -96), 15, INK_GOLD)
+	words(Rules.equation(0), foot + Vector2(-42, -76), 12)
+	words(Rules.equation(1), foot + Vector2(-42, -58), 12)
+	words("红 %d · 蓝 %d" % [state.red, state.blue], foot + Vector2(-42, -40), 12)
+
+func draw_signs() -> void:
+	for board in sign_boards():
+		plaque(board["text"], board["rect"], board["size"], INK_GOLD if board.get("gold", false) else INK_LIGHT)
+	# 结幕也要留着这张纸：小岚那句「原单也就找到了」说的就是它，原先它只活在交货那几秒里。
+	if state.stage == "complete" or (state.stage == "delivery" and progress > 0.35):
+		draw_original_order()

@@ -35,9 +35,7 @@ func goal_line() -> String:
 	return "围巾的边要 11 段：只用 3 段或 5 段的整包，最多拿 3 包"
 
 func status_line() -> String:
-	var got = Rules.total(state)
-	var tail = "正好够" if got == Rules.NEED else "还差 %d 段" % (Rules.NEED - got)
-	return "%d 包 · %d 段 · %s" % [Rules.carried(state), got, tail]
+	return "%d 包 · %d 段 · %s" % [Rules.carried(state), Rules.total(state), Rules.gap_text(state)]
 
 func submit_label() -> String: return "交给扣扣补边"
 
@@ -89,7 +87,7 @@ func receipt_text() -> String:
 		Rules.packages_line(state), Rules.total(state), Rules.NEED, Rules.left_line(state)]
 
 func exit_buttons() -> void:
-	# 从航图进来的场合由宿主给出「返回集市航图」；单独启动本关时也要有一条回去的路。
+	# 从航图进来的场合由宿主给出「返回千灯航图」；单独启动本关时也要有一条回去的路。
 	if origin != "hub": add_button("open_hub", "回千灯航图", Rect2(690, 646, 280, 54), go_hub)
 
 func snapshot(value: Dictionary) -> Dictionary:

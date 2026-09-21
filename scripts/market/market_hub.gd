@@ -17,6 +17,7 @@ var ui: Control
 var overlay: Control
 var buttons: Dictionary = {}
 var modal = false
+var window_theme: Theme
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -26,8 +27,15 @@ func _ready() -> void:
 	ui = Control.new(); ui.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(ui)
 	overlay = Control.new(); overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(overlay)
 	get_window().title = "千灯集市 · 航图与灯火"
+	# 十八张卡片的完整目标只写在 tooltip 里，而 tooltip 的主题继承到 Window 为止：
+	# 与 level_host 同一条修法，离场还原，不漏给森林岛。
+	window_theme = get_window().theme
+	get_window().theme = UIStyle.tooltip_theme()
 	refresh()
 	if save_note == "protected": show_protected()
+
+func _exit_tree() -> void:
+	if is_instance_valid(get_window()): get_window().theme = window_theme
 
 # The next lamp breathes, so the world layer redraws every frame instead of on commit.
 func _process(_delta: float) -> void:

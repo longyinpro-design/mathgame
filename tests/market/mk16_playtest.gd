@@ -108,6 +108,14 @@ func spilled(parent: Node) -> int:
 			over += 1; print("SPILL ", child.text, " needs ", needed, " in ", child.size)
 	return over
 
+# 台词板钉在屏幕 (338,92)…(1164,191)，镜头推拉动不了它：
+# 包裹与吊牌整块必须在板底以下，否则「红船带着你选的那一件离岸」只是句台词。
+func parcel_clear(label: String) -> void:
+	var box = game.world.charm_box()
+	check(box.size.x > 0 and box.position.y >= 191.0 and box.position.x >= 0.0 \
+		and box.end.x <= 1280.0 and box.end.y <= 720.0,
+		"%s：包裹与吊牌整块露在台词板下沿以外（%s）" % [label, str(box)])
+
 func paper_on_screen() -> String:
 	for child in game.ui.get_children():
 		if child is Label and RECEIPT_TITLE in child.text: return child.text
@@ -235,11 +243,13 @@ func run() -> void:
 		check(game.world.progress > 0.4 and game.world.progress < 0.6,
 			"the three souvenirs are wrapped in one continuous motion")
 		await capture(prefix+"09-wrapping-cup")
+		parcel_clear("封箱途中")
 		await click("skip")
 		check(game.state.stage == "delivery" and game.state.sent == 1,
 			"the red boat takes the parcel and reports it once")
 		check("白杯" in game.line(),"the sailing line names the cup the player chose")
 		await hold(2.6); await capture(prefix+"10-sailing-cup")
+		parcel_clear("红船离岸")
 		await click("skip")
 		check(game.state.stage == "complete" and Rules.validate(game.state),
 			"the sailing ends on the receipt")
@@ -276,6 +286,7 @@ func run() -> void:
 		check(game.state.stage == "delivery" and "铜铃" in game.line(),
 			"the sailing line follows the bell instead")
 		await capture(prefix+"13-sailing-bell")
+		parcel_clear("铜铃那一条离岸")
 		await click("skip")
 		var bell_paper = paper_on_screen()
 		check(bell_paper != cup_paper and "铃一响" in bell_paper and Rules.REWARD in bell_paper,

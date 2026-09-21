@@ -1,6 +1,9 @@
 extends SceneTree
 const Scene = preload("res://game/market_mk02.tscn")
 const Rules = preload("res://scripts/market/mk02_rules.gd")
+const Sample = preload("res://scripts/market/mk02_scene.gd")
+const World = preload("res://scripts/market/mk02_world.gd")
+const UIStyle = preload("res://scripts/cargo/skin.gd")
 const Bridge = preload("res://scripts/market/market_bridge.gd")
 const HarborSample = preload("res://scripts/market/mk01_scene.gd")
 const Focus = preload("res://tests/forest/window_focus.gd")
@@ -37,6 +40,30 @@ func hold(seconds: float) -> void:
 	game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
 	await process_frame
+# 抬头那两块板与回执板都由 UIStyle.text 画：Label 的框按板子内框写死，汉字又从不折行，
+# 一句超长的话会直接爬出板子外面。这里按真实字号量每一句，超框就算缺陷。
+func spilled_labels() -> int:
+	var over = 0
+	for child in game.ui.get_children():
+		if not child is Label or child.text.is_empty(): continue
+		var needed = 0.0
+		var widest = ""
+		for line in child.text.split("\n"):
+			var width = UIStyle.face().get_string_size(line,HORIZONTAL_ALIGNMENT_LEFT,
+				-1,child.get_theme_font_size("font_size")).x
+			if width > needed: needed = width; widest = line
+		if needed > child.size.x+0.5:
+			over += 1; print("LABEL ",widest," needs ",needed," in ",child.size.x)
+	return over
+# 回执板在 ui 层、四条木牌画在世界层：谁压住谁要看镜头此刻的换算，这里不重抄那条换算式。
+func receipt_covers_planks() -> bool:
+	var at: Transform2D = game.world.get_global_transform_with_canvas()
+	return Sample.RECEIPT.end.y > (at * Vector2(330,World.PLAQUE_ROW_Y)).y
+func pool_readout() -> String:
+	var found = ""
+	for child in game.ui.get_children():
+		if child is Label and "可换" in child.text: found += child.text
+	return found
 func run() -> void:
 	create_timer(90).timeout.connect(func(): push_error("MK02 window watchdog"); quit(1))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(CAPTURE))
@@ -64,9 +91,17 @@ func run() -> void:
 		await click("next")
 		check(game.state.stage == "puzzle" and game.world.parts.has("copper_fruit"),"kit-v1 parts are loaded with the table")
 		check(game.buttons.rack_0.size.x >= 48 and game.buttons.hook_0.size.y >= 48,"drop targets keep the 48 pixel logical floor")
+		check(game.world.scale.x > 1.09,"the camera is already at the counter when the player takes over")
+		check("第1位" in game.buttons.rack_0.tooltip_text and "第6位" in game.buttons.hook_0.tooltip_text
+			and "第7位" in game.buttons.hook_1.tooltip_text,
+			"the seven drop targets are numbered by the very key that reaches them")
+		check("铜果 8 颗" in pool_readout() and "线卷 0 卷" in pool_readout() and not " 个 " in pool_readout(),
+			"both pools are counted with the measure word the rest of the chapter uses")
+		check(spilled_labels() == 0,"nothing written on a board climbs out of it")
 		await capture(prefix+"02-table")
 		await key(KEY_Q)
 		check(game.state.stage == "exchanging" and game.state.exchange == [0,1],"keyboard Q stages one fruit group")
+		check(game.world.scale.x > 1.09,"the camera holds the counter through the exchange animation")
 		await click("skip")
 		check(game.state.a == 1 and game.world.shown_state().b == 0,"a single group books exactly once")
 		await click("batch_0")
@@ -112,7 +147,8 @@ func run() -> void:
 		for n in range(5):
 			await click("single_1"); await click("skip")
 		for slot in range(Rules.RACK_SLOTS): await click("rack_%d"%slot)
-		for slot in range(Rules.HOOK_SLOTS): await click("hook_%d"%slot)
+		for slot in range(Rules.HOOK_SLOTS): await key(KEY_6+slot)
+		check(game.state.hook == [1,1],"the two keys the tooltips number 第6/第7位 are the two that hang the spools")
 		check(Rules.solved(game.state),"five wicks and two bench spools close both promises")
 		await capture(prefix+"06-solved-table")
 		await click("reset"); await click("cancel")
@@ -122,8 +158,13 @@ func run() -> void:
 		await hold(2.8)
 		check(game.world.progress > 0.6 and game.world.progress < 0.8,"wicks are away while the kept line is still on its way")
 		await capture(prefix+"07-delivery")
+		await hold(game.duration())
+		check(game.world.walk_off() == 1.0 and game.world.hand_off() == 1.0 and game.world.shipped() == 1.0,
+			"the last delivery frame has already handed every good over")
 		await click("skip")
 		check(game.state.stage == "complete" and game.state.hook.count(1) == 2,"the delivery ends with 扣扣's two spools kept")
+		check(game.world.walk_off() == 1.0 and game.world.hand_off() == 1.0 and game.world.shipped() == 1.0,
+			"the finished counter is the pose the hand-over ended in, not a snap back")
 		check(not game.buttons.has("back_camp"),"a standalone sample keeps its own exit")
 		await capture(prefix+"08-receipt")
 		var receipt = ""
@@ -131,6 +172,8 @@ func run() -> void:
 			if child is Label and "回执 · 育苗铺" in child.text: receipt = child.text
 		check(receipt.contains("约定一 ×4") and receipt.contains("交付架 5 根"),
 			"the receipt restates the groups the player actually made")
+		check(not receipt_covers_planks(),"the receipt stops above the two conventions nailed to the counter")
+		check(spilled_labels() == 0,"no word on the finished counter climbs out of its board")
 		await click("next"); await click("cancel")
 		check(game.state.stage == "complete","leaving the restart dialog preserves the finished order")
 		game.queue_free(); await process_frame

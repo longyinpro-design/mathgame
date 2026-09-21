@@ -90,9 +90,9 @@ func line() -> String:
 
 func puzzle_line() -> String:
 	match phase():
-		1: return "采购台只卖三种封装：A 3油+1芯 5票、B 1油+2芯 4票、C 2油 3票。\n预算 29 票，库存 A4 B4 C5，必须恰好凑成 14 提油 7 束芯。"
+		1: return "采购台只卖三种封装，含量与价钱都写在每一行左边的牌上，库存 A4 B4 C5。\n预算 29 票，要恰好凑成 14 提油 7 束芯；键盘 1 2 3 加一包、Q W E 退一包。"
 		2: return "桥头街已经交完，中街与西坡的最终安排现在才公开。\n封装可以拆开分配，但不再购买；摆齐了先交整单预览。"
-		3: return "三街都齐了。亲手把预留的 2 提油 1 束芯装进领航灯，\n再把三条街的回执一张张投进万签胸前的空信槽。"
+		3: return "三街都齐了。亲手把预留的 2 提油 1 束芯装进领航灯（键盘 L），\n再把三条街的回执一张张投进万签胸前的空信槽。"
 	return ""
 
 # ---- 热点：三阶段各摆自己那一套，每一处都有中文说明 ----
@@ -109,8 +109,15 @@ func build_purchasing() -> void:
 			var tip = "%s 种第 %d 包 · %s · 库存 %d 包：" % [Rules.PACK_NAMES[kind], index + 1,
 				Rules.pack_caption(kind), Rules.STOCK[kind]]
 			tip += "已订着，点一下退到 %d 包" % index if booked else "点一下订到 %d 包" % (index + 1)
+			tip += "\n" + kind_keys(kind)
 			add_hotspot("pack_%d_%d" % [kind, index], world.pack_rect(kind, index),
 				choose_pack.bind(kind, index), tip)
+
+# 快捷键写在自己那一行的牌上：订到顶就不写「加一包」，一格没订就不写「退一包」。
+func kind_keys(kind: int) -> String:
+	if state.order[kind] == 0: return "键盘 %s 加一包" % ["1", "2", "3"][kind]
+	if state.order[kind] >= Rules.STOCK[kind]: return "键盘 %s 退一包" % ["Q", "W", "E"][kind]
+	return "键盘 %s 加一包 · %s 退一包" % [["1", "2", "3"][kind], ["Q", "W", "E"][kind]]
 
 func slot_foot(slot: int) -> Vector2:
 	return world.lamp_cells_foot() if slot == Rules.SLOTS - 1 else world.board_foot(slot + 1)
@@ -130,9 +137,9 @@ func build_allocating() -> void:
 		add_hotspot("revoke", world.pool_rect(), do_revoke, "撤回这份整单预览，回到摆放")
 
 func build_lighting() -> void:
-	add_hotspot("lamp", world.lamp_rect(), do_lamp,
-		"把预留的 %s 装进领航灯" % Rules.goods(Rules.RESERVED[Rules.OIL], Rules.RESERVED[Rules.WICK])
-			if state.lamp == 0 else "把领航灯里的油芯先抽回货台")
+	var loaded = "把预留的 %s 装进领航灯" % Rules.goods(Rules.RESERVED[Rules.OIL], Rules.RESERVED[Rules.WICK]) \
+		if state.lamp == 0 else "把领航灯里的油芯先抽回货台"
+	add_hotspot("lamp", world.lamp_rect(), do_lamp, loaded + " · 键盘 L")
 	for slot in range(3):
 		add_hotspot("seal_%d" % slot, world.seal_rect(slot), do_seal.bind(slot),
 			"%s已经交齐：把这张真实回执投进万签胸前的空信槽" % Rules.LINES[slot]
@@ -149,7 +156,7 @@ func extra() -> void:
 	UIStyle.text(ui, body, Rect2(112, 312, 588, 226), 18)
 
 func exit_buttons() -> void:
-	# 从航图进来的场合由宿主给出「返回集市航图」；单独启动本关时也要有一条回去的路。
+	# 从航图进来的场合由宿主给出「返回千灯航图」；单独启动本关时也要有一条回去的路。
 	if origin != "hub": add_button("open_hub", "回千灯航图", Rect2(690, 646, 280, 54), go_hub)
 
 func snapshot(value: Dictionary) -> Dictionary:

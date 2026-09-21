@@ -20,6 +20,11 @@ const CUP_BASE_R = [18.0,12.5,5.8]  # half width where the cup meets its support
 const LIFT = 9.0
 const DIM = Color(0.80,0.76,0.70)   # unselected cups recede while one is held
 const HELD = Color(1.16,1.14,1.02)   # the held cup is lit slightly above the shelf
+# 整盘回执上的杯样是货架那只的一比一缩小：两种杯共用同一个缩放，杯口朝下站在同一条底线上。
+const RECEIPT_SCALE = 0.42
+const RECEIPT_GAP = 6.0
+# 三个托盘位走 Q/W/E，与键盘一致；1—8 是货架上那八只杯子，不能在同一屏用同一个数字指两处。
+const SLOT_KEYS = ["Q", "W", "E"]
 var state = Rules.fresh()
 var selected = -1
 var clock = 0.0
@@ -44,7 +49,10 @@ func cup_kind(id: int) -> int:
 func cup_description(id: int) -> String:
 	var kind = cup_kind(id)
 	var label = ["蓝杯","白杯","小杯"][kind]
-	return label+" · "+("每杯 %d 小杯"%Rules.CAPACITIES[id] if state.calibrated or kind == 2 else "容量未知（2—8 小杯）")
+	# 货架上那八只走键盘 1—8，托盘三位走 Q/W/E：两处都得把键写在框上，
+	# 否则屏幕上只有托盘位标着数字，玩家会以为 1/2/3 就是那三个位子。
+	return label+" · "+("每杯 %d 小杯"%Rules.CAPACITIES[id] if state.calibrated or kind == 2
+		else "容量未知（2—8 小杯）")+" · 键盘 %d"%(id+1)
 
 func kind_size(kind: int) -> Vector2:
 	# The one-unit cup fits below the white-cup label, on its own shelf.
@@ -63,8 +71,14 @@ func cup_foot(id: int) -> Vector2:
 func cup_rect(id: int) -> Rect2:
 	# The held cup hovers, so its hotspot follows it and stays clickable end to end.
 	var foot = cup_foot(id)-Vector2(0,LIFT if selected == id else 0)
-	if id >= 5: return Rect2(foot-Vector2(33,44),Vector2(66,48))
-	return Rect2(foot-Vector2(33,79 if id < 2 else 55),Vector2(66,80 if id < 2 else 64))
+	# 小杯那一排的框顶从脚下 44 收到 29：44 会一直爬到白杯那排门口的容量签上
+	# （那块牌底边在 y 452，小杯脚点 481），点它下半截就同时够到两只不同的杯子。
+	# 收到 29 之后框顶停在牌底，仍然盖住小杯画出来的那 27 像素，也还是 48 高。
+	if id >= 5: return Rect2(foot-Vector2(33,29),Vector2(66,48))
+	# 白杯同理：框顶原本抬到脚下 55，会爬进上排蓝杯那块容量签（牌底 375，杯画顶 381），
+	# 点在那块牌的下半截上选中的却是一只白杯。抬到 45、下沿照旧，仍然把 42 高的杯画整个盖住。
+	if id >= 2: return Rect2(foot-Vector2(33,45),Vector2(66,54))
+	return Rect2(foot-Vector2(33,79),Vector2(66,80))
 
 func slot_rect(slot: int) -> Rect2:
 	return Rect2(slot_foot(slot)-Vector2(32,83),Vector2(64,102))
@@ -146,6 +160,20 @@ func seed_position() -> Vector2:
 	if progress < 0.75: return Vector2(312,229).lerp(Vector2(423,265),smoothstep(0.4,0.75,progress))
 	return Vector2(423,265).lerp(Vector2(423,411),smoothstep(0.75,1,progress))
 
+# 三只容量签钉在货架前沿，各管自己那一排：数字从 Rules.CAPACITIES 现取，
+# 牌上写的与验量槽读出来的永远得是同一个数。检查也从这里按 kind 找到牌子，量它归谁。
+func lip_plaques() -> Array:
+	var reps = [0, 2, 5]
+	var boards = []
+	for index in range(3):
+		var kind = index
+		boards.append({"kind": kind, "rect": [Rect2(914,348,185,27), Rect2(914,425,185,27),
+			Rect2(914,488,185,27)][index],
+			"text": "%s · %s"%[["蓝杯","白杯","小杯"][kind],
+				"每杯 %d"%Rules.CAPACITIES[reps[index]] if (state.calibrated or kind == 2)
+					else "容量待查"]})
+	return boards
+
 func _draw() -> void:
 	if font == null: return
 	draw_texture_rect(BACKDROP,Rect2(0,0,1280,720),false)
@@ -172,7 +200,7 @@ func _draw() -> void:
 		if state.slots[slot] < 0 and selected >= 0:
 			var beat = 0.5+0.5*sin(clock*4.6)
 			ground_mark(SLOT_SOCKETS[slot],SOCKET_R*(1.0+0.07*beat),0.45+0.3*beat)
-		var digit = str(slot+1)
+		var digit = SLOT_KEYS[slot]
 		words(digit,SLOT_SOCKETS[slot]+Vector2(-font.get_string_size(digit,HORIZONTAL_ALIGNMENT_LEFT,-1,16).x/2,45),16)
 	plaque("接货托盘 · 恰好 3 只满杯",Rect2(436,531,280,34),18)
 	for id in range(8):
@@ -193,9 +221,7 @@ func _draw() -> void:
 		var foot = move_from.lerp(move_to,smoothstep(0,1,move_progress))-Vector2(0,sin(move_progress*PI)*33)
 		cup(move_id,foot)
 	# The capacity signs hang on the shelf's front lip, so they stay over the cups' footprints.
-	plaque("蓝杯 · 每杯 6" if state.calibrated else "蓝杯 · 容量待查",Rect2(914,348,185,27))
-	plaque("白杯 · 每杯 4" if state.calibrated else "白杯 · 容量待查",Rect2(914,425,185,27))
-	plaque("小杯 · 每杯 1",Rect2(914,488,185,27))
+	for sign in lip_plaques(): plaque(sign["text"], sign["rect"])
 	if state.stage == "measuring" and not state.calibrated:
 		# Opaque shutter covers the entire chamber, including baked glass highlights.
 		plaque("三杯倒完再开",Rect2(740,411,143,104),16)
@@ -219,11 +245,14 @@ func _draw() -> void:
 		var origin = Vector2(108,145+index*80)
 		plaque("",Rect2(origin,Vector2(256,70)))
 		words("第 %d 盘 · 整盘回执"%(index+1),origin+Vector2(10,20),16)
-		var cursor = 0
+		var cursor = 0.0
 		for kind in range(2):
 			for n in range(record.counts[kind]):
-				# Receipt icons share the body-axis anchoring of the shelf and tray cups.
-				var shift = CUP_AXIS_X[kind]*34/kind_size(kind).x
-				draw_texture_rect_region(PROPS,Rect2(origin+Vector2(12+cursor*43-shift,28),Vector2(34,34)),CUP_REGIONS[kind])
-				cursor += 1
+				# 杯样按 RECEIPT_SCALE 等比缩，与货架那只同一形状：原先两种杯都被硬塞进 34×34 的方格，
+				# 蓝杯被横向拉开两成、白杯被拉高半截，而这一关要比的恰恰是「看着大不代表装得多」，
+				# 杯脚站在同一条底线上，一只挨一只排过去。货架那只需要按杯身轴线偏移的换算在这里用不上：
+				# 回执排的是一个个小方格，格子匀着排过去就是玩家看到的样子。
+				var dims = kind_size(kind)*RECEIPT_SCALE
+				draw_texture_rect_region(PROPS,Rect2(origin+Vector2(12+cursor,62-dims.y),dims),CUP_REGIONS[kind])
+				cursor += dims.x+RECEIPT_GAP
 		words("= %d"%record.total,origin+Vector2(151,59),24)

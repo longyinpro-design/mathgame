@@ -65,6 +65,12 @@ func laid_runs() -> int:
 	for id in game.buttons:
 		if id.begins_with("run_"): n += 1
 	return n
+# 底栏那条读数是宿主直接画在 ui 上的 Label：按内容认出它，才能量它说的是哪一边。
+func status_bar() -> Label:
+	var said = game.status_line()
+	for child in game.ui.get_children():
+		if child is Label and child.text == said: return child
+	return null
 
 func run() -> void:
 	create_timer(150).timeout.connect(func(): push_error("MK13 window watchdog"); quit(1))
@@ -129,7 +135,25 @@ func run() -> void:
 		check(game.state.hand == [0, 2],"a 5-段 package with a 3-段 one lays 8 段 on the gauge")
 		await click("deliver")
 		check("8 段" in game.message and "还差 3 段" in game.message,"the short count is named in the segments the player laid")
+		var lone = game.state.duplicate(true)
+		lone.hand = [0]
+		check(Rules.shortfalls(lone)[0] == "一包 5 段，围巾的边要 11 段：还差 6 段，手上还能再拿 2 包。",
+			"one package on the gauge is named once, not as 「5 段 是 5 段」")
 		await capture(prefix+"04-eight-on-the-gauge")
+		# --- 摊多了：底栏要跟着换成「多出」，负号永远不该出现在屏上 ---
+		await key(KEY_2)
+		check(game.state.hand == [0, 2, 1] and Rules.total(game.state) == 13,"a third package can overshoot the gauge")
+		var bar = status_bar()
+		check(bar != null and "3 包 · 13 段 · 多出 2 段" in bar.text and "-" not in bar.text,
+			"the bottom bar reads the overshoot as 2 段 too many, never as a minus")
+		check(bar != null and fits(bar.text, 20, bar.size.x) and spilled(game.ui) == 0,
+			"the overshoot reading stays inside its own strip of the bottom bar")
+		await click("deliver")
+		check(game.state.stage == "puzzle" and "多出 2 段" in game.message
+			and spilled(game.ui) == 0 and fits(game.message, 20, 798),
+			"13 段 is refused in one line the dialogue board holds whole")
+		await key(KEY_2)
+		check(game.state.hand == [0, 2] and Rules.total(game.state) == 8,"taking the extra package back leaves 8 段 on the gauge")
 		# --- 三级提示：只提点，不代劳，也不判分 ---
 		for n in range(3): await click("hint")
 		check(game.state.hint == 3 and "5 + 3 + 3 = 11" in game.message,"the third hint states the whole split and stops there")

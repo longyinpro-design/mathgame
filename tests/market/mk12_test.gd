@@ -376,7 +376,9 @@ func run() -> void:
 	check(host.scene_id == "oil" and host.level_id == "MK12" and host.title == entry.title, "场景声明了自己的身份")
 	check(host.rules == Rules and host.world_script == World, "宿主接到 MK12 的规则与世界")
 	check(host.durations.has("handing") and host.durations.has("delivery"), "两段演出都有时长")
-	check(host.zoom_stages == ["puzzle"], "只有装车时贴近台面，交货与点灯退回整院")
+	check(host.zoom_stages == ["ready", "puzzle", "handing"],
+		"装车、那句操作说明与三辆车一起离场都贴着庭院，点灯才退回全景：" +
+		"漏掉 ready 会让镜头先弹回 1.0 再弹回 1.10，漏掉 handing 则在交接那两帧连着跳三次")
 	check(Rules.BEATS == host.LINES.size() and host.submit_label() == "三处一起交货", "开场四句，提交是一次性交货")
 	check(not host.cleared_state().is_empty() and not host.reset_prompt().is_empty() and
 			not host.restart_prompt().is_empty(), "重摆与重新体验的文案齐全")
@@ -417,8 +419,17 @@ func run() -> void:
 	check(game.state.stage == "puzzle", "确认后才开始装车")
 	check(game.buttons.has("deliver") and game.buttons.deliver.text == "三处一起交货", "提交按钮写着这是一单三处")
 	check(game.buttons.undo.disabled, "第一步之前撤销是空的")
-	check(game.status_line() == "车上 0/6 壶 · 台面 6 壶" and real_fits(game.status_line(), 20, 300.0),
+	check(game.status_line() == "三车已装 0/6 壶 · 台面 6 壶" and real_fits(game.status_line(), 20, 300.0),
 		"计数只数实物：" + game.status_line())
+	# 计数只在装车与离场两幕说话：approach 还没进庭院、delivery 已经在点灯，
+	# 那时候再报「三车已装几壶」就是把一张已经交出去的草稿挂在车帮的算式板旁边。
+	var draft_stage: String = game.state.stage
+	var guard_ok := true
+	for stage in ["arrival", "approach", "ready", "delivery", "complete"]:
+		game.state.stage = stage
+		if not game.status_line().is_empty(): guard_ok = false
+	game.state.stage = draft_stage
+	check(guard_ok, "其余五幕底栏留白，不挂过期的草稿计数")
 	var rects: Array = []
 	for jug in range(Rules.JUGS): rects.append(game.world.stock_rect(jug))
 	for place in range(Rules.PLACES.size()):
@@ -466,7 +477,7 @@ func run() -> void:
 	game.choose_place(2); settle(game)
 	check(game.state.plan == [[0, 1], [2], [3]], "换个有空位的地方继续装")
 	game.choose_jug(4); settle(game); game.choose_place(2); settle(game)
-	check(game.state.plan == [[0, 1], [2], [3, 4]] and game.status_line() == "车上 5/6 壶 · 台面 1 壶",
+	check(game.state.plan == [[0, 1], [2], [3, 4]] and game.status_line() == "三车已装 5/6 壶 · 台面 1 壶",
 		"西坡接满两壶 3 单位，计数跟着走：" + game.status_line() + " " + str(game.state.plan))
 	game.message = ""; game.advance(); settle(game)
 	check(game.state.stage == "puzzle" and game.state.handed == Rules.empty_plan() and "还剩 1 壶" in game.message,
@@ -485,7 +496,7 @@ func run() -> void:
 		game.choose_place(step[1]); settle(game)
 	check(game.state.plan == solution_rows() and Rules.assigned(game.state.plan) == Rules.JUGS and
 			Rules.totals(game.state.plan) == Rules.NEEDS, "六步装完：一壶不剩，三处各自接满")
-	check(game.status_line() == "车上 6/6 壶 · 台面 0 壶", "装完后计数说台面 0 壶")
+	check(game.status_line() == "三车已装 6/6 壶 · 台面 0 壶", "装完后计数说台面 0 壶")
 	var history_size = game.history.size()
 	game.undo(); settle(game); game.undo(); settle(game)
 	check(game.state.plan == [[0, 1], [2, 3], []] and game.history.size() == history_size - 2,
@@ -606,6 +617,18 @@ func run() -> void:
 	check(spill == 0 and boards.size() >= 6, "庭院里 %d 块牌子都装得下自己的字" % boards.size())
 
 	# ---- 12. 每个阶段都重画一遍，画完还在画框里 ----
+	# 换幕不跳：handing 最后一帧的车脚必须就是 delivery 第一帧的车脚，点灯过半时车回到庭院原位，
+	# 收尾那一格的车、车帮算式与联合回执栏才还按审计量过的坐标各占各处。
+	game.state = build(solution_rows(), "handing"); game.world.state = game.state
+	game.world.progress = 1.0
+	var rolled_out: Vector2 = game.world.cart_foot(2) - game.world.cart_station(2)
+	game.state = build(solution_rows(), "delivery"); game.world.state = game.state
+	game.world.progress = 0.0
+	var rolled_back: Vector2 = game.world.cart_foot(2) - game.world.cart_station(2)
+	game.world.progress = 0.6
+	check(rolled_out.distance_to(rolled_back) < 0.01 and
+			game.world.cart_foot(2) == game.world.cart_station(2) and rolled_out.x > 20.0,
+		"三辆车驶向街口再回到庭院是一来一回：换幕那一帧没有整排弹回去的跳变")
 	var repaints = 0
 	var offscreen = 0
 	var lines_ok := true

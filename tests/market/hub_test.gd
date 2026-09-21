@@ -191,6 +191,46 @@ func run() -> void:
 		var w = UIStyle.face().get_string_size("千灯集市  /  "+name, HORIZONTAL_ALIGNMENT_LEFT, -1, UIStyle.text_size(24)).x
 		if w > 382.0: wide += 1
 	check(wide == 0, "every station name fits the header board the host draws it on")
+	# 底栏与出口那几块木牌由宿主一处写死、十八关共用：字比盒子宽就被引擎裁掉，
+	# 「重摆 X」少半句就只剩「重摆」，键位等于没告诉玩家。这里直接从宿主源码里读出每块牌
+	# 的字样与盒子量一遍——以后改字或改盒子都会立刻被这一条拦住。
+	var narrow = 0
+	var boarded = 0
+	var board_pattern = RegEx.create_from_string("add_button\\(\"[a-z_]+\",\\s*\"([^\"]+)\",\\s*Rect2\\(([^)]+)\\)")
+	for spoken in FileAccess.get_file_as_string("res://scripts/market/level_host.gd").split("\n"):
+		var found = board_pattern.search(spoken)
+		if found == null: continue
+		boarded += 1
+		var stub = Button.new()
+		UIStyle.style_button(stub); stub.text = found.get_string(1)
+		var room = float(found.get_string(2).split(",")[2])
+		if stub.get_combined_minimum_size().x > room + 0.5:
+			narrow += 1; print("牌装不下自己那句字：", stub.text, " 要 ",
+				stub.get_combined_minimum_size().x, " 只有 ", room)
+		stub.free()
+	check(boarded >= 7 and narrow == 0,
+		"底栏与出口的 %d 块木牌都装得下自己那句字" % boarded)
+	# 回航图那颗按钮由宿主与十八关各自挂上，目的地却是同一块屏。航图自己的牌头写的是
+	# 「千灯集市 / 千灯航图」，那每一颗回它的按钮就得都叫这个名字：一处「集市航图」、一处
+	# 「回千灯航图」，玩家会以为是两条路、两个地方。字样与牌头都从源码里读，不抄第二遍。
+	var header = ""
+	for line in FileAccess.get_file_as_string("res://scripts/market/market_hub.gd").split("\n"):
+		if line.begins_with("\tsign_text(\"千灯集市"): header = line
+	var exits = 0
+	var misnamed = 0
+	var exit_pattern = RegEx.create_from_string("add_button\\(\"(?:back_hub|leave_hub|open_hub)\",\\s*\"([^\"]+)\"")
+	var folder = DirAccess.open("res://scripts/market")
+	for file in folder.get_files():
+		if not file.ends_with("_scene.gd") and file != "level_host.gd": continue
+		for line in FileAccess.get_file_as_string("res://scripts/market/" + file).split("\n"):
+			var found = exit_pattern.search(line)
+			if found == null: continue
+			exits += 1
+			if "千灯航图" not in found.get_string(1):
+				misnamed += 1; print("回航图的按钮报的是别处：", file, " ", found.get_string(1))
+	check("千灯航图" in header, "航图自己牌头上写的那个名字")
+	check(exits >= 21 and misnamed == 0,
+		"宿主与十八关那 %d 颗回航图的按钮，报的都是航图自己那个名字" % exits)
 	check(hub.card_status("MK02") == "已点亮 · 可重玩" and hub.card_status("MK01") == "待出发",
 		"a lit lamp still offers the station back to the player")
 	check(hub.buttons.has("next_station") and hub.buttons.next_station.text == "下一站 · MK01",
@@ -198,6 +238,20 @@ func run() -> void:
 	check(not hub.buttons.camp.disabled, "the way back to the forest camp is open")
 	check("比较两张混合装法" in hub.buttons.card_MK01.tooltip_text, "a card's tip carries the full goal")
 	check(hub.world.completed == ["MK02", "MK11"] and hub.world.next_id == "MK01", "the lamp strip follows the record")
+	# 打磨轮补的共享守卫。热点是隐形按钮，「这个能点」只靠 hover 那一圈金边与 tooltip 说话；
+	# 而 tooltip 的主题继承只到 Window，挂到宿主 Control 上会静默失效，所以这里两头都钉住。
+	var tip = Button.new(); UIStyle.hotspot(tip, "检查用说明")
+	var hover_box = tip.get_theme_stylebox("hover")
+	check(hover_box is StyleBoxFlat and (hover_box as StyleBoxFlat).border_width_left > 0,
+		"a hotspot answers the pointer the moment it arrives")
+	tip.free()
+	var chart_theme = UIStyle.tooltip_theme()
+	check(chart_theme.get_stylebox("panel", "Tooltip") is StyleBoxFlat,
+		"an explanation rides on the level's own wooden plate, not the engine default box")
+	check(chart_theme.get_font("font", "TooltipLabel") == UIStyle.face(),
+		"the explanation is drawn in the font every other board already uses")
+	check(hub.get_window().theme != null,
+		"the chart hangs that theme on the window, which is the only place tooltips read it from")
 	Bridge.origin = ""
 	hub.choose("MK13")
 	check(Bridge.origin.is_empty(), "a locked card never sends the player anywhere")

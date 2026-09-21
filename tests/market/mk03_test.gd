@@ -71,8 +71,8 @@ func run() -> void:
 	check(winners == 1, "exactly one hanging satisfies both weighings at once")
 	check(Rules.solved(pose(1, 5, 4)) and not Rules.solved(pose(1, 4, 5)), "the answer is 红 5 · 蓝 4, and swapping it fails")
 	check(only_first == 2 and only_second == 3 and neither == 43, "the single-condition near misses are counted as authored")
-	check(Rules.shortfalls(pose(1, 6, 2)) == ["记录二没兑现：1 红 + 2 蓝 应是 13 斤，挂 6 与 2 只合出 10 斤。"], "R=6 B=2 names only the failing record")
-	check(Rules.shortfalls(pose(1, 3, 5)) == ["记录一没兑现：2 红 + 1 蓝 应是 14 斤，挂 3 与 5 只合出 11 斤。"], "R=3 B=5 names the other failing record")
+	check(Rules.shortfalls(pose(1, 6, 2)) == ["记录二没兑现：1红+2蓝 = 13 斤，挂 6 与 2 只合出 10 斤。"], "R=6 B=2 names only the failing record")
+	check(Rules.shortfalls(pose(1, 3, 5)) == ["记录一没兑现：2红+1蓝 = 14 斤，挂 3 与 5 只合出 11 斤。"], "R=3 B=5 names the other failing record")
 	check(named(Rules.shortfalls(pose(1, 2, 2)), "一") and named(Rules.shortfalls(pose(1, 2, 2)), "二"), "a pair matching neither record is told both")
 	check(Rules.reading(pose(1, 5, 4), 0) == 14 and Rules.reading(pose(1, 5, 4), 1) == 13, "the winning hang reads back 14 and 13")
 	# ---- 叠合/消去：真实操作、幂等、不发明证据 ----
@@ -186,6 +186,11 @@ func run() -> void:
 	check(not "成立" in Rules.record_caption(0) and not "对" in Rules.record_caption(1), "no record card marks itself as met")
 	check(Rules.difference_caption() == "消去 1红1蓝 · 红比蓝重 1 斤", "the folded card states the difference, not the answer")
 	check(not "5" in Rules.difference_caption() and not "4" in Rules.difference_caption(), "the folded card never hands out the tags")
+	# 同一行公开算式在本关会出现五处（目标板、两块柜面牌、缺口说明、回执与原单）：写法只留一种。
+	check(Rules.equation(0) == "2红+1蓝 = 14 斤" and Rules.equation(1) == "1红+2蓝 = 13 斤",
+		"each published weighing has exactly one spelling")
+	check(Rules.record_caption(0).ends_with(Rules.equation(0)) and Rules.record_caption(1).ends_with(Rules.equation(1)),
+		"both counter plaques quote that spelling instead of retyping it")
 	# ---- 提示与文案（离树探针，用完即释） ----
 	var probe = Scene.instantiate(); probe.configure()
 	check(probe.save_path == SAVE_DEFAULT, "the level defaults to the market-mk03-1 profile")
@@ -198,6 +203,8 @@ func run() -> void:
 	check(probe.durations.has("reweigh") and probe.zoom_stages.has("reweigh"), "the reweigh keeps the camera at the counter")
 	check(probe.hint_texts().size() == Rules.HINTS, "three hints ship and no more")
 	check(probe.submit_label() == "挂签复秤", "the submit button asks for the reweigh")
+	check(Rules.equation(0) in probe.goal_line() and Rules.equation(1) in probe.goal_line(),
+		"the goal board reuses both published equations as written on the counter")
 	for spoken in probe.hint_texts(): check(not spoken.is_empty() and spoken.count("\n") <= 1, "hint %s stays inside the sign board" % spoken.left(4))
 	check("\n" not in probe.goal_line(), "the goal line fits one unbroken line")
 	probe.state = pose(0, 0, 0)

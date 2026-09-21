@@ -6,6 +6,7 @@ const Catalog = preload("res://scripts/market/chapter_catalog.gd")
 const Bridge = preload("res://scripts/market/market_bridge.gd")
 const UIStyle = preload("res://scripts/cargo/skin.gd")
 const Scene = preload("res://game/market_mk08.tscn")
+const KOUKOU = preload("res://assets/runtime/market/characters/koukou-v1/tie-parcel.png")
 const START = [[0, 6, 1], [1, 4, 1], [0, 6, 1]]
 # 只把总数拨成 13：重复的红单还在板上，漏掉的绿单还是没上来。
 const TRAP = [[0, 6, 1], [1, 4, 1], [0, 3, 1]]
@@ -55,6 +56,15 @@ func fits(text: String, requested: int, box: float) -> bool:
 # 世界层的木牌走 draw_string，字号原样生效，不做 18/22/28 的抬升。
 func carves(text: String, size_px: int, box: float) -> bool:
 	return width(text, size_px) <= box
+
+# 一件货画出来占多大，只由 manifest 的裁剪尺寸与 anchor_px 决定：这里照 kit() 的算法独立量一遍，
+# 不去取绘制层算好的矩形——不然排版错在哪里，量出来的框就跟着错在哪里。
+func sprite_box(node: Node, part: String, foot: Vector2, drawn: float) -> Rect2:
+	var texture: Texture2D = node.atlases[part]
+	var scale: float = drawn / texture.get_width()
+	var anchor = node.parts[part]["anchor_px"]
+	return Rect2(foot - Vector2(anchor[0], anchor[1]) * scale,
+		Vector2(texture.get_width(), texture.get_height()) * scale)
 
 func block_height(text: String, requested: int) -> float:
 	var size_px = UIStyle.text_size(requested)
@@ -475,6 +485,12 @@ func run() -> void:
 		"only the changed row flies: one copy out, one copy in")
 	check(game.world.copying_in(2, plan) and not game.world.copying_in(0, plan),
 		"the flying copy is not drawn twice on the board")
+	# 两半张抄件都在前半程落位；后半程整段 phase 都夹在 1.0，还报「在空中」的话
+	# `draw_board()` 会为空中那一份把整行让出来，归档动画有一半时长板上是缺货的。
+	var landed = game.world.filing_plan(0.60)
+	check(landed.is_empty() and game.world.hide_while_moving(landed).is_empty()
+		and not game.world.line_goods(2, game.world.board()).is_empty(),
+		"抄件一落定，改过那一行的货样就跟着回到板面上")
 	game.skip_animation(); settle(game)
 	check(game.state.stage == "delivery", "the board is handed over to the dock")
 	game.world.progress = 0.2
@@ -482,6 +498,14 @@ func run() -> void:
 		"the stamps land row by row")
 	check(game.world.dock_count() == 6 and game.world.dock_count() < Rules.BOOKED,
 		"the dock count climbs with the stamped rows, never with the old 16")
+	# 托盘上摆的就是那张单里的 13 瓶：盖讫进行中只写「点收 6 瓶」，像是在说码头只到了 6 瓶。
+	var stamp_board: Array = []
+	for ticket in game.world.signs():
+		if str(ticket["text"]).begins_with("码头"): stamp_board = [str(ticket["text"]), ticket["rect"]]
+	check(stamp_board[0] == "码头 · 点收中 6/13 瓶",
+		"盖讫进行中的那块牌把「已点收」和「实收总数」分开报")
+	check(carves(stamp_board[0], 16, stamp_board[1].size.x - 20),
+		"这条进度读数在牌面上不换行")
 	game.skip_animation(); settle(game)
 	check(game.state.stage == "complete" and game.world.dock_count() == Rules.RECEIVED,
 		"the stamped board closes with 13 bottles handed over")
@@ -543,7 +567,43 @@ func run() -> void:
 		if game.world.line_goods(row, SOLVED).is_empty(): tipped += 1
 		if game.world.chip_rect(row).intersects(game.world.ticket_rect(row)): tipped += 1
 	check(tipped == 0, "the three rows sit between the spoken board and the command bar")
+	# ---- 板上那一排货样就是题面：木牌最后画、底色不透明，货压在牌底下等于把要数的件数藏掉半截。
+	# 每一种合法写法都量一遍（三行 × 箱/瓶 × 1..8 件），比对的是当帧画出来的全部牌面。
+	var buried = 0
+	var layouts = 0
+	for row in range(Rules.LINES):
+		for unit in [Rules.UNIT_BOX, Rules.UNIT_BOTTLE]:
+			for tally in range(1, Rules.MAX_COUNT + 1):
+				var look = Rules.empty_lines()
+				look[row] = [row, tally, unit]
+				game.world.state = build(look)
+				var planks: Array = []
+				for ticket in game.world.signs(): planks.append(ticket["rect"])
+				# 一行的货只许长在这一行自己的底条上，爬到行外或板外都算越界。
+				var strip = Rect2(game.world.row_foot(row) - Vector2(40, 34), Vector2(730, 48))
+				layouts += 1
+				for item in game.world.line_goods(row, look):
+					var box = sprite_box(game.world, item["kit"], item["at"], item["w"])
+					if not strip.encloses(box):
+						buried += 1
+						print("OUTSIDE row ", row + 1, " ", tally, " 件 ",
+							item["kit"], " ", box, " strip ", strip)
+					for board in planks:
+						if board.intersects(box):
+							buried += 1
+							print("BURIED row ", row + 1, " ", tally, " 件 ",
+								item["kit"], " ", box, " under ", board)
+	check(buried == 0, "all "+str(layouts)+" ways of writing a row count out clear of every sign")
+	# 扣扣 0.5 倍身位有 163 宽：puzzle 那一档镜头推到 1.10 倍、往左上抬 (64,43)，
+	# 站位再往左半个身子就要被窗框切掉。按宿主自己算出来的镜头量，不另抄一遍缩放常数。
+	game.apply_committed(build(SOLVED), [])
+	var body = Vector2(KOUKOU.get_width(), KOUKOU.get_height()) * 0.5
+	var stand = Rect2(game.world.koukou_foot() - Vector2(body.x / 2.0, body.y), body)
+	var zoomed = stand.position.x * game.world.scale.x + game.world.position.x
 	game.apply_committed(build(SOLVED, "complete"), []); settle(game)
+	var flat = stand.position.x * game.world.scale.x + game.world.position.x
+	check(absf(game.world.scale.x - 1.0) < 0.002 and zoomed >= 8.0 and flat >= 8.0,
+		"both cameras leave 扣扣 whole: her left edge stays inside the window frame")
 	# ---- 11. 重开、航图交棒与坏档保护 ----
 	game.queue_free(); await process_frame
 	game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame

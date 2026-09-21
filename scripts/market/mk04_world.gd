@@ -8,9 +8,7 @@ const KOUKOU_WAVE = preload("res://assets/runtime/market/characters/koukou-v1/wa
 const TRAY_WIDTH = 174.0
 const CARD_WIDTH = 120.0
 const CAND_WIDTH = 58.0
-# 空白回执的裁剪图是 237×316、anchor 在 (118.5,308)：纸顶 = 脚点 − 宽 × 308/237，纸高 = 宽 × 316/237。
-const PAPER_TOP = 308.0 / 237.0
-const PAPER_TALL = 316.0 / 237.0
+# 纸顶与纸高（空白回执 237×316、anchor 118.5/308）由 kit_world 的 PAPER_TOP/PAPER_TALL 统一给出。
 const GOODS = {"cloth": ["cloth_bolt", 64], "oil": ["oil_bottle", 38], "bell": ["brass_bell", 42]}
 const SEAL_RED = Color("b8412c")
 const SEAL_BLUE = Color("2f6f86")
@@ -40,8 +38,10 @@ func card_foot(index: int) -> Vector2:
 func cand_foot(index: int) -> Vector2:
 	return station("counter_right") + Vector2(158, -199 + index * 84)
 
-func card_rect(index: int) -> Rect2: return target(card_foot(index), CARD_WIDTH, 120)
-func cand_rect(index: int) -> Rect2: return target(cand_foot(index), 54, 48)
+# 热点就是纸面本身：target() 给的是正方框，120 见方够不到 160 高的纸，
+# 纸的上沿有 36 像素（候选签是 27 像素）点不着，玩家照着纸尖去点就落空。
+func card_rect(index: int) -> Rect2: return paper_rect(card_foot(index), CARD_WIDTH)
+func cand_rect(index: int) -> Rect2: return paper_rect(cand_foot(index), CAND_WIDTH)
 
 # 只有刚落地的那一件需要弹跳：油是这一批换出来的，铃同理。退回的货不弹。
 func begin_land(previous: Dictionary) -> void:
@@ -82,7 +82,9 @@ func carry_plan(p: float) -> Array:
 		var home = cand_foot(Rules.CANDIDATES.find(state.proposed))
 		var phase = clampf(p / 0.5, 0, 1)
 		var at = home.lerp(card_foot(2) + Vector2(0, -30), phase)
-		at.y = lerpf(at.y, 250.0, sin(phase * PI))
+		# 拱顶只能抬到 286：台词条那块板钉在屏上 98..184，这张 58 宽的纸有 75 高，
+		# 再往上拱，纸的上半截就钻进板子后面，看着像数字被台词吃掉了半截。
+		at.y = lerpf(at.y, 286.0, sin(phase * PI))
 		plan.append({"what": "claim", "home": home, "at": at, "phase": phase})
 		return plan
 	if state.stage != "exchanging": return plan
@@ -200,7 +202,8 @@ func draw_candidates(placed: Dictionary, hidden: Array) -> void:
 		var chosen = placed.correction == value
 		kit("receipt_blank", foot, CAND_WIDTH, 0.6 if not open else 1.0)
 		var top = foot.y - CAND_WIDTH * PAPER_TOP
-		words("3 卷布", Vector2(foot.x - 22, top + 20), 11, Color("c9bda3"))
+		# 11 号字压在牌夹那一横黄铜上，缩到 960×540 就成了一片糊色；让到夹子下沿、加到 13 号。
+		words("3 卷布", Vector2(foot.x - 22, top + 28), 13, Color("c9bda3"))
 		words("%d" % value, Vector2(foot.x - 12, foot.y - 26), 22, INK_GOLD if chosen else INK_LIGHT)
 		words("只铃", Vector2(foot.x + 7, foot.y - 26), 12)
 		if state.stage != "puzzle": continue
@@ -226,9 +229,10 @@ func sign_plates(placed: Dictionary) -> Array:
 	plates.append({"text": "实换 %d 只 · 单上 %d 只" % [Rules.bells_loose(placed), Rules.bell_claim(placed)],
 		"rect": Rect2(516, 514, 232, 28), "px": 16,
 		"color": INK_GOLD if Rules.bells_loose(placed) == Rules.bell_claim(placed) else INK_LIGHT})
-	if state.stage in ["puzzle", "exchanging"]:
-		# 数字一旦起飞，这块牌子就让路：拱形航迹会从它下沿穿过去。
-		plates.append({"text": "改签 · 3 卷布换几只铃", "rect": Rect2(916, 192, 244, 26), "px": 16, "color": INK_LIGHT})
+	# 「改签 · 3 卷布换几只铃」这块牌原先钉在柜面上方 y 192：那是台词条那块板（屏上 98..184）
+	# 的下沿，牌的上半截永远被吃掉。往哪儿挪都躲不开——候选签的纸尖就在它下面 6 像素，
+	# 底下那一排四块牌也已经排满。这句话本来就有三处说：目标行、候选签的悬停说明、
+	# 还有「实换几只 · 单上几只」那块对照牌，删掉不丢信息。
 	if state.stage == "complete":
 		plates.append({"text": "空货签 · 当众重写", "rect": Rect2(1024, 514, 200, 28), "px": 16, "color": INK_LIGHT})
 	return plates

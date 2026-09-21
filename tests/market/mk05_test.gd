@@ -75,16 +75,26 @@ func run() -> void:
 			if matches(order,index): widened += 1
 		check(widened > 1,"dropping clue %d admits a second matching"%index)
 	# ---- 缺口点名：说清是哪一句留下的话被摆坏了 ----
+	# 引号里的字必须就是那家门口那块残句牌上的原文，玩家抬头能一字不差地找到。
+	for clue in Rules.CLUES:
+		check(clue.kept in Rules.KEPT,"clue %d quotes a sentence that really is painted on a board" % Rules.CLUES.find(clue))
+		check(clue.kept == Rules.KEPT[clue.place],"clue %d quotes the board of the shop it speaks about" % Rules.CLUES.find(clue))
 	check(Rules.shortfalls(board(-1,-1,-1,-1)) == ["订单板上还有 4 家没按货签：面包铺、育苗铺、桥头、邮亭。"],"an empty board lists every open place")
 	check(Rules.shortfalls(board(1,0,-1,-1)) == ["订单板上还有 2 家没按货签：桥头、邮亭。"],"a half board counts what is still open")
 	var trap = board(2,0,1,3)
 	check(Rules.validate(trap) and not Rules.solved(trap),"the guess that ignores the third clue is legal but wrong")
-	check(Rules.shortfalls(trap) == ["留下的话：面包铺不收铃。铜铃按在了面包铺。"],"the trap is stopped by the clue it breaks")
-	check(Rules.shortfalls(board(1,0,3,2)) == ["留下的话：纸去邮亭。纸卷现在按在桥头。"],"a misplaced 纸 names its own clue")
-	check(Rules.shortfalls(board(1,3,2,0))[0] == "留下的话：布去育苗铺。布卷现在按在邮亭。","a misplaced 布 names its own clue")
+	check(Rules.shortfalls(trap) == ["订单板上「面包铺」写着「不收 铜铃」：铜铃正按在那儿。"],
+		"the trap is stopped by the clue it breaks")
+	check(Rules.shortfalls(board(1,0,3,2)) == ["订单板上「邮亭」写着「收 纸卷」：纸卷现在按在桥头。"],
+		"a misplaced 纸 names its own clue")
+	check(Rules.shortfalls(board(1,3,2,0))[0] == "订单板上「育苗铺」写着「收 布卷」：布卷现在按在邮亭。",
+		"a misplaced 布 names its own clue")
 	var doubled = Rules.shortfalls(board(1,3,2,0))
-	check(doubled.size() == 2 and doubled[1].find("纸去邮亭") >= 0,"a board breaking two clues reports both")
-	check(Rules.shortfalls(board(-1,3,-1,-1)) == ["留下的话：布去育苗铺。育苗铺现在按的是纸卷。","留下的话：纸去邮亭。纸卷现在按在育苗铺。","订单板上还有 3 家没按货签：面包铺、桥头、邮亭。"],"an occupied place can break a clue while its own tag is still loose")
+	check(doubled.size() == 2 and "收 纸卷" in doubled[1],"a board breaking two clues reports both")
+	check(Rules.shortfalls(board(-1,3,-1,-1)) == ["订单板上「育苗铺」写着「收 布卷」：那一格按的是纸卷。",
+		"订单板上「邮亭」写着「收 纸卷」：纸卷现在按在育苗铺。",
+		"订单板上还有 3 家没按货签：面包铺、桥头、邮亭。"],
+		"an occupied place can break a clue while its own tag is still loose")
 	# ---- 阶段机 ----
 	var arriving = Rules.advance(Rules.fresh())
 	check(arriving.beat == 1 and arriving.stage == "arrival","arrival plays its lines in order")
@@ -229,7 +239,9 @@ func run() -> void:
 	await create_timer(0.4).timeout
 	check(game.state.assign == [-1,3,-1,-1] and Rules.loose(game.state) == [0,1,2],"pressing a filled place sends 布 back to the counter")
 	game.advance()
-	check(game.state.stage == "puzzle" and game.message.find("布去育苗铺") >= 0,"the submit names the clue that is broken")
+	check(game.state.stage == "puzzle"
+		and game.message.find("订单板上「育苗铺」写着「收 布卷」：那一格按的是纸卷。") == 0
+		and game.message.find("还有 2 处没有归位") > 0,"the submit quotes the board it breaks and counts the rest")
 	game.choose_place(1)
 	await create_timer(0.4).timeout
 	game.hint(); game.hint(); game.hint(); game.hint()
@@ -239,7 +251,8 @@ func run() -> void:
 	var shown = game.state.duplicate(true); shown.assign = [2,0,1,3]; shown.hand = -1
 	game.commit(shown); await create_timer(0.4).timeout
 	game.advance()
-	check(game.state.stage == "puzzle" and game.message == "留下的话：面包铺不收铃。铜铃按在了面包铺。","the ignored clue stops the hand-over by name")
+	check(game.state.stage == "puzzle" and game.message == "订单板上「面包铺」写着「不收 铜铃」：铜铃正按在那儿。",
+		"the ignored clue stops the hand-over by name")
 	var twin = game.state.duplicate(true); twin.assign = [1,3,2,0]
 	game.commit(twin); await create_timer(0.4).timeout
 	game.advance()

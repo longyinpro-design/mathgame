@@ -495,6 +495,13 @@ func run() -> void:
 				check(fits(spoken, 20, 798.0), "phase %d hint %s holds the dialogue board" % [
 					Rules.phase_of(other), spoken.left(4)])
 		probe.state = delivered(0, [0, 0, 0], branch)
+	# 三阶段的台面话各自两行以内、写在口条里；键位只写在真有快捷键的那两幕。
+	for draft in [drafting(Rules.empty_order()), purchased(0), delivered(0, [0, 0, 0], 0)]:
+		probe.state = draft
+		check(probe.line().count("\n") <= 1 and fits(probe.line(), 20, 798.0),
+			"phase %d 的台面话两行以内、写在口条里" % Rules.phase_of(draft))
+		check(("键盘" in probe.puzzle_line()) == (Rules.phase_of(draft) != 2),
+			"phase %d 的台面话里键位说得不多也不少" % Rules.phase_of(draft))
 	probe.state = drafting([0, 0, 0])
 	check(probe.submit_label() == "提交共同订单", "the first phase submits one whole order")
 	for order in [[0, 0, 0], [3, 2, 1], [4, 2, 0], [1, 3, 4]]:
@@ -529,6 +536,39 @@ func run() -> void:
 	for kind in range(Rules.KINDS):
 		for index in range(Rules.STOCK[kind]): expected.append("pack_%d_%d" % [kind, index])
 	audit_hotspots(game, expected, "phase 1")
+	# 牌上写着的那颗键，按下去就得真做那件事；订到顶或一格没订时不许多写半句。
+	var key_codes = {"1": KEY_1, "2": KEY_2, "3": KEY_3, "Q": KEY_Q, "W": KEY_W, "E": KEY_E}
+	var kept = game.state.duplicate(true)
+	var kept_history = game.history.duplicate(true)
+	var told = 0
+	var mistaken = 0
+	for kind in range(Rules.KINDS):
+		for count in range(Rules.STOCK[kind] + 1):
+			var order = Rules.empty_order()
+			order[kind] = count
+			game.state = drafting(order); game.refresh()
+			var tip: String = game.buttons["pack_%d_0" % kind].tooltip_text
+			var spoken = tip.split("\n")[1] if tip.count("\n") == 1 else ""
+			var add = ["1", "2", "3"][kind]
+			var back = ["Q", "W", "E"][kind]
+			var says_add = "加一包" in spoken and add in spoken
+			var says_back = "退一包" in spoken and back in spoken
+			if not spoken.begins_with("键盘 ") or says_add != (count < Rules.STOCK[kind]) \
+					or says_back != (count > 0):
+				mistaken += 1
+				print("这一行的键位说得不对：", kind, " 已订 ", count, " 牌上「", spoken, "」")
+			for pair in [[add, 1], [back, -1]]:
+				game.state = drafting(order); game.refresh()
+				game.handle_key(key_codes[pair[0]]); told += 1
+				var promised = (pair[1] == 1 and says_add) or (pair[1] == -1 and says_back)
+				if promised != (game.state.order[kind] == count + pair[1]):
+					mistaken += 1
+					print("牌上写的与按出来的不是一回事：", pair[0], " 从 ", count, " 动到 ", game.state.order[kind])
+	game.apply_committed(kept, kept_history); game.refresh()
+	check(told == 32 and mistaken == 0,
+		"三行封包在 %d 个数量档上共 %d 次点键，写着加一包的按下去真加、没写的按下去不动" % [
+			Rules.STOCK[0] + Rules.STOCK[1] + Rules.STOCK[2] + 3, told])
+	check("键盘 1 加一包" in game.buttons.pack_0_0.tooltip_text, "每一行的说明里写着自己那两颗键")
 	game.choose_pack(0, 2)
 	check(game.state.order == [3, 0, 0], "clicking the third pack of a kind books three at once, not one")
 	game.choose_pack(0, 2)
@@ -559,6 +599,12 @@ func run() -> void:
 		for kind in range(2):
 			alloc_ids.append("put_%d_%d" % [slot, kind]); alloc_ids.append("back_%d_%d" % [slot, kind])
 	audit_hotspots(game, alloc_ids, "phase 2")
+	# 第二阶段没有快捷键：十二块加减牌上都不许写「键盘」，写了就是骗手指。
+	var silent = true
+	for id in game.buttons.keys():
+		if (id.begins_with("put_") or id.begins_with("back_")) and "键盘" in game.buttons[id].tooltip_text:
+			silent = false
+	check(silent, "第二阶段没有快捷键，十二块加减牌上不冒充有")
 	game.do_put(0, Rules.OIL)
 	check(game.state.alloc[0] == [1, 0] and game.history.size() == 1, "a jug laid on a tray is saved and recorded")
 	game.undo()
@@ -580,6 +626,17 @@ func run() -> void:
 	game.skip_animation()
 	check(game.state.stage == "puzzle" and game.phase() == 3, "the third phase begins after the delivery")
 	audit_hotspots(game, ["lamp", "seal_0", "seal_1", "seal_2"], "phase 3")
+	# 领航灯牌上那颗 L 与点一下是同一件事；三张回执没有快捷键，牌上就不写。
+	var lit_before = game.state.duplicate(true)
+	var lit_history = game.history.duplicate(true)
+	game.handle_key(KEY_L)
+	check(game.state.lamp == 1 and "键盘 L" in game.buttons.lamp.tooltip_text,
+		"领航灯的牌上写着 L，按下去真把预留的那份装进灯里")
+	game.apply_committed(lit_before, lit_history); game.refresh()
+	var seals_silent = true
+	for street in range(3):
+		if "键盘" in game.buttons["seal_%d" % street].tooltip_text: seals_silent = false
+	check(seals_silent, "三张回执没有快捷键，牌上也不冒充有")
 	game.do_lamp()
 	check(game.state.lamp == 1, "the reserved goods go into the lantern by hand")
 	game.advance()

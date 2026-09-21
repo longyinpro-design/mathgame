@@ -5,6 +5,7 @@ const Rules = preload("res://scripts/market/mk16_rules.gd")
 const Catalog = preload("res://scripts/market/chapter_catalog.gd")
 const Content = preload("res://scripts/content/content_catalog.gd")
 const Bridge = preload("res://scripts/market/market_bridge.gd")
+const UIStyle = preload("res://scripts/cargo/skin.gd")
 const Scene = preload("res://game/market_mk16.tscn")
 const SAVE_DEFAULT = "user://profiles/market-mk16-1/save-v1.json"
 var checks = 0
@@ -42,6 +43,14 @@ func cup_pose(stage: String = "puzzle") -> Dictionary:
 
 func bell_pose(stage: String = "puzzle") -> Dictionary:
 	return pose([Rules.LEAF, Rules.PAPER, Rules.BELL], stage)
+
+# kit 图块真正占的那一块：底边贴脚点，按 manifest 的 anchor_px 往左上展开。
+func kit_box(world: Node, id: String, foot: Vector2, width: float) -> Rect2:
+	var texture: Texture2D = world.atlases[id]
+	var item: Dictionary = world.parts[id]
+	var scale = width / texture.get_width()
+	return Rect2(foot - Vector2(item.anchor_px[0], item.anchor_px[1]) * scale,
+		Vector2(texture.get_width(), texture.get_height()) * scale)
 
 # 把所有 16 种摆法都过一遍，只把通过验收的那几组收回来。
 func accepted_tables() -> Array:
@@ -359,10 +368,98 @@ func run() -> void:
 			if not wanted.has(id) and id not in ["undo", "reset", "hint", "deliver", "leave_hub"]:
 				stray.append(id)
 		check(stray.is_empty(), "layout %s adds no stray hotspot: %s" % [str(layout[0]), str(stray)])
+		# 热点两两不相压：两块叠在一起，玩家点的是上面那块的名字，走的是下面那一件的剧情。
+		var pairs: Array = []
+		for first in wanted:
+			for second in wanted:
+				if first >= second: continue
+				var left: Rect2 = game.buttons[first].get_global_rect()
+				var right: Rect2 = game.buttons[second].get_global_rect()
+				if left.intersects(right): pairs.append([first, second])
+		check(pairs.is_empty(), "layout %s 的热点两两不重叠：%s" % [str(layout[0]), str(pairs)])
 	game.apply_committed(pose([]), [])
 	check(game.buttons.has("deliver") and not game.buttons.deliver.disabled, "the boat button is live on an empty table")
 	check(game.buttons.has("undo") and game.buttons.undo.disabled, "nothing to undo on a fresh table")
 	check(game.buttons.has("reset") and game.buttons.has("hint"), "the table offers 重摆 and 请扣扣提醒")
+	# ---- 打包台那块读数牌：整块要在贴脸镜头里，字要装得下自己那块牌 ----
+	game.apply_committed(pose([]), [])
+	var board_rect = game.world.table_board()
+	var view = game.world.get_transform()
+	var shown_board = Rect2(view * board_rect.position, board_rect.size * view.get_scale().x)
+	print("BOARD ", board_rect, " 镜头里 ", shown_board)
+	check(shown_board.position.x >= 0.0 and shown_board.end.x <= 1280.0,
+		"打包台那块读数牌整块留在贴脸镜头的窗框里，牌头的字不再被窗框切掉")
+	check(absf(shown_board.position.x - 24.0) <= 2.0,
+		"读数牌的左沿与顶上那块关卡名对齐（屏幕 x %.1f），不是贴着窗框硬塞" % shown_board.position.x)
+	var under_plate: Array = []
+	for id in game.buttons:
+		if game.buttons[id].get_global_rect().intersects(shown_board): under_plate.append(id)
+	check(under_plate.is_empty(),
+		"读数牌底下不藏任何热点，玩家点牌子不会误交船：%s" % str(under_plate))
+	var all_tables: Array = []
+	var fit_worst := 0.0
+	for mask in range(1 << Rules.KINDS.size()):
+		var picks: Array = []
+		for pick_id in range(Rules.KINDS.size()):
+			if (mask >> pick_id) & 1: picks.append(pick_id)
+		if picks.size() > Rules.PICKS: continue
+		all_tables.append(picks)
+		game.apply_committed(pose(picks), [])
+		fit_worst = maxf(fit_worst, UIStyle.face().get_string_size(game.world.table_plaque(),
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x)
+	check(all_tables.size() == 15, "四样货取到三样以内的摆法共 %d 种，读数牌每一种都量过" % all_tables.size())
+	check(fit_worst <= board_rect.size.x - 12.0,
+		"读数牌最宽的一句 %.0f 装得进 %.0f 的内框" % [fit_worst, board_rect.size.x - 12.0])
+	# ---- 红船那一泊：封箱、离岸、回执三幕逐帧量，包裹与吊牌不许躲进台词板 ----
+	# 宿主那块台词条钉在屏幕 (338,98,826,86)、带阴影到 191，镜头推拉动不了它；
+	# manifest 的 boat_red 在 (460,227)，船高 165、包裹 52、吊牌再加 40，整段正好落在板子里，
+	# 于是「红船带着你选的那一件离岸」变成一句只有字在演的戏（实窗 09/10/13 三帧看到的）。
+	var dialogue_board = Rect2(338, 92, 826, 99)
+	var worst = 0.0
+	var worst_at = ""
+	var seen_frames = 0
+	for stage in ["loading", "delivery", "complete"]:
+		for look in [cup_pose(stage), bell_pose(stage)]:
+			game.apply_committed(look, [])
+			var steps = 1 if stage == "complete" else 20
+			for frame in range(steps + 1):
+				game.paused = true
+				game.world.progress = float(frame) / float(steps)
+				game.update_camera()
+				if game.world.parcel_alpha() <= 0: continue
+				seen_frames += 1
+				var box = game.world.charm_box()
+				var share = box.intersection(dialogue_board).get_area() / maxf(1.0, box.get_area())
+				if share > worst:
+					worst = share
+					worst_at = "%s @%.2f %s" % [stage, game.world.progress, box]
+	check(seen_frames >= 40, "两条分支三幕一共量到 %d 帧看得见包裹的画面" % seen_frames)
+	print("PARCEL WORST ", worst, " at ", worst_at)
+	check(worst < 0.05, "包裹最多被台词板盖住 %.0f%%（%s）：系在最外面的那一件全程看得见" % [worst * 100, worst_at])
+	var berth = game.world.boat_foot()
+	check(berth.y >= 300.0 and berth.y <= 400.0,
+		"红船停在近岸的水道里（%s），船身与包裹都留在台词板下沿以外" % str(berth))
+	# ---- 底栏读数：演出那一格念的是包裹，不是刚交出去的空台面 ----
+	game.apply_committed(pose([Rules.LEAF, Rules.PAPER]), [])
+	check(game.status_line() == "已选 2/3 · 共 3 斤", "摆货那一格底栏跟着台面走")
+	game.apply_committed(cup_pose("loading"), [])
+	check(game.status_line() == "已封箱 3 样 · 共 7 斤", "封箱演出里底栏改念包裹，不再报「已选 0/3」")
+	game.apply_committed(bell_pose("delivery"), [])
+	check(game.status_line() == "已封箱 3 样 · 共 6 斤", "离岸那一句报的是这条分支真正寄出去的 6 斤")
+	# ---- 打包台上那张回执：五行字一行都不许出纸边 ----
+	var letter_rows_seen = 0
+	var letter_fill = 0.0
+	for look in [cup_pose("delivery"), bell_pose("delivery")]:
+		game.apply_committed(look, [])
+		game.paused = true; game.world.progress = 1.0; game.update_camera()
+		var paper = kit_box(game.world, "receipt_blank", game.world.station("packing"), 124.0)
+		check(game.world.show_letter(), "%s 那一条把回执摊在打包台上" % look.present)
+		for row in game.world.letter_rows():
+			letter_rows_seen += 1
+			var wide = UIStyle.face().get_string_size(row[0], HORIZONTAL_ALIGNMENT_LEFT, -1, row[2]).x
+			letter_fill = maxf(letter_fill, (row[1].x + wide - paper.position.x) / (paper.size.x - 8.0))
+	check(letter_rows_seen == 10 and letter_fill <= 1.0,
+		"两条分支共 %d 行回执文字，最宽的一行占到纸面 %.0f%%，没有一行出边" % [letter_rows_seen, letter_fill * 100])
 	# ---- 每一幕真的重画一遍：绘制代码一崩就会带着 SCRIPT ERROR 退出来 ----
 	for stage in Rules.STAGES:
 		var looks = [pose([], stage)]

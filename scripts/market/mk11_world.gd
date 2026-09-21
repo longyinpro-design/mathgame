@@ -111,15 +111,11 @@ func beam_angle() -> float:
 	return 0.0 if braked() else settled
 
 # 交付过半：罐里的油已经倒进陶姨的封坛，盘上不再留这一份油（坛子改画在庭院边上）。
+# 只有这一处跟着动画走：牌面与两盘读数仍然念玩家提交的那一份约定（见 boards()/notes()），
+# 秤杆也照那一份保持水平——演出的一分半里不能出现「砝码 3 = 砝码 1 + 砝码 9」这种话。
 func shown_oil() -> int:
 	if state.stage == "delivery" and progress >= 0.5: return 0
 	return state.oil
-
-func shown_state() -> Dictionary:
-	if state.stage != "delivery": return state
-	var shown = state.duplicate(true)
-	shown.oil = shown_oil()
-	return shown
 
 func oil_height(oil: int) -> float: return 5.0 + oil * 1.9
 # 交付落点：铜秤右边那块台面，陶姨的封坛放在那儿等衡伯来验。
@@ -194,10 +190,9 @@ func draw_scale() -> void:
 		draw_pan(side, attach("scale_pan", "cargo", hook, factor))
 
 func draw_pan(side: int, cargo: Vector2) -> void:
-	var shown = shown_state()
 	if side == Rules.GOODS: draw_pot(cargo)
 	for index in range(Rules.COUNT):
-		if not Rules.on_pan(shown, side, index): continue
+		if not Rules.on_pan(state, side, index): continue
 		var foot = cargo + Vector2(SLOT_DX[side][index], -PAN_LIFT)
 		var drop = landing("pan", side * 10 + index)
 		var at = foot + Vector2(0, 34.0 * drop)
@@ -237,25 +232,28 @@ func draw_flight(plan: Array) -> void:
 # 超框就会画到牌子外面。
 func boards() -> Array:
 	var boards = [
-		{"text": "陶姨的油车 · 一格一单位", "rect": Rect2(238, 250, 196, 26), "px": 15},
+		# 这块牌子原来在 y 250、宽 196，横穿 44 宽的高油壶（壶身画到 313.7），
+		# 木牌是不透明底、又排在最后画，正好把壶拦腰切成两截。挪到壶底下面 4 像素、
+		# 只留车名这么宽（右沿 330）：秤杆摆到最满那一格，货盘连盘上数字扫到的是 x 374 起，
+		# 两块各说各的，谁也压不到谁。「一格 1 单位」本来就写在油阀的悬停句里，不必挤在这块牌上。
+		{"text": "陶姨的油车", "rect": Rect2(238, 318, 92, 26), "px": 15},
 		{"text": "衡伯借出的三枚砝码 · 每枚最多一次", "rect": Rect2(150, 584, 300, 26), "px": 15},
 	]
 	if state.stage in ["arrival", "approach"]: return boards
-	boards.append({"text": Rules.equation(shown_state()), "rect": Rect2(470, 584, 330, 28), "px": 15})
+	boards.append({"text": Rules.equation(state), "rect": Rect2(470, 584, 330, 28), "px": 15})
 	return boards
 
 # 没有底板的描边短词：盘名与锁秤说明。width 一格是可用宽度，无头检查按它量字。
 func notes() -> Array:
-	var shown = shown_state()
 	var revealed = not braked()
-	var goods = "货盘 · 油压在这头" if not revealed else "货盘 %d 单位"%Rules.pan_total(shown, Rules.GOODS)
-	var far = "对面那盘 · 只站砝码" if not revealed else "对面 %d 单位"%Rules.pan_total(shown, Rules.FAR)
+	var goods = "货盘 · 油压在这头" if not revealed else "货盘 %d 单位"%Rules.pan_total(state, Rules.GOODS)
+	var far = "对面那盘 · 只站砝码" if not revealed else "对面 %d 单位"%Rules.pan_total(state, Rules.FAR)
 	var notes = [
 		{"text": goods, "at": Vector2(404, 514), "px": 14, "width": 140.0},
 		{"text": far, "at": Vector2(740, 514), "px": 14, "width": 156.0},
 	]
 	if state.stage == "puzzle":
-		var lock = "秤已锁 · 提交之后才抬秤" if shown.weighs == 0 else "秤又锁上了 · 再提一次看看"
+		var lock = "秤已锁 · 提交之后才抬秤" if state.weighs == 0 else "秤又锁上了 · 再提一次看看"
 		# y 从 216 抬到 232：puzzle 把整座庭院按 1.10 抬起来（宿主的镜头），216 那行的字面顶边
 		# 换算到屏幕是 180.6，会被 y 98..184 的台词板切掉一小截；232 留 8 像素余量，仍在秤杆上方。
 		notes.append({"text": lock, "at": Vector2(500, 232), "px": 15, "width": 264.0})

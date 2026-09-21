@@ -93,6 +93,25 @@ func scan_file(found: Array, file: String) -> Array:
 	if "market-mk15" in text and file not in REGISTRY: found.append(file + " 带着本摊的存档路径")
 	return found
 
+# 拆件在屏幕上占的那一格：与 kit_world.kit() 用同一份 anchor，牌与货不会各说一套。
+func kit_box(world: Node, id: String, foot: Vector2, width: float) -> Rect2:
+	var texture: Texture2D = world.atlases[id]
+	var item: Dictionary = world.parts[id]
+	var scale = width / texture.get_width()
+	return Rect2(foot - Vector2(item.anchor_px[0], item.anchor_px[1]) * scale,
+		Vector2(texture.get_width(), texture.get_height()) * scale)
+
+# 闭环那一刻挂在摊口的一整圈：环、铃、三件货。风铃在转，所以按三件货各自能到的最低点合起来量。
+func chime_room(world: Node) -> Rect2:
+	var at = world.chime_foot()
+	var band = Rect2(at.x - World.CHIME_RADIUS, at.y - World.CHIME_RADIUS * 0.42,
+		World.CHIME_RADIUS * 2.0, World.CHIME_RADIUS * 0.84)
+	band = band.merge(kit_box(world, "brass_bell", at + Vector2(0, 16), 34.0))
+	for kind in range(Rules.KINDS):
+		var foot = at + Vector2(0, World.CHIME_RADIUS * 0.42 + 12)
+		band = band.merge(kit_box(world, Rules.KIT_GOODS[kind], foot, World.GOOD_WIDTH[kind] * 0.8))
+	return band
+
 func run() -> void:
 	create_timer(60).timeout.connect(func(): push_error("MK15 rule watchdog"); quit(1))
 	# ---- 开局与常量 ----
@@ -510,6 +529,16 @@ func run() -> void:
 	check(covered == 0, "扣扣站的这一块地上没有牌压着她")
 	check(World.ROWS[3] + World.ROW_W[3] <= 1221.0 and World.ROWS[0] >= 58.0,
 		"柜面那一排短牌整体在放大 1.10 倍后的画面里")
+	# ---- 摊口那一圈：风铃挂上之后，那句真话不许压在铃与货身上 ----
+	game.apply_committed(pose([6, 9, 3], "complete"), [])
+	var ringing = chime_room(game.world)
+	var truth = game.world.honest_rect()
+	print("CHIME ", ringing, " 牌 ", truth)
+	check(not truth.intersects(ringing), "「%s」这块牌整块待在风铃那一圈之外" % Rules.honest_caption())
+	check(truth == game.world.sign_rect(),
+		"那句真话接过的正是招牌原来那块牌的位置与尺寸，玩家不必在两处之间找对应")
+	check(game.world.sign_target().encloses(game.world.sign_rect()),
+		"招揽牌的热点罩得住整块牌：照着牌的两头点下去也答得出来")
 	# ---- 真点击：一次一组、整批、撤销、重摆、提示、拒绝 ----
 	game.apply_committed(pose([0, 0, 0]), [])
 	game.do_trade(Rules.FRUIT, 1)

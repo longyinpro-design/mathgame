@@ -15,7 +15,7 @@ const INK_DIM = Color("b6a98d")
 const RACK_STALLS = ["stall_left", "stall_midleft", "stall_midright"]
 const ROW_PITCH = 58.0
 const COL_PITCH = 92.0
-const GOODS_FROM = 66.0				# 行上的货样从单位牌右边这么多像素起排
+const GOODS_EDGE = 50.0				# 第一件货的左沿离本行第 4 列槽位中心：「换算」牌只占中心右 42，留 8 像素不压牌
 const BOX_MINI = 20.0				# 汇总板上的整箱显示宽：只表示「这一行记了几件」
 const BOTTLE_MINI = 14.0
 const RACK_BOX = 46.0
@@ -54,7 +54,9 @@ func rack_foot(order: int) -> Vector2: return station(RACK_STALLS[order]) + Vect
 func ticket_rect(order: int) -> Rect2: return target(rack_foot(order), 96, 76)
 func dock_foot() -> Vector2: return station("stall_right") + Vector2(0, 10)
 func basket_foot() -> Vector2: return station("stall_right") + Vector2(-6, 130)
-func koukou_foot() -> Vector2: return counter() + Vector2(-560, 56)
+# 扣扣站在汇总板左边。原先停在柜台左 560：0.5 倍身位有 163 宽，左沿落在世界 −1.75，
+# puzzle/filing 那一档 1.10 倍镜头再把她往屏幕外推 64——半个身子被窗框切掉。
+func koukou_foot() -> Vector2: return counter() + Vector2(-490, 56)
 
 # 一排货样：以 center 为中线按件数等距排开，位置由基类的 grid() 算出，不手写坐标列表。
 func row_of(part: String, center: Vector2, count: int, width: float) -> Array:
@@ -85,7 +87,10 @@ func line_goods(row: int, rows: Array) -> Array:
 	var boxed: bool = line[2] == Rules.UNIT_BOX
 	var part: String = Rules.KIT_BOX[line[0]] if boxed else "oil_bottle"
 	var width: float = BOX_MINI if boxed else BOTTLE_MINI
-	var from = slot_foot(row, 4) + Vector2(GOODS_FROM, 2)
+	# 货样左对齐、件数多了往右长：原先按中线排，6 瓶那一行的头两件正好落进「换算」牌底下
+	# （木牌最后画、是实心的），玩家数出来 4 件、计数牌却写着 6 件——这一关要数的就是货。
+	var pitch: float = width + 6.0
+	var from = slot_foot(row, 4) + Vector2(GOODS_EDGE + width / 2.0 + pitch * (line[1] - 1) / 2.0, 2)
 	for spot in row_of(part, from, line[1], width):
 		items.append({"kit": part, "at": spot, "w": width})
 	return items
@@ -109,7 +114,9 @@ func filing_plan(p: float) -> Array:
 	var plan: Array = []
 	if state.stage != "filing" or not state.has("filed"): return plan
 	var phase = clampf(p / 0.5, 0, 1)
-	if phase <= 0.0: return plan
+	# 落定之后（后半程整段都夹在 1.0）就不必再报「还在飞」：`draw_board()` 会为了空中那张
+	# 抄件把整行让出来，货样也跟着一起消失——归档动画有一半时长板上是缺货的。
+	if phase <= 0.0 or phase >= 1.0: return plan
 	for row in Rules.changed_rows(state):
 		var home: Vector2 = row_foot(row)
 		var glide = smoothstep(0, 1, phase)
@@ -230,8 +237,13 @@ func signs() -> Array:
 		boards.append({"text": "%s · %s" % [Rules.NAMES[order], Rules.note(order)],
 			"rect": Rect2(foot.x - 110, foot.y - 100, 220, 28)})
 	if state.stage == "arrival": return boards
-	boards.append({"text": "码头 · 点收 %d 瓶" % dock_count(),
-		"rect": Rect2(dock_foot().x - 100, dock_foot().y - 148, 200, 28)})
+	# 交付那一段是「一行一行盖讫」的进行读数：只写「点收 10 瓶」像是在说码头只到了 10 瓶，
+	# 托盘上明明摆着 13 瓶。这一段报的是进度（已盖 / 实收），其余时候报码头实收的总数。
+	var dock_board: String = "码头 · 点收 %d 瓶" % dock_count()
+	if state.stage == "delivery":
+		dock_board = "码头 · 点收中 %d/%d 瓶" % [dock_count(), Rules.RECEIVED]
+	boards.append({"text": dock_board,
+		"rect": Rect2(dock_foot().x - 120, dock_foot().y - 148, 240, 28)})
 	boards.append({"text": "撤下的抄件", "rect": Rect2(basket_foot().x - 70, basket_foot().y - 96, 140, 26)})
 	var legend = row_foot(Rules.LINES - 1).y + 24
 	boards.append({"text": "本板按瓶记", "rect": Rect2(board_origin().x - 32, legend, 130, 28)})

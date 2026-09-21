@@ -31,6 +31,7 @@ var paused = false
 var message = ""
 var modal = false
 var transient = 0.0
+var window_theme: Theme
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -44,8 +45,14 @@ func _ready() -> void:
 	ui = Control.new(); ui.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(ui)
 	overlay = Control.new(); overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(overlay)
 	get_window().title = "千灯集市 · MK01 接货台样板"
+	# 与 level_host 同一条：tooltip 的主题只继承到 Window，MK01 不走宿主基类，所以这里各设一次。
+	window_theme = get_window().theme
+	get_window().theme = UIStyle.tooltip_theme()
 	refresh()
 	if read.status == "protected": show_protected()
+
+func _exit_tree() -> void:
+	if is_instance_valid(get_window()): get_window().theme = window_theme
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and is_instance_valid(world) and state.stage in Rules.ANIMATIONS:
@@ -71,7 +78,10 @@ func update_camera() -> void:
 	if state.stage == "approach": amount = smoothstep(0,1,world.progress)
 	if state.stage == "delivery": amount = 1-smoothstep(0,0.45,world.progress)
 	world.scale = Vector2.ONE*lerpf(1,1.16,amount)
-	world.position = Vector2(-111,-66)*amount
+	# 贴脸那一段整张台面往下让 26 像素：吊车的滑轮画在世界 (313,96)，按旧的 -66 换算到屏幕只剩 y 45，
+	# 正好藏进「千灯集市」那块抬头板底下，绳子看着就像拴在标题牌上。让到 -40 之后滑轮落在 71.4，
+	# 抬头板底是 68；台面最下沿那块小杯容量签（世界 515）换算到 557，离底栏按钮的 646 还留着 89 像素。
+	world.position = Vector2(-111,-40)*amount
 
 func commit(candidate: Dictionary, next_history: Array = []) -> bool:
 	if candidate.is_empty() or modal: return false
@@ -85,7 +95,10 @@ func apply_committed(candidate: Dictionary, next_history: Array) -> void:
 	var previous = state
 	state = candidate.duplicate(true); history = next_history.duplicate(true)
 	if previous.stage != state.stage:
-		elapsed = 0; world.progress = 0; paused = false; selected = -1; message = ""
+		elapsed = 0; world.progress = 0; paused = false; selected = -1
+	# 与宿主同一条：每落一步先把上一句说过的话收掉。留在屏上就会出现
+	# 「交货需要恰好三只满杯」还挂在一盘已经摆好三只杯的托盘旁边。
+	message = ""
 	if previous.slots != state.slots and state.stage == "puzzle":
 		for id in range(8):
 			if previous.slots.find(id) != state.slots.find(id):
@@ -120,7 +133,13 @@ func refresh() -> void:
 	update_camera()
 	sign_text("千灯集市  /  找回杯子的刻度",Rect2(24,20,394,48),24)
 	if state.stage not in ["arrival","complete","delivery"]:
-		sign_text("交货：恰好 3 只满杯 · 合计 11 小杯" if state.calibrated else "先复核：每盘 3 只 · 蓝白都要有 · 只读整盘",Rect2(442,20,790,48),22)
+		# 三幕三种目标：还没核对时说的是复核规矩，推容量那一幕要说的是这一步真正要做的事，
+		# 已经把签挂回去之后才轮到那张交货单。
+		var goal = "交货：恰好 3 只满杯 · 合计 11 小杯"
+		if not state.calibrated:
+			if state.stage == "deduction": goal = "比较左边两张整盘回执：把蓝杯、白杯各装几小杯填进容量签"
+			else: goal = "先复核：每盘 3 只 · 蓝白都要有 · 只读整盘"
+		sign_text(goal,Rect2(442,20,790,48),22)
 	var line = ""
 	match state.stage:
 		"arrival": line = LINES[state.beat]
@@ -152,12 +171,15 @@ func refresh() -> void:
 			b.focus_mode = Control.FOCUS_NONE
 			b.disabled = modal or transient > 0
 		for slot in range(3):
+			var seated = state.slots[slot]
+			var note = "空着，先点一只杯子，再点这里放下"
+			if seated >= 0: note = "放着%s，点一下取回"%["蓝杯","白杯","小杯"][world.cup_kind(seated)]
 			var b = add_button("slot_%d"%slot,"",world.slot_rect(slot),choose_slot.bind(slot),false,world)
-			UIStyle.hotspot(b,"托盘第%d位：%s"%[slot+1,"空" if state.slots[slot] < 0 else "点选取回"])
+			UIStyle.hotspot(b,"托盘 %s 位 · %s"%[World.SLOT_KEYS[slot],note])
 			b.focus_mode = Control.FOCUS_NONE
 			b.disabled = modal or transient > 0
 		add_button("undo","撤销 Z",Rect2(24,654,124,46),undo).disabled = history.is_empty() or transient > 0
-		add_button("reset","重摆",Rect2(162,654,110,46),confirm_reset).disabled = transient > 0
+		add_button("reset","重摆 X",Rect2(162,654,110,46),confirm_reset).disabled = transient > 0
 		add_button("hint","请扣扣提醒",Rect2(286,654,162,46),hint).disabled = transient > 0
 		add_button("measure","验收交货" if state.calibrated else "测这一盘总量",Rect2(1020,646,235,54),advance,true).disabled = transient > 0
 		var instruction = "已放 %d / 3 只 · %s"%[Rules.count(state.slots),"提交后验量" if state.calibrated else "已留 %d 份回执"%state.observations.size()]
@@ -179,7 +201,7 @@ func refresh() -> void:
 		if labels.has(state.stage): add_button("next",labels[state.stage],Rect2(982,646,274,54),confirm_restart if state.stage == "complete" else advance,true)
 		if state.stage == "complete" and from_camp: add_button("back_forest","交完货 · 回营地",Rect2(700,646,270,54),go_forest)
 		if state.stage == "complete": add_button("next_sample","去育苗铺 · 留下一段线",Rect2(414,646,272,54),go_nursery)
-		if state.stage == "complete" and from_hub: add_button("back_hub","返回集市航图",Rect2(132,646,270,54),go_hub)
+		if state.stage == "complete" and from_hub: add_button("back_hub","返回千灯航图",Rect2(132,646,270,54),go_hub)
 		# 营地进来的旅客也要能直接上航图，否则后面十七站在游戏里没有路可达（重玩时本关已经停在 complete，不该再走一遍育苗铺）。
 		if state.stage == "complete" and from_camp: add_button("open_hub","去千灯航图",Rect2(132,646,270,54),go_hub)
 		if state.stage == "result" and state.calibrated and not Rules.delivered(state): add_button("undo_result","撤销上一次摆杯",Rect2(24,654,225,46),undo_from_result).disabled = history.is_empty()
@@ -315,6 +337,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			if id not in state.slots: select_cup(id)
 		elif event.keycode in [KEY_Q,KEY_W,KEY_E]: choose_slot([KEY_Q,KEY_W,KEY_E].find(event.keycode))
 		elif event.keycode == KEY_Z: undo()
+		elif event.keycode == KEY_X: confirm_reset()
 		elif event.keycode == KEY_H: hint()
 		elif event.keycode == KEY_SPACE: advance()
 	get_viewport().set_input_as_handled()

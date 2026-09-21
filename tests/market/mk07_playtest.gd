@@ -77,31 +77,51 @@ func spilled_boards() -> int:
 			over += 1; print("BOARD ", board["text"], " needs ", needed, " in ", board["rect"].size.x)
 	return over
 # 街面上的木牌、货物与出口按钮都在同一个 1280×720 平面上：谁压住谁只由矩形相交决定。
+# 单据这一类归关卡自己摊开的纸（y>170）留给 off_paper 逐行量，这里只收纸面。
 func paper_rects() -> Array:
 	var papers := []
 	for child in game.ui.get_children():
 		if child is Panel and child.position.y > 170: papers.append(Rect2(child.position, child.size))
 	return papers
+# 覆盖者 = 宿主钉在屏幕上的标题板、目标板、台词板 + 关卡自己摊开的单据。
+func cover_rects() -> Array:
+	var papers := []
+	for child in game.ui.get_children():
+		if child is Panel: papers.append(screen_rect(child))
+	return papers
+func screen_rect(node: CanvasItem) -> Rect2:
+	var xf: Transform2D = node.get_global_transform_with_canvas()
+	return Rect2(xf * Vector2.ZERO, node.size * Vector2(xf.x.x, xf.y.y))
+# 街面是 Node2D：木牌与柜台上的货活在镜头坐标里（柜台那几格是 1.10 倍、偏移 (-64,-43)），
+# 宿主的台词板却贴在屏幕上。原来拿世界坐标直接比屏幕纸面，等于把镜头当没发生——
+# 柜台上方那块「援助货」牌被进口台词板压掉 8 像素顶边，一路都没量出来。
+func on_screen(rect: Rect2) -> Rect2:
+	var xf: Transform2D = game.world.get_global_transform_with_canvas()
+	return Rect2(xf * rect.position, rect.size * Vector2(xf.x.x, xf.y.y))
 func covered_boards() -> int:
 	var over = 0
 	for board in game.world.signs():
-		for paper in paper_rects():
-			if paper.intersects(board["rect"]):
+		for paper in cover_rects():
+			if paper.intersects(on_screen(board["rect"])):
 				over += 1; print("COVERED board ", board["text"], " by paper ", paper)
 	for good in range(Rules.COUNT):
-		for paper in paper_rects():
-			if paper.intersects(game.world.good_rect(good)):
+		for paper in cover_rects():
+			if paper.intersects(on_screen(game.world.good_rect(good))):
 				over += 1; print("COVERED good ", good, " by paper ", paper)
 	for id in ["next","open_hub","back_hub","leave_hub"]:
 		if not game.buttons.has(id): continue
-		for paper in paper_rects():
-			if paper.intersects(Rect2(game.buttons[id].position, game.buttons[id].size)):
+		for paper in cover_rects():
+			if paper.intersects(screen_rect(game.buttons[id])):
 				over += 1; print("COVERED exit ", id, " by paper ", paper)
 	return over
 func board_with(needle: String) -> String:
 	for board in game.world.signs():
 		if str(board["text"]).contains(needle): return str(board["text"])
 	return ""
+func board_rect(needle: String) -> Rect2:
+	for board in game.world.signs():
+		if str(board["text"]).contains(needle): return board["rect"]
+	return Rect2()
 # 一件货在同一时刻只能出现在一个地方：落位之前只在演出里，落位之后只在居民手里。
 func in_hands() -> int:
 	var landed = 0
@@ -201,6 +221,15 @@ func run() -> void:
 			"the empty street holds every board's own text")
 		check(board_with("只能用布") != "" and board_with("能用绳或钉") != "",
 			"each household's own limits are carved on its board, not only in the dialogue")
+		# 柜台镜头是 1.10 倍：进口台词板钉在屏幕 y 98..184，柜台上方的「援助货」牌不许爬到它底下。
+		var desk := board_rect("援助货")
+		check(desk != Rect2() and on_screen(desk).position.y >= 184.0,
+			"the counter's own board starts below the pinned dialogue panel")
+		check(covered_boards() == 0,
+			"no board, good or exit hides behind the header, goal or dialogue panel")
+		check(game.line() == "柜台上还有 4 件没预定：照每家牌子上的分，分满四户再整批试交。"
+			and fits(game.line(), 20, 798.0),
+			"the counter opens on a live count of what is still loose, inside its own board")
 		await capture(prefix+"03-counter")
 		# ---- 落下动画：宿主先把已提交的现场交给世界，再问谁落下来 ----
 		await click("good_2")
@@ -223,8 +252,12 @@ func run() -> void:
 		await key(KEY_2); await key(KEY_R)
 		check(game.state.plan == TRAP and Rules.complete_plan(game.state) and not Rules.solved(game.state),
 			"the greedy plan fills all four households and still strands 医护")
-		check(game.status_line() == "已分 4/4 · 台面 0 件","the running tally counts promises, not deliveries")
-		check(spilled_boards() == 0,"four promised goods keep every board inside its own wood")
+		check(game.status_line() == "已分 4/4 · 待分 0 件","the running tally counts promises, not deliveries")
+		check(game.line() == "四件都预定好了：点「整批试交」，看是不是每家都用得上。"
+			and fits(game.line(), 20, 798.0),
+			"a promised-out counter no longer claims four goods are still lying on it")
+		check(spilled_boards() == 0 and covered_boards() == 0,
+			"four promised goods keep every board inside its own wood")
 		await capture(prefix+"05-trap-set")
 		await click("deliver")
 		check(game.state.stage == "handover","a complete-but-wrong plan is still tried as one batch")
@@ -257,8 +290,9 @@ func run() -> void:
 			"医护's board names what is missing while 帆匠's keeps what he was promised")
 		check(spilled(game.ui) == 0 and spilled_boards() == 0,
 			"the shortfall report adds no text outside its own box")
-		# 台词板归宿主排版（Rect2(338,98,826,68) 只装得下一行 22 号字），关卡能负责的只有横向：
-		# 两行回执的每一行都必须留在板子宽度之内，否则汉字会直接爬到旁边的货上。
+		# 台词板归宿主排版（Rect2(338,98,826,86)，内框 798×74：两行 22 号汉字刚好装得下），
+		# 关卡能负责的只有横向：两行回执的每一行都必须留在板子宽度之内，
+		# 汉字不断词，溢出的那一段会直接画到旁边的货上。
 		check(fits(game.line(), 20, 798.0),"the honest report stays inside the width of the line board")
 		await key(KEY_Z)
 		check(game.state.plan == [2,0,3,-1] and game.state.failed == [TRAP],
@@ -311,8 +345,14 @@ func run() -> void:
 		check(game.state.stage == "delivery" and game.state.failed == [TRAP],
 			"the accepted batch is booked and the trial record stays")
 		await hold(1.2)
-		check(game.world.scale.x > 1.05 and board_with("已收：绳") != "",
-			"the delivery starts at the counter with the goods in hand")
+		# 基座这一轮把「交货」改成开场就往外收（四成五的时长内回到整条街，MK12 的灯串因此不再被
+		# 台词板切顶）：1.2 秒时镜头已经松到 1.03，这一格量的是「四户手里都有货、街正在展开、
+		# 展开路上的每一块牌都不落在任何纸板底下」，而不是原来那句「还贴着柜台」。
+		check(game.world.scale.x > 1.0 and game.world.scale.x < 1.05
+			and in_hands() == Rules.COUNT and board_with("已收：绳") != "",
+			"the delivery hands every household its good while the street opens back up")
+		check(covered_boards() == 0,
+			"the opening camera leaves no board behind the header or dialogue panel")
 		await capture(prefix+"13-delivery-counter")
 		await hold(4.0)
 		check(at_camera(1.0, Vector2.ZERO) and in_hands() == Rules.COUNT,

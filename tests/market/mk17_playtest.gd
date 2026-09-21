@@ -6,6 +6,7 @@ extends SceneTree
 # 1280×720 与 960×540 各走一遍，并检查世界层牌子上那些汉字有没有爬出自己的木牌。
 const Scene = preload("res://game/market_mk17.tscn")
 const Rules = preload("res://scripts/market/mk17_rules.gd")
+const World = preload("res://scripts/market/mk17_world.gd")
 const Bridge = preload("res://scripts/market/market_bridge.gd")
 const UIStyle = preload("res://scripts/cargo/skin.gd")
 const Focus = preload("res://tests/forest/window_focus.gd")
@@ -49,6 +50,19 @@ func has_content(image: Image) -> bool:
 	for step in range(64, image.get_width(), 97):
 		if image.get_pixel(step, image.get_height() / 2) != first: return true
 	return false
+
+# 搬运台原图在某个世界点上的颜色：carrying 这一幕镜头是 1.0，世界点就是屏幕点。
+# 取的是那个像素的中心（+0.5），差 0.8 个贴图像素就落到隔壁那一格上了。
+func plate_pixel(at: Vector2) -> Color:
+	var texture: Texture2D = World.HERON_PLATFORM
+	var dims := Vector2(texture.get_width(), texture.get_height()) * World.HERON_SCALE
+	var origin: Vector2 = game.world.boss_foot() - Vector2(dims.x / 2, dims.y)
+	return texture.get_image().get_pixel(int((at.x + 0.5 - origin.x) / World.HERON_SCALE),
+		int((at.y + 0.5 - origin.y) / World.HERON_SCALE))
+
+func shot_pixel(image: Image, at: Vector2) -> Color:
+	var step := Vector2(image.get_width(), image.get_height()) / Vector2(1280, 720)
+	return image.get_pixel(int(at.x * step.x), int(at.y * step.y))
 
 func click(id: String) -> void:
 	game.paused = false
@@ -180,6 +194,9 @@ func play_flag_a() -> void:
 	check(game.world.heron_pose() == 0, "走进来的时候它举的还是巡守那一态")
 	await click("skip")
 	check(game.state.stage == "ready", "入幕之后先停一下，把三张货单钉上栏")
+	check("1—4" in game.line() and "Q W E" in game.line() and "R 放回" in game.line() and "F 看旗" in game.line(),
+		"开始验货那句简报把键位一次交到底，不用玩家自己去撞")
+	check(fits(game.line(), 20, 798), "简报两行都写在口条里，没有溢出")
 	await snap("03-cards")
 	await click("next")
 	check(game.state.stage == "puzzle" and game.state.chances == 3, "开始验货：一台面大包，一次机会没动")
@@ -189,6 +206,10 @@ func play_flag_a() -> void:
 	check(report[1], "每个热点至少 48×48 逻辑像素")
 	check(report[2], "缩放镜头下每个热点都还在画面里，也没压住底栏")
 	check(report[3], "每个热点都写着中文说明")
+	check("键盘 1" in game.buttons.op_0.tooltip_text and "键盘 4" in game.buttons.op_3.tooltip_text \
+		and "键盘 Q" in game.buttons.take_0.tooltip_text and "键盘 E" in game.buttons.take_2.tooltip_text \
+		and "键盘 F" in game.buttons.flag.tooltip_text,
+		"封装牌、封包行与检查旗的说明里，各自写着自己那颗键")
 	check(game.buttons.has("deliver") and game.buttons.deliver.text == "提交这一站验收", "提交这块牌子写着玩家要做的事")
 	check(spilled(game.ui) == 0, "空台面的文字没有爬出自己的盒子")
 	check(plaque_fits("重新封装 · 剩 3 次", game.world.header_rect(), 15), "封台头的木牌装得下自己那句话")
@@ -221,6 +242,13 @@ func play_flag_a() -> void:
 	for step in range(4): await key(KEY_Z)
 	check(game.state.tray == [1, 1, 0] and game.state.stock == [4, 0, 1] and game.state.chances == 2,
 		"四步撤销只退摆法：多放的货回到台面，机会仍是已用一次")
+	var packed = game.state.tray.duplicate(true)
+	check("键盘 R" in game.buttons.tray_1.tooltip_text and not "键盘" in game.buttons.tray_0.tooltip_text,
+		"R 只写在最后放上去的那一包上：前面那一格不冒充自己有快捷键")
+	await key(KEY_R)
+	check(game.state.tray == [1, 0, 0], "按 R 请回的是最后那一包，不是第一格")
+	await click("take_1")
+	check(game.state.tray == packed, "再点一下把它放回同一格，账目照旧")
 	for step in range(4): await click("hint")
 	check(game.state.hint == Rules.HINTS and not game.message.is_empty(), "提示只有三级，按到第四级也不越界")
 	check(fits(game.message, 20, 798), "提示写在口条里，没有溢出")
@@ -262,9 +290,26 @@ func play_flag_a() -> void:
 	await snap("11-station-three")
 	await click("deliver")
 	check(game.state.stage == "carrying", "三站办完，铜鹭收起旗、展翼把自己变成搬运台")
-	await hold(1.9)
+	await hold(3.2)
 	await snap("12-platform")
 	check(game.world.heron_pose() == 2, "搬运台那一态确实是展翼的那张原图")
+	# 展翼的整片羽翅是同一张原图：三站那三包若画在铜鹭之前，会被压得一颗也看不见。
+	# 这里不读代码，读那一帧的像素——同一个位置在搬运台原图上是实心木色，画面上就必须不是。
+	if not lite:
+		var shot = frames[prefix + "12-platform"]
+		var covered = 0
+		for slot in range(Rules.MAX_PACKS[2]):
+			var atlas: Texture2D = game.world.atlases["parcel_medium"]
+			var pinned: Array = game.world.parts["parcel_medium"].anchor_px
+			var scale: float = game.world.BERTH_PACK_WIDTH[M] / atlas.get_width()
+			var middle: Vector2 = game.world.pack_home(2, slot) \
+				- Vector2(pinned[0], pinned[1]) * scale + Vector2(atlas.get_width(), atlas.get_height()) * scale / 2.0
+			if shot_pixel(shot, middle) == plate_pixel(middle): covered += 1
+		check(covered == 0, "货床上那三包压在搬运台之上（%d 包与甲板原色一模一样，等于没画出来）" % covered)
+		var control = 0
+		for spot in [Vector2(601, 490), Vector2(742, 495)]:
+			if shot_pixel(shot, spot) == plate_pixel(spot): control += 1
+		check(control == 2, "取色对得上：那两处没有包的甲板，画面读回来就是搬运台原图本身")
 	await click("skip")
 	check(game.state.stage == "delivery", "离岸这一幕：码头一盏一盏亮起来")
 	await hold(2.2)

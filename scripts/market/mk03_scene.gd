@@ -20,7 +20,7 @@ func configure() -> void:
 	rules = Rules; world_script = World
 
 func goal_line() -> String:
-	return "两条公开称量都要成立：2红+1蓝=14 · 1红+2蓝=13"
+	return "两条公开称量都要成立：%s · %s" % [Rules.equation(0), Rules.equation(1)]
 
 func status_line() -> String:
 	return "红 %s · 蓝 %s · %s" % [tag_word(state.red), tag_word(state.blue), "已叠" if Rules.folded(state) else "未叠"]
@@ -49,8 +49,11 @@ func line() -> String:
 	return ""
 
 func build() -> void:
+	# 热点要压在 tooltip 说的那张纸上：没叠的时候能点的是右边那张记录二，
+	# 叠好之后能点的是合起来的那一摞。原先两处正好写反，玩家点记录二没有反应，
+	# 点叠好的那一摞也没反应，倒是把右侧空台上那张「差量签」点了就分开。
 	var folding = not Rules.folded(state)
-	add_hotspot("fold", world.stack_rect() if folding else world.card_rect(1), do_fold,
+	add_hotspot("fold", world.card_rect(1) if folding else world.stack_rect(), do_fold,
 		"把记录二叠到记录一上，消去相同的 1 红 1 蓝" if folding else "把两份记录分开，重新摆回台面")
 	for kind in range(2):
 		var label = Rules.kind_name(kind)
@@ -65,14 +68,15 @@ func build() -> void:
 
 func extra() -> void:
 	if state.stage != "complete": return
-	# 回执只复述玩家真正做过的事：他挂的两枚重签、消去的那一组，以及两条记录各自合出多少。
+	# 回执只复述玩家真正做过的事：他挂的两枚重签、消去的那一组，以及两条公开记录各自合出多少
+	# （能翻出原单，说明这两条都被他的挂法兑现了，所以直接引用柜面上那两行原话）。
 	UIStyle.panel(ui, Rect2(116, 352, 432, 172))
-	UIStyle.text(ui, "回执 · 育苗铺封箱重签\n红箱挂 %d 号 · 蓝箱挂 %d 号\n叠合两份记录，消去 1 红 1 蓝：红比蓝重 %d 斤\n复秤：2红+1蓝=%d 斤 · 1红+2蓝=%d 斤" % [
-		state.red, state.blue, Rules.DIFFERENCE, Rules.reading(state, 0), Rules.reading(state, 1)],
+	UIStyle.text(ui, "回执 · 育苗铺封箱重签\n红箱挂 %d 号 · 蓝箱挂 %d 号\n叠合两份记录，消去 1 红 1 蓝：红比蓝重 %d 斤\n复秤：%s · %s" % [
+		state.red, state.blue, Rules.DIFFERENCE, Rules.equation(0), Rules.equation(1)],
 		Rect2(132, 364, 404, 152), 18)
 
 func exit_buttons() -> void:
-	# 从航图进来的场合由宿主给出「返回集市航图」；单独启动本关时也要有一条回去的路。
+	# 从航图进来的场合由宿主给出「返回千灯航图」；单独启动本关时也要有一条回去的路。
 	if origin != "hub": add_button("open_hub", "回千灯航图", Rect2(690, 646, 280, 54), go_hub)
 
 func snapshot(value: Dictionary) -> Dictionary:

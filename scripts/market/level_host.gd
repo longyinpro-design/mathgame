@@ -35,9 +35,10 @@ var message = ""
 var modal = false
 var transient = 0.0
 var origin = ""
+var window_theme: Theme
 
 func _ready() -> void:
-	# 进来时是谁送的：hub = 集市航图，mk01 = 码头，空 = 直接启动本关。读一次即清空。
+	# 进来时是谁送的：hub = 千灯航图，mk01 = 码头，空 = 直接启动本关。读一次即清空。
 	origin = Bridge.origin; Bridge.origin = ""
 	configure()
 	state = rules.fresh()
@@ -49,8 +50,16 @@ func _ready() -> void:
 	ui = Control.new(); ui.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(ui)
 	overlay = Control.new(); overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(overlay)
 	get_window().title = "千灯集市 · " + title
+	# 热点是隐形按钮，它的中文说明只靠 tooltip。tooltip 的 Label 挂在 viewport 自己的画布上，
+	# 主题继承只到 Window 这一级——挂在宿主 Control 上传不到它，于是全章唯一不用关卡字体的
+	# 文字就是它（默认细灰字、压在石板上）。这里换成木纹牌主题，并在离场时还原，不漏给森林岛。
+	window_theme = get_window().theme
+	get_window().theme = UIStyle.tooltip_theme()
 	refresh()
 	if read.status == "protected": show_protected()
+
+func _exit_tree() -> void:
+	if is_instance_valid(get_window()): get_window().theme = window_theme
 
 # ---- overridable hooks ----
 func configure() -> void: pass
@@ -94,8 +103,15 @@ func _process(delta: float) -> void:
 # Walk-in zooms the counter, the hand-out pulls back to the whole street.
 func update_camera() -> void:
 	var amount = 1.0 if state.stage in zoom_stages else 0.0
+	# 走位收尾已经把镜头推到 1.10，紧接的那一格（ready）说的是「先点什么、再点什么」，
+	# 画面必须还贴着同一张台面。各关写 zoom_stages 时很容易只写 puzzle，于是 ready 先弹回
+	# 1.0、点「开始」再弹回 1.10，两下硬跳（MK09／MK12 实窗量到的）。
+	if state.stage == "ready" and "puzzle" in zoom_stages: amount = 1.0
 	if state.stage == "approach": amount = smoothstep(0,1,world.progress)
-	if state.stage == "delivery": amount = 1-smoothstep(0.5,1,world.progress)
+	# 交货这一幕要演的是整条街：原先留到后半程才拉回，前半程一直贴着柜台，
+	# 挂在庭院上方的灯串、驶出的车队正好被台词板切掉顶边（MK12 点灯那一幕实窗拍到的）。
+	# 改成开场就往外收，四成五的时长内回到整院，之后全程保持。
+	if state.stage == "delivery": amount = 1-smoothstep(0,0.45,world.progress)
 	world.scale = Vector2.ONE*lerpf(1,1.10,amount)
 	world.position = Vector2(-64,-43)*amount
 
@@ -178,16 +194,20 @@ func refresh() -> void:
 	if state.stage in rules.ANIMATIONS:
 		add_button("pause","继续动画" if paused else "暂停动画",Rect2(922,654,140,46),toggle_pause)
 		add_button("skip","跳过当前动画",Rect2(1080,654,176,46),skip_animation)
+		# 演出那几格底栏原本是空的：好几关都写了「已落定 3 / 五件」这一类读数，
+		# 宿主不在这里画，玩家就看不见一批货正在落下（MK02／MK09 都写了、都没显示）。
+		var moving = status_line()
+		if not moving.is_empty(): UIStyle.text(ui,moving,Rect2(470,656,300,42),20)
 	elif state.stage == "puzzle":
 		build()
 		add_button("undo","撤销 Z",Rect2(24,654,124,46),undo).disabled = history.is_empty() or transient > 0
-		add_button("reset","重摆",Rect2(162,654,110,46),confirm_reset).disabled = transient > 0
+		add_button("reset","重摆 X",Rect2(162,654,110,46),confirm_reset).disabled = transient > 0
 		add_button("hint","请扣扣提醒",Rect2(286,654,168,46),hint).disabled = transient > 0
 		add_button("deliver",submit_label(),Rect2(1020,646,235,54),advance,true).disabled = transient > 0
 		var status = status_line()
 		if not status.is_empty(): UIStyle.text(ui,status,Rect2(470,656,300,42),20)
 		# 摆放中途也能回航图：每一步都已经落盘，离开不会丢现场。
-		if origin == "hub": add_button("leave_hub","集市航图",Rect2(786,654,124,46),go_hub)
+		if origin == "hub": add_button("leave_hub","千灯航图",Rect2(786,654,124,46),go_hub)
 	else:
 		var labels = stage_labels()
 		if labels.has(state.stage):
@@ -195,7 +215,7 @@ func refresh() -> void:
 		if state.stage == "complete":
 			exit_buttons()
 			# 从航图进来的关卡，办完事就把玩家送回航图，灯火由枢纽读档补记。
-			if origin == "hub": add_button("back_hub","返回集市航图",Rect2(690,646,280,54),go_hub)
+			if origin == "hub": add_button("back_hub","返回千灯航图",Rect2(690,646,280,54),go_hub)
 	# 关卡自己的回执、单据与阶段说明画在最后，才能压在按钮之上。
 	extra()
 	if modal:
@@ -299,10 +319,19 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if event.keycode == KEY_ESCAPE:
 		if state.stage in rules.ANIMATIONS: toggle_pause()
 		else: refresh()
-	elif state.stage == "puzzle" and transient <= 0:
+	elif transient <= 0:
 		var key = event.keycode
-		if key == KEY_Z: undo()
-		elif key == KEY_H: hint()
-		elif key == KEY_SPACE: advance()
-		else: handle_key(key)
+		if state.stage == "puzzle":
+			if key == KEY_Z: undo()
+			elif key == KEY_H: hint()
+			# 重摆留给 X：R 已经被六关自己拿去当收货位快捷键（MK09 的丁摊就是 R），
+			# 而这一枚按钮在底栏上写着「重摆 X」，玩家看得见就能按得到。
+			elif key == KEY_X: confirm_reset()
+			elif key == KEY_SPACE: advance()
+			else: handle_key(key)
+		elif key == KEY_SPACE and buttons.has("next"):
+			# 开场那几句、走位、以及「开始装车」那一格原本只有鼠标能走：只用键盘的玩家
+			# 会被钉在台词板前面。空格在这里按的就是 next 那一个动作；提交仍然只在 puzzle 里
+			# 由空格触发，而那一格有 shortfalls 兜底，按错了只会念出还差哪一处。
+			buttons["next"].pressed.emit()
 	get_viewport().set_input_as_handled()

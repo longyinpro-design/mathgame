@@ -16,6 +16,8 @@ const GOOD_ON_TAG = [50.0, 36.0, 38.0, 46.0]
 const GOOD_ON_CARD = [38.0, 28.0, 30.0, 34.0]
 const TAG_LIFT = 50.0
 const CARD_LIFT = 60.0
+# 拿在手里的整张签往上抬这么多：热点必须跟着抬，不然玩家对着抬起来的那张点会落空。
+const HELD_LIFT = 22.0
 # 一家晚起步 0.12、各自抬得不一样高：四只箱子在街上排成一串，而不是叠成一团。
 const START_GAP = 0.12
 const WALK_TIME = 0.62
@@ -46,8 +48,12 @@ func name_rect(place: int) -> Rect2: return Rect2(stall(place).x - 90, stall(pla
 func label_spots() -> Array:
 	return grid(counter() + Vector2(-144, 6), Vector2(96, 0), 4, 4)
 
-func label_rect(good: int) -> Rect2: return target(label_spots()[good], 76, 84)
-func card_rect(place: int) -> Rect2: return target(stall(place), 88, 96)
+# 热点就是玩家看见的那面纸：target() 的正方框比 76 宽的纸矮 25 像素，
+# 纸尖与纸尾都点不着，抬起来的那一张还会整个跑出框外。
+func label_foot(good: int) -> Vector2:
+	return label_spots()[good] + Vector2(0, -HELD_LIFT if state.hand == good else 0.0)
+func label_rect(good: int) -> Rect2: return paper_rect(label_foot(good), TAG_WIDTH)
+func card_rect(place: int) -> Rect2: return paper_rect(stall(place), CARD_WIDTH)
 
 # 交货演出：四只箱子按去处依次离开柜台，一路抬到各自家门口。
 # 每件货物有自己的起步时刻与抬升高度，到家的先后就是玩家按签的左右顺序。
@@ -103,9 +109,10 @@ func draw_wash(foot: Vector2, half: float, rows: Array) -> void:
 		draw_line(Vector2(foot.x - width - 6.0, y + 4.0), Vector2(foot.x + width - 2.0, y + 6.0),
 			Color(0.72, 0.82, 0.92, 0.26), 2)
 
-func draw_tag(good: int, spot: Vector2, held: bool) -> void:
-	var foot = spot + Vector2(0, -22.0 if held else 0.0)
-	contact(spot, 24, 0.1 if held else 0.2)
+func draw_tag(good: int) -> void:
+	var held = state.hand == good
+	var foot = label_foot(good)
+	contact(label_spots()[good], 24, 0.1 if held else 0.2)
 	# 麻绳把签子挂在木夹上，拿起来的时候绳子跟着抬。
 	draw_line(foot + Vector2(0, -96), foot + Vector2(6, -116), Color("8f6420", 0.85), 2)
 	kit("receipt_blank", foot, TAG_WIDTH, 1.0 if held else 0.92)
@@ -113,6 +120,18 @@ func draw_tag(good: int, spot: Vector2, held: bool) -> void:
 	kit(Rules.KIT_GOODS[good], foot - Vector2(0, TAG_LIFT), GOOD_ON_TAG[good])
 	words(Rules.GOODS_FULL[good], foot + Vector2(-16, -12), 16, INK_GOLD if held else INK_LIGHT)
 	if held: socket(foot - Vector2(0, TAG_LIFT), Vector2(34, 32), 0.5 + 0.4 * pulse())
+
+# 牌面上的字集中在这里拼：实窗按同一份字符串量宽度，不靠把文案再抄一遍。
+func board_head_plate() -> String: return "订单板 · 三句留下的话"
+# 柜台牌跟着摊着的签数一起少：四张全按上订单板的那一刻，柜台上空无一物，
+# 牌面就退回光一个「柜台」，不许写着一张也不摊着的「0 张货签」。
+func counter_plate() -> String:
+	var loose = Rules.loose(state).size()
+	return "柜台 · %d 张货签" % loose if loose > 0 else "柜台"
+# 一家门口那块牌：没收货时只写店名，收了货就跟着写「收 X」，两种都要木牌装得下。
+func name_plate(place: int, good: int) -> String:
+	if good < 0: return Rules.PLACE_CN[place]
+	return "%s · 收 %s" % [Rules.PLACE_CN[place], Rules.GOODS_FULL[good]]
 
 func draw_order(place: int, foot: Vector2, good: int, waiting: bool) -> void:
 	contact(foot, 30, 0.22)
@@ -122,14 +141,14 @@ func draw_order(place: int, foot: Vector2, good: int, waiting: bool) -> void:
 	# 货签一按上就钉在订单上，箱子却还在街上走：没到货的这一家只写店名。
 	if good >= 0: kit("receipt_blank", foot - Vector2(0, 30), PIN_WIDTH, 0.98)
 	if good < 0 or waiting:
-		plaque(Rules.PLACE_CN[place], name_rect(place))
+		plaque(name_plate(place, -1), name_rect(place))
 		# 空着的格子只在手里有签时闪，免得满街都是提示。
 		if good < 0 and state.stage == "puzzle" and Rules.holding(state):
 			socket(foot - Vector2(0, CARD_LIFT), Vector2(30, 28), 0.4 + 0.3 * pulse())
 		return
 	var rise = landing("card", place)
 	kit(Rules.KIT_GOODS[good], foot - Vector2(0, CARD_LIFT + 30.0 * rise), GOOD_ON_CARD[good], 1.0 - rise * 0.7)
-	plaque("%s · 收 %s" % [Rules.PLACE_CN[place], Rules.GOODS_FULL[good]], name_rect(place), 16, INK_GOLD)
+	plaque(name_plate(place, good), name_rect(place), 16, INK_GOLD)
 
 func draw_level() -> void:
 	var spots = label_spots()
@@ -143,7 +162,7 @@ func draw_level() -> void:
 	for place in range(Rules.PLACES.size()):
 		draw_order(place, stall(place), state.assign[place], moved["waiting"].has(place))
 	var middle = station("stall_middle")
-	plaque("订单板 · 三句留下的话", Rect2(middle.x - 90, middle.y - 45, 180, 28))
+	plaque(board_head_plate(), Rect2(middle.x - 90, middle.y - 45, 180, 28))
 	if state.stage == "delivery":
 		# 货签都按上订单板了，柜台上只剩还没起飞的箱子。
 		for good in range(Rules.GOODS.size()):
@@ -151,9 +170,10 @@ func draw_level() -> void:
 			contact(spots[good], 24, 0.2)
 			kit(Rules.KIT_GOODS[good], spots[good], GOOD_ON_TAG[good])
 	elif state.stage != "complete":
-		plaque("柜台 · 四张货签", Rect2(counter().x - 90, counter().y + 12, 180, 28))
+		# 柜台上的签一张一张少下去：牌面跟着报还剩几张摊着，不写死「四张」。
+		plaque(counter_plate(), Rect2(counter().x - 90, counter().y + 12, 180, 28))
 		for good in range(Rules.GOODS.size()):
 			if state.assign.has(good): continue
-			draw_tag(good, spots[good], state.hand == good)
+			draw_tag(good)
 	for entry in carried:
 		if entry["phase"] < 1.0: kit(Rules.KIT_GOODS[entry["good"]], entry["at"], GOOD_ON_TAG[entry["good"]])

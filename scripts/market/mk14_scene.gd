@@ -40,14 +40,17 @@ func stage_labels() -> Dictionary:
 		"ready": "开始配秤", "result": "回到秤前再摆", "complete": "再配一次"}
 
 func restart_prompt() -> Array: return ["重新体验配秤这一幕？", "留在小摊", "重新体验"]
+# 第二句只说此刻真在账上的事：第一单还没交出去时，「已经配平交出去的那一单」还不存在。
 func reset_prompt() -> Array:
-	return ["三枚砝码全部放回架上？\n已经配平交出去的那一单不会重来，秤仍然锁着。", "继续摆放", "砝码放回架上"]
+	var kept := "已经配平交出去的那一单不会重来" if state.delivered > 0 else "这一单还没交出去"
+	return ["三枚砝码全部放回架上？\n%s，秤仍然锁着。" % kept, "继续摆放", "砝码放回架上"]
 
 func line() -> String:
 	match state.stage:
 		"arrival": return LINES[state.beat]
 		"approach": return "铜秤的制动还插着，三枚砝码都在左手的架上。"
-		"ready": return "货压在货盘上，砝码两边都能站，一枚最多上一次秤。"
+		# 简报把两条操作都说全：鼠标一格一格挪，键盘上想省事就直接把手里那枚放回架上。
+		"ready": return "货压在货盘上，砝码两边都能站，一枚最多上一次秤。\n点一下挪一格；按 Q、W、E 让手里那枚直接回架。"
 		"puzzle": return "点一下架上的砝码，它就挪一个地方：架上 → 对面那盘 → 货盘。\n摆好就按「抬秤验收」，秤抬起来之前不预告平不平。"
 		"weighing": return "扣扣扶稳秤盘，衡伯拔出制动销……哪头沉，这会儿才看得出来。"
 		"result": return Rules.result_line(state)
@@ -120,7 +123,7 @@ func extra() -> void:
 	paper.add_theme_constant_override("line_spacing", 0)
 
 func exit_buttons() -> void:
-	# 从航图进来的场合由宿主给出「返回集市航图」；单独启动本关时也要有一条回去的路。
+	# 从航图进来的场合由宿主给出「返回千灯航图」；单独启动本关时也要有一条回去的路。
 	if origin != "hub": add_button("open_hub", "回千灯航图", Rect2(690, 646, 280, 54), go_hub)
 
 func snapshot(value: Dictionary) -> Dictionary:

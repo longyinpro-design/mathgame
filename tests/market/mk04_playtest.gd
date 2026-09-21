@@ -1,5 +1,5 @@
 extends SceneTree
-# MK04 实窗审计：真实窗口里走一遍「听完争吵 → 沿两条原约实换 → 给第三张改签 → 核对收据 → 翻出回执」，
+# MK04 实窗审计：真实窗口里走一遍「听完争吵 → 沿两条原约实换 → 给转抄件改签 → 核对收据 → 翻出回执」，
 # 在 1280×720 与 960×540 各拍一次，并检查柜面上的单纸、文字与落地动画有没有各就各位。
 const Scene = preload("res://game/market_mk04.tscn")
 const Rules = preload("res://scripts/market/mk04_rules.gd")
@@ -127,6 +127,40 @@ func plate_texts() -> Array:
 	var list: Array = []
 	for plate in game.world.sign_plates(game.world.shown_state()): list.append(plate["text"])
 	return list
+# 台词条那块板钉在屏上，柜面上的牌钉在世界里：两者一交叠，牌的上半截就被板子吃掉。
+# 宿主把 message 排在台词之前，量板子要按同一份优先级找，否则有拒绝语的那一刻会量空。
+func spoken_text() -> String:
+	return game.line() if game.message.is_empty() else game.message
+func line_board() -> Rect2:
+	if spoken_text().is_empty(): return Rect2()
+	var spoken: Label = label_with(spoken_text())
+	if spoken == null: return Rect2()
+	for child in game.ui.get_children():
+		if child is Panel and Rect2(child.position, child.size).has_point(spoken.position):
+			return Rect2(child.position, child.size)
+	return Rect2()
+func plates_behind_board() -> int:
+	var board = line_board()
+	if board.size == Vector2.ZERO: return 0
+	var eaten = 0
+	for plate in game.world.sign_plates(game.world.shown_state()):
+		if on_board(plate["rect"]).intersects(board):
+			eaten += 1; print("BEHIND ", plate["text"], " ", on_board(plate["rect"]), " vs ", board)
+	return eaten
+# 起飞的那张纸有 75 高：拱顶抬得太高，纸尖就钻进台词条后面，数字看着像被吞了半截。
+func flight_behind_board(flight: Array) -> int:
+	var board = line_board()
+	if board.size == Vector2.ZERO: return 0
+	var eaten = 0
+	for entry in flight:
+		if on_board(carried_box(entry)).intersects(board): eaten += 1
+	return eaten
+# 热点必须罩得住玩家看得见的那张纸：纸尖点不着，玩家照着纸去点就落空。
+func hotspot_of(id: String) -> Rect2:
+	return game.buttons[id].get_global_rect()
+func covers_sheet(hot: Rect2, sheet: Rect2) -> bool:
+	return (hot.position.x <= sheet.position.x + 0.5 and hot.position.y <= sheet.position.y + 0.5
+		and hot.end.x >= sheet.end.x - 0.5 and hot.end.y >= sheet.end.y - 0.5)
 
 func run() -> void:
 	create_timer(90).timeout.connect(func(): push_error("MK04 window watchdog"); quit(1))
@@ -189,7 +223,15 @@ func run() -> void:
 			"the counter states both pools in the player's own units")
 		drawn("扣扣的转抄件 · 待核对", 16, 216.0, "转抄件台面牌")
 		drawn("原约一 · 1 布 → 2 油", 16, 230.0, "左柜台面牌")
-		drawn("改签 · 3 卷布换几只铃", 16, 224.0, "改签台面牌")
+		check(line_board().size != Vector2.ZERO,"the dialogue board the counter is measured against is on screen")
+		check(plates_behind_board() == 0,"no counter plaque hides behind the pinned dialogue board")
+		# 热点就是玩家看得见的那张纸：纸尖、纸尾落进死区，照着纸点就会落空。
+		for spec in [["card_0",0],["card_1",1],["card_third",2]]:
+			check(covers_sheet(hotspot_of(spec[0]), card_paper(spec[1])),
+				"the clickable frame of %s covers the whole sheet the player sees" % spec[0])
+		for index in range(Rules.CANDIDATES.size()):
+			check(covers_sheet(hotspot_of("cand_%d" % index), cand_paper(index)),
+				"the clickable frame of candidate %d covers the whole tag the player sees" % index)
 		var stacked = 0
 		for index in range(1, Rules.CANDIDATES.size()):
 			if paper(game.world.cand_foot(index - 1), World.CAND_WIDTH).intersects(
@@ -197,7 +239,7 @@ func run() -> void:
 		check(stacked == 0,"the three candidate tags leave each other's gold frame whole")
 		check(game.buttons.undo.disabled,"an untouched counter has nothing to undo")
 		await capture(prefix+"04-empty-table")
-		# ---- 三条单都要问得动：两张原约念条款，第三张念它为什么不算 ----
+		# ---- 三条单都要问得动：两张原约念条款，转抄件念它为什么不算 ----
 		await key(KEY_1)
 		check(game.state.correction == 0 and "先按两条原约" in game.message,"the candidates stay shut before the run")
 		await click("card_0")
@@ -270,14 +312,19 @@ func run() -> void:
 		check(pen.size() == 1,"the correction carries one number, not a crate of goods")
 		check(over_face(pen) == 0,"the flying number arcs over 扣扣's head instead of smearing past his face")
 		var swept = 0
+		var eaten = 0
+		check(line_board().size != Vector2.ZERO,"the dialogue board is on screen while the number is in the air")
 		for index in range(Rules.CANDIDATES.size()):
 			var scratch = game.state.duplicate(true)
 			scratch.stage = "correcting"; scratch.proposed = Rules.CANDIDATES[index]
 			game.world.state = scratch
 			for step in range(11):
 				if over_face(game.world.carry_plan(step / 20.0)) > 0: swept += 1
+				eaten += flight_behind_board(game.world.carry_plan(step / 20.0))
 		game.world.state = game.state
 		check(swept == 0,"every candidate number, from the lowest tag too, clears 扣扣's head on the way to the copy")
+		check(eaten == 0,"every candidate number stays out from behind the pinned dialogue board in flight")
+		check(flight_behind_board(pen) == 0,"the number in front of the camera is fully readable against the board")
 		await hold(0.5)
 		await capture(prefix+"11-correcting-flight")
 		await press("skip")
@@ -344,7 +391,7 @@ func run() -> void:
 			check("原约一 ×3：3 卷布 → 6 瓶油" in paper_label.text
 				and "原约二 ×2：6 瓶油 → 2 只铜铃" in paper_label.text,
 				"the receipt restates the two promises the player actually ran")
-			check("第三张改签：3 卷布换 2 只铜铃" in paper_label.text
+			check("转抄件改签：3 卷布换 2 只铜铃" in paper_label.text
 				and "抄错不是偷货：原单 2、转抄 3" in paper_label.text,
 				"the receipt keeps a wrong copy and a stolen bell apart")
 			var sheet = panel_over(Rect2(paper_label.position,paper_label.size))
@@ -378,7 +425,7 @@ func run() -> void:
 		drawn("原约二 · 3 油 → 1 铃", 16, 230.0, "右柜台面牌")
 		drawn("实换 %d 只 · 单上 %d 只" % [Rules.CORRECT_BELLS, Rules.CORRECT_BELLS], 16, 212.0, "对照台面牌")
 		drawn("空货签 · 当众重写", 16, 180.0, "空货签台面牌")
-		drawn("换 %d 只铜铃" % Rules.CORRECT_BELLS, 15, 110.0, "第三张单纸正文")
+		drawn("换 %d 只铜铃" % Rules.CORRECT_BELLS, 15, 110.0, "转抄件单纸正文")
 		drawn("双方有章", 12, 110.0, "原约章印旁注")
 		await capture(prefix+"16-receipt")
 		# ---- 存档：这一幕记得玩家真的做过什么 ----

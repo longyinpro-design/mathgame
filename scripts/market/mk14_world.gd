@@ -46,9 +46,17 @@ const SOUVENIR_SCALE = 0.42
 const SOUVENIR_FOOT = Vector2(470, 63)
 const SOUVENIR_BASE = Vector2(0, -30)
 const SOUVENIR_PLANK = 240.0
-const KEEPER = Vector2(-540, 33)
+# 扣扣站在铜秤左手边的空地上：oil 场景没有人物站位，坐标由秤脚推出，不另立锚点。
+# dx −500 是两头夹出来的：再往左，1.10 贴脸镜头下她左边那半个圆码会被窗框切掉
+# （−540 时切掉 43.9 像素）；再往右，她自己的不透明框（右沿 222.0）就压上砝码盘
+# （receiving_tray 的左沿 223.0）。按贴图 get_used_rect() 量，贴脸镜头下左沿还剩 2.3 像素。
+const KEEPER = Vector2(-500, 33)
 # 盘内横排里「这一单的货」占的那一格用这个哨兵表示，砝码一律用 0..2 的下标。
 const PARCEL_SLOT = -1
+# 一单货此刻算站在哪儿：车顶板与画面共用这一份说法。
+const SPOT_CART = 0
+const SPOT_PAN = 1
+const SPOT_DONE = 2
 var drop_seen := [0, 0, 0]
 var drop_at := [-100.0, -100.0, -100.0]
 
@@ -173,26 +181,44 @@ func parcel_width(index: int) -> float:
 	return PARCEL_WIDTHS[clampi(index, 0, Rules.ORDERS.size() - 1)]
 
 # ---- 两单货的位置：车上等着、盘上压着、交完回到交货车 ----
-func parcel_foot(index: int) -> Vector2:
-	if index < 0 or index >= Rules.ORDERS.size(): return scale_foot()
-	if index < state.order: return cart_bed(2, index)
-	if index > state.order: return cart_bed(index, 0)
+# 一单货此刻的行程：[起点, 终点, 走了几成, 起点算站在哪儿, 终点算站在哪儿]。
+# amount < 0 表示没在飞，货就稳稳站在 from 那一处。画面落点与车顶板那句「在哪儿」
+# 都从这一条读，交付那一幕里两块牌子不会再各算一套。
+func parcel_leg(index: int) -> Array:
+	if index < 0 or index >= Rules.ORDERS.size():
+		return [scale_foot(), scale_foot(), -1.0, SPOT_CART, SPOT_CART]
+	if index < state.order:
+		return [cart_bed(2, index), cart_bed(2, index), -1.0, SPOT_DONE, SPOT_DONE]
+	if index > state.order:
+		# 交付那一幕，下一单的货同时被推上秤：这段飞行也算进落点，与真秤那一单同一条公式。
+		if index == state.order + 1 and state.stage == "delivery":
+			return [cart_bed(index, 0), parcel_on_pan(index), smoothstep(0.4, 1.0, progress), SPOT_CART, SPOT_PAN]
+		return [cart_bed(index, 0), cart_bed(index, 0), -1.0, SPOT_CART, SPOT_CART]
 	match state.stage:
 		"arrival":
-			return cart_bed(index, 0)
+			return [cart_bed(index, 0), cart_bed(index, 0), -1.0, SPOT_CART, SPOT_CART]
 		"approach":
-			return carry(cart_bed(index, 0), parcel_on_pan(index), smoothstep(0.2, 1.0, progress))
+			return [cart_bed(index, 0), parcel_on_pan(index), smoothstep(0.2, 1.0, progress), SPOT_CART, SPOT_PAN]
 		"delivery":
-			return carry(parcel_on_pan(index), cart_bed(2, index), smoothstep(0.15, 0.9, progress))
+			return [parcel_on_pan(index), cart_bed(2, index), smoothstep(0.15, 0.9, progress), SPOT_PAN, SPOT_DONE]
 		"complete":
-			return cart_bed(2, index)
-	return parcel_on_pan(index)
+			return [cart_bed(2, index), cart_bed(2, index), -1.0, SPOT_DONE, SPOT_DONE]
+	return [parcel_on_pan(index), parcel_on_pan(index), -1.0, SPOT_PAN, SPOT_PAN]
+
+func parcel_foot(index: int) -> Vector2:
+	var leg: Array = parcel_leg(index)
+	return leg[0] if float(leg[2]) < 0.0 else carry(leg[0], leg[1], float(leg[2]))
+
+# 车顶板上那句「在哪儿」：飞行过半就算落进了新的那一头。
+func parcel_spot(index: int) -> int:
+	var leg: Array = parcel_leg(index)
+	return int(leg[4]) if float(leg[2]) >= 0.5 else int(leg[3])
 
 # 交付那一幕里，下一单的货同时被推上秤：迁移就这么演出来。
 func next_parcel_foot() -> Vector2:
 	var index: int = state.order + 1
 	if index >= Rules.ORDERS.size(): return Vector2.INF
-	return carry(cart_bed(index, 0), parcel_on_pan(index), smoothstep(0.4, 1.0, progress))
+	return parcel_foot(index)
 
 func carry(from: Vector2, to: Vector2, amount: float) -> Vector2:
 	return from.lerp(to, amount) + Vector2(0, -CARRY_ARC * sin(amount * PI))
@@ -249,11 +275,7 @@ func draw_carts() -> void:
 
 func draw_parcels() -> void:
 	for index in range(Rules.ORDERS.size()):
-		if state.stage == "delivery" and index == state.order + 1: continue
 		draw_parcel(index, parcel_foot(index))
-	if state.stage == "delivery":
-		var coming := next_parcel_foot()
-		if coming != Vector2.INF: draw_parcel(state.order + 1, coming)
 
 func draw_parcel(index: int, foot: Vector2) -> void:
 	var width := parcel_width(index)
@@ -337,10 +359,17 @@ func souvenir_items(side: int) -> Array:
 	for weight in Rules.on_list(state.built_goods[last], state.built_far[last], side): list.append(weight)
 	return list
 
-# 扣扣站在铜秤左手边的空地上：oil 场景没有人物站位，坐标由秤脚推出，不另立锚点。
 func draw_figure() -> void:
-	var happy: bool = state.stage == "complete" or (state.stage == "delivery" and progress > 0.5)
-	figure(KOUKOU_WAVE if happy else KOUKOU_TIE, keeper_foot(), 0.5)
+	figure(KOUKOU_WAVE if happy() else KOUKOU_TIE, keeper_foot(), 0.5)
+
+# 基类 figure() 以脚点水平居中、向上长一个身位，这里复算同一份几何给检查用。
+func keeper_rect() -> Rect2:
+	var texture: Texture2D = KOUKOU_WAVE if happy() else KOUKOU_TIE
+	var dims = Vector2(texture.get_width(), texture.get_height()) * 0.5
+	return Rect2(keeper_foot() - Vector2(dims.x / 2, dims.y), dims)
+
+func happy() -> bool:
+	return state.stage == "complete" or (state.stage == "delivery" and progress > 0.5)
 
 # ---- 柜面文字：画之前先被无头检查逐条量过宽度 ----
 # 汉字在 Godot 里是一个不断词，plaque 与 words 都不换行，超框就会画到旁边的货上。
@@ -362,7 +391,8 @@ func signs() -> Array:
 		boards.append(sign_board(pan_label(side), Vector2(dish.x, dish.y + 26), 96.0, 14, false))
 	if state.stage == "puzzle":
 		boards.append(sign_board(Rules.equation(state), Vector2(690, 592), 340.0, 15, true))
-		boards.append(sign_board("三枚砝码 · 点一下挪地方", Vector2(310, 600), 248.0, 15, true))
+		# 这块牌子说的是左手边那一排砝码，就钉在架子正下方：挪动架子它跟着走，不会指错。
+		boards.append(sign_board("三枚砝码 · 点一下挪地方", Vector2(rack_foot().x, 600), 248.0, 15, true))
 	if state.stage == "weighing":
 		boards.append(sign_board("制动已松 · 秤杆抬起来", Vector2(670, 596), 260.0, 15, true))
 	if state.stage == "result":
@@ -380,13 +410,14 @@ func signs() -> Array:
 	return boards
 
 # 车顶板上只写「哪一单、几单位、现在在哪」：完整说法留在热点文字与回执里。
+# 「在哪」读的是 parcel_spot()，与货此刻真正站的那一格同一个来源：交付那一幕里
+# 货已经落上秤盘（或已经停进交货车）时，牌上不会再写着「在车上」。
 func cart_caption(index: int) -> String:
 	if index >= Rules.ORDERS.size(): return "交货车 · 已交 %d 单" % state.delivered
 	var text := "%s · %d 单位" % [Rules.ORDER_NAMES[index], Rules.ORDERS[index]]
-	if index < state.order: return text + " · 已交货"
-	# 车顶板说的是「这一单的货此刻站在哪儿」：cargo_on_pan() 问的是整具秤，
-	# 拿它来写后面那一辆车，就会对还压在车上的货说「已经上秤了」。
-	if index == state.order and Rules.cargo_on_pan(state): return text + " · 上秤了"
+	var spot := parcel_spot(index)
+	if spot == SPOT_DONE: return text + " · 已交货"
+	if spot == SPOT_PAN: return text + " · 上秤了"
 	return text + " · 在车上"
 
 func pan_label(side: int) -> String:

@@ -55,9 +55,9 @@ static func shortfalls(state: Dictionary) -> Array:
 	# 两条记录都要兑现；只说玩家挂的数与公开数差在哪，不指出该怎么改。
 	if state.red > 0 and state.blue > 0:
 		if reading(state, 0) != published(0):
-			missing.append("记录一没兑现：2 红 + 1 蓝 应是 14 斤，挂 %d 与 %d 只合出 %d 斤。" % [state.red, state.blue, reading(state, 0)])
+			missing.append("记录一没兑现：%s，挂 %d 与 %d 只合出 %d 斤。" % [equation(0), state.red, state.blue, reading(state, 0)])
 		if reading(state, 1) != published(1):
-			missing.append("记录二没兑现：1 红 + 2 蓝 应是 13 斤，挂 %d 与 %d 只合出 %d 斤。" % [state.red, state.blue, reading(state, 1)])
+			missing.append("记录二没兑现：%s，挂 %d 与 %d 只合出 %d 斤。" % [equation(1), state.red, state.blue, reading(state, 1)])
 	return missing
 
 static func solved(state: Dictionary) -> bool:
@@ -116,10 +116,16 @@ static func advance(state: Dictionary) -> Dictionary:
 	return next
 
 # ---- 柜面文字：只复述公开记录，永远不含玩家挂上的数字 ----
-static func record_caption(index: int) -> String:
+# 这一条算式在本关会出现在四个地方（抬头目标板、柜面两块牌、复秤缺口的说明、结幕回执与原单）。
+# 写法只留一种：数字与汉字之间不空格、等号两侧各空一格、单位跟着等号右边的那个数走。
+# 之前四处各写各的（2红+1蓝=14 / 2红+1蓝 = 14 斤 / 2 红 + 1 蓝 应是 14 斤 / 2红+1蓝 14 斤），
+# 而这一关要教的恰恰就是「同一行算式」，换一种写法就像换了一道题。
+static func equation(index: int) -> String:
 	var record: Array = RECORDS[index]
-	var ordinal = "一" if index == 0 else "二"
-	return "记录%s · %d红+%d蓝 = %d 斤" % [ordinal, record[0], record[1], record[2]]
+	return "%d红+%d蓝 = %d 斤" % [record[0], record[1], record[2]]
+
+static func record_caption(index: int) -> String:
+	return "记录%s · %s" % ["一" if index == 0 else "二", equation(index)]
 
 static func difference_caption() -> String:
 	return "消去 1红1蓝 · 红比蓝重 %d 斤" % DIFFERENCE

@@ -7,6 +7,7 @@ const Content = preload("res://scripts/content/content_catalog.gd")
 const Bridge = preload("res://scripts/market/market_bridge.gd")
 const Scene = preload("res://game/market_mk13.tscn")
 const World = preload("res://scripts/market/mk13_world.gd")
+const UIStyle = preload("res://scripts/cargo/skin.gd")
 const SAVE_DEFAULT = "user://profiles/market-mk13-1/save-v1.json"
 # 5 段那两包是 0、1 号，3 段那三包是 2、3、4 号；解是 5+3+3。
 const WIN = [0, 2, 3]
@@ -39,6 +40,14 @@ func multiset(hand: Array) -> String:
 	sizes.sort()
 	return str(sizes)
 
+# 拒收的话要说得完：台词板内框 798、20 号字，汉字串中间不会自动折行，
+# 改一次措辞就可能悄悄多出一个字把它撑到板子外面，这里逐条量一遍。
+var typeface: FontFile
+func fits_board(text: String) -> bool:
+	if typeface == null: typeface = UIStyle.face()
+	if "\n" in text: return false
+	return typeface.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, UIStyle.text_size(20)).x <= 798.0
+
 func run() -> void:
 	create_timer(40).timeout.connect(func(): push_error("MK13 rule watchdog"); quit(1))
 	# ---- 开局存档与公开常量 ----
@@ -59,6 +68,8 @@ func run() -> void:
 	var multisets = {}
 	var mismatches = 0
 	var scolding = 0
+	var negatives = 0
+	var crowded = 0
 	for mask in range(1 << Rules.packages()):
 		var hand = []
 		for id in range(Rules.packages()):
@@ -76,10 +87,20 @@ func run() -> void:
 				if not str(Rules.segs(id)) in missing[0]: mismatches += 1
 			for word in ["错", "笨", "不行", "重新听"]:
 				if word in missing[0]: scolding += 1
+			# 底栏与柜面用同一套话说差多少：摊多了就不能再写「还差」，负号永远不该出现在屏上。
+			var gap = Rules.gap_text(probe)
+			if "-" in gap: negatives += 1
+			if Rules.total(probe) > Rules.NEED and not "多出" in gap: negatives += 1
+			if Rules.total(probe) < Rules.NEED and not "还差" in gap: negatives += 1
+			for sentence in missing:
+				if not fits_board(sentence): crowded += 1
 	check(winning.size() == 6, "6 of the counter's subsets lay out exactly 11 段")
 	check(multisets.size() == 1 and multisets.has("[3, 3, 5]"), "5+3+3 is the only multiset of whole packages that works")
 	check(mismatches == 0, "every carried subset agrees with the 11 段 the scarf asks for")
 	check(scolding == 0, "no refusal ever judges the player")
+	check(negatives == 0, "the gap phrase never shows a minus sign and always picks 还差/多出 by which side of 11 段 the hand lies on")
+	check(crowded == 0, "every refusal is one line that the dialogue board can hold whole")
+	check(Rules.gap_text(pose(WIN)) == "正好够", "an exact hand is reported as 正好够, not as a zero gap")
 	var ways := 0
 	var sums = {}
 	for fives in range(Rules.MAX_PACKAGES + 1):
@@ -104,6 +125,8 @@ func run() -> void:
 	check(Rules.shortfalls(pose(WIN)).is_empty() and Rules.solved(pose(WIN)), "5+3+3 is accepted")
 	check(not Rules.solved(pose([0, 1, 2])), "13 段 is not a solution just because the hand is full")
 	check(Rules.shortfalls(pose([3, 4])).size() == 1 and "6 段" in Rules.shortfalls(pose([3, 4]))[0], "two small packages are counted in the player's own numbers")
+	check(Rules.shortfalls(pose([0]))[0] == "一包 5 段，围巾的边要 11 段：还差 6 段，手上还能再拿 2 包。", "a lone package is named once, not as 「5 段 是 5 段」")
+	check(Rules.shortfalls(pose([2]))[0] == "一包 3 段，围巾的边要 11 段：还差 8 段，手上还能再拿 2 包。", "the 3-段 package alone keeps the same shape of sentence")
 	# ---- 拿包 / 退包 / 第四包 ----
 	var empty = pose([])
 	var first = Rules.take(empty, 0)
@@ -113,6 +136,9 @@ func run() -> void:
 	check("最多拿 3 包" in Rules.refusal(pose(OVER), 3), "the fourth package is refused out loud, in the shop's own words")
 	check(Rules.refusal(pose([0, 2]), 1).is_empty(), "a third package inside the limit is never refused")
 	check("退回柜面" in Rules.refusal(pose([0, 2]), 0), "pointing at a package already on the gauge says where to click instead")
+	check(fits_board(Rules.refusal(pose(OVER), 3)) and fits_board(Rules.refusal(pose([0, 2]), 0))
+		and fits_board(Rules.returned_line(pose([0, 2]), 0)),
+		"the two refusals and the take-back are each one line the board can hold")
 	check(Rules.take(empty, 5).is_empty() and Rules.take(empty, -2).is_empty(), "packages that are not on the counter cannot be taken")
 	check(Rules.take(pose([], "arrival"), 0).is_empty(), "nothing can be carried before the player walks in")
 	check(Rules.take(pose(WIN, "complete"), 4).is_empty(), "the counter is closed once the receipt is out")
@@ -258,6 +284,9 @@ func run() -> void:
 	check("10 段" in probe.status_line() and "还差 1 段" in probe.status_line(), "the status follows the laid segments")
 	probe.state = pose(WIN)
 	check("正好够" in probe.status_line(), "the status says 正好够 without grading the player")
+	probe.state = pose(OVER)
+	check("多出 2 段" in probe.status_line() and "-" not in probe.status_line(),
+		"13 段 on the gauge reads as 2 段 too many, never as a negative gap")
 	for beat in range(3):
 		probe.state = pose([], "arrival", 0, beat)
 		var text = probe.line()

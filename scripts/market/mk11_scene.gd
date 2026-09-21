@@ -70,16 +70,19 @@ func build() -> void:
 			add_hotspot("bench_%d" % index, world.bench_rect(index), do_cycle.bind(index),
 				"%s 还在台面：点一下请它上秤，先站到对面那盘（再点一次才是货盘）· 键盘 %d" % [weight_label, index + 1])
 		else:
+			# 键盘上把这一枚请回台面是 Q/W/E，跟点这一下是同一件事，就一并写出来。
 			add_hotspot("bench_%d" % index, world.bench_rect(index), do_return.bind(index),
-				"%s 正站在%s：点一下放回台面" % [weight_label, Rules.pan_name(standing)])
+				"%s 正站在%s：点一下放回台面 · 键盘 %s" % [weight_label, Rules.pan_name(standing), ["Q", "W", "E"][index]])
 		for side in [Rules.GOODS, Rules.FAR]:
 			if standing == side:
 				var onward = Rules.pan_name(Rules.NEXT[side])
 				add_hotspot("pan_%d_%d" % [side, index], world.pan_rect(side, index), do_cycle.bind(index),
 					"%s 正站在%s：再点一次挪去%s · 键盘 %d" % [weight_label, Rules.pan_name(side), onward, index + 1])
 			else:
+				# 这半句不写「键盘 %d」：数字键走的是 cycle 那一格一格的路，
+				# 砝码还搁在台面上时按 2 只会先把它请到对面那盘，不会请到这一格。
 				add_hotspot("pan_%d_%d" % [side, index], world.pan_rect(side, index), do_place.bind(index, side),
-					"这一格是留给%s的：点一下把它请上%s · 键盘 %d" % [weight_label, Rules.pan_name(side), index + 1])
+					"这一格是留给%s的：点一下把它请上%s" % [weight_label, Rules.pan_name(side)])
 
 # 抬秤之后的回执：只复述玩家真正摆出来的那两盘，不另立第二套说法。
 func receipt_lines() -> Array:
@@ -91,7 +94,10 @@ func receipt_lines() -> Array:
 	lines.append("这一坛抬过 %d 次秤" % state.weighs)
 	return lines
 
-func receipt_rect() -> Rect2: return Rect2(912, 176, 344, 232)
+# 验看单摊在右下角：左边那格原本压在第三辆油车上（那辆车画到 x 945、y 286.7…384.5，
+# 这块板是不透明底、又画在最后一层，收尾画面正好把车尾切掉一块），上边那格又盖住了
+# 台词板 184 那条下沿。挪到 950/200 起：离车尾 5 像素、离台词板的投影 9 像素，右沿仍停在 1256。
+func receipt_rect() -> Rect2: return Rect2(950, 200, 306, 232)
 func receipt_text_rect() -> Rect2:
 	var board = receipt_rect()
 	return Rect2(board.position + Vector2(16, 12), board.size - Vector2(30, 20))
@@ -104,7 +110,7 @@ func extra() -> void:
 	paper.add_theme_constant_override("line_spacing", 0)
 
 func exit_buttons() -> void:
-	# 从航图进来时宿主已经给出「返回集市航图」；直接启动本关样板时留一条回航图的路。
+	# 从航图进来时宿主已经给出「返回千灯航图」；直接启动本关样板时留一条回航图的路。
 	if origin != "hub": add_button("open_hub", "回千灯航图", Rect2(690, 646, 280, 54), go_hub)
 
 func snapshot(value: Dictionary) -> Dictionary:

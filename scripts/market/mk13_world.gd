@@ -128,7 +128,10 @@ func draw_scarf(texture: Texture2D) -> void:
 		draw_rect(Rect2(at, Vector2(maxf(1.0, pitch - 1.0), 5)), colour)
 		draw_rect(Rect2(at, Vector2(maxf(1.0, pitch - 1.0), 5)), colour.lightened(0.4), false, 1.0)
 	if done == Rules.NEED and state.worn == 1:
-		socket(hem.position + Vector2(hem.size.x / 2.0, 3), Vector2(34, 13), 0.26 + 0.18 * pulse())
+		# 这一圈是「看，边在这儿」，不是「点我」：story/complete 的柜面上再没有能点的格子，
+		# 会呼吸的光圈是别处一直在用的可点提示，挂在她脖子上只会让人去点围巾。
+		# 改成恒定的一层柔光，强调留着，假的可点暗示去掉。
+		socket(hem.position + Vector2(hem.size.x / 2.0, 3), Vector2(34, 13), 0.34)
 
 func draw_board() -> void:
 	var frame = board_frame()
