@@ -405,7 +405,8 @@ func play_flag_b() -> void:
 	await click("confirm")
 	check(Rules.packs_of(game.state.tray) == 0 and game.state.stock == [1, 4, 2] and game.state.chances == 0,
 		"重摆把四包放回台面：不发明货物，也不退还机会")
-	check(not game.buttons.has("plan"), "这里还剩得下二站的走法，就不催玩家回关前")
+	check(game.buttons.has("plan"),
+		"退回再腾开之后二站照样交得出去，可三站再没有不接大包的凑法：这一格就该催他回关前")
 	var rewound = game.state.duplicate(true)
 	await snap("b-04-reset-table")
 	await close_scene()

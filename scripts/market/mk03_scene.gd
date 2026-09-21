@@ -89,7 +89,7 @@ func cleared_state() -> Dictionary:
 func hint_texts() -> Array:
 	return ["同类封箱一样重，箱子不能拆开称。\n两份记录里都出现 1 红 1 蓝，那一部分叠起来就抵消了。",
 		"记录一 14 斤、记录二 13 斤：叠合消去 1 红 1 蓝之后，\n只剩 1 红 比 1 蓝 重 1 斤。",
-		"把记录一看成 1 红 +（1 红 1 蓝）：红箱比蓝箱重 1，\n14 斤就是 3 个蓝箱加 1 斤——蓝 4、红 5，两个钩子各挂一枚。"]
+		"把记录一的两只红箱都换成蓝箱：每只轻 1 斤，一共轻 2 斤，\n14 斤就是 3 个蓝箱加 2 斤——蓝 4、红 5，两个钩子各挂一枚。"]
 
 func do_fold() -> void:
 	place(Rules.unfold(state) if Rules.folded(state) else Rules.fold(state))

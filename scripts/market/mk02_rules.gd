@@ -70,6 +70,12 @@ static func shortfalls(state: Dictionary) -> Array:
 	if fruits_left(state) > 0: missing.append("货筐里还剩 %d 颗铜果没用：%d 颗才能换 %d 卷线。" % [fruits_left(state), GROUP, SPOOL_PER_GROUP])
 	return missing
 
+# 两条约定都是单向的：换出去的线退不回铜果，灯芯也退不回线卷，所以这条路上确实有走死的位置。
+# 交付架只放得下 5 根，第 6 根一旦换出来就永远留在台面上——「重摆」按契约不退还已经换好的组，
+# 撤销又只在本次开机内有效，所以走死时要如实给一条回本关开头的路，而不是把玩家钉在这里。
+static func stranded(state: Dictionary) -> bool:
+	return state.stage == "puzzle" and state.b > WICK_ORDER
+
 static func exchange(state: Dictionary, rule: int, times: int) -> Dictionary:
 	if state.stage != "puzzle" or not legal_exchange(state, rule, times): return {}
 	var next = state.duplicate(true)

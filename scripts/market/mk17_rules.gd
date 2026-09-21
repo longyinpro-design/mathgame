@@ -72,6 +72,17 @@ static func sum_packs(left: Array, right: Array) -> Array:
 	for kind in range(KINDS): out.append(left[kind] + right[kind])
 	return out
 
+# 这堆货拿不拿得出一组交货，以及拿出去之后还剩多少：推演只问这两句。
+static func fits_packs(pool: Array, packs: Array) -> bool:
+	for kind in range(KINDS):
+		if pool[kind] < packs[kind]: return false
+	return true
+
+static func without_packs(pool: Array, packs: Array) -> Array:
+	var out = []
+	for kind in range(KINDS): out.append(pool[kind] - packs[kind])
+	return out
+
 static func delivered_units(state: Dictionary) -> int:
 	var total = 0
 	for row in state.delivered: total += units_of(row)
@@ -120,14 +131,28 @@ static func station_of(state: Dictionary) -> int:
 	return state.station - 1
 
 # 二站收不收大包由开局固定的那面旗决定；玩家看到旗之前，这条约定其实已经成立。
-static func accepts_large(state: Dictionary, index: int) -> bool:
+static func large_ok(flag: int, index: int) -> bool:
 	if index == 2: return false
-	if index == 1: return state.flag == FLAG_A
+	if index == 1: return flag == FLAG_A
 	return true
 
+static func accepts_large(state: Dictionary, index: int) -> bool:
+	return large_ok(state.flag, index)
+
+# 每一站的合法交货组合只有这么几组：先按约定枚出来，判交货与往前推演都只看这一份表。
+static func delivery_options(index: int, allows_large: bool) -> Array:
+	var options: Array = []
+	if index < 0 or index >= KINDS: return options
+	for a in range(MAX_PACKS[index] + 1):
+		if not allows_large and a > 0: continue
+		for b in range(MAX_PACKS[index] - a + 1):
+			for c in range(MAX_PACKS[index] - a - b + 1):
+				if a + b + c == 0: continue
+				if units_of([a, b, c]) == DEMAND[index]: options.append([a, b, c])
+	return options
+
 static func rule_met(state: Dictionary, index: int, packs: Array) -> bool:
-	return units_of(packs) == DEMAND[index] and packs_of(packs) <= MAX_PACKS[index] \
-		and (accepts_large(state, index) or packs[LARGE] == 0)
+	return delivery_options(index, accepts_large(state, index)).has(packs)
 
 # 柜面上钉着的货单文字：翻旗之前二站把两种可能一并写出来，不藏。
 static func rule_caption(state: Dictionary, index: int) -> String:
@@ -273,38 +298,61 @@ static func solved(state: Dictionary) -> bool:
 	if index < 0 or index >= KINDS: return false
 	return shortfalls(state).is_empty()
 
-# ---- 还能不能办成这一站：只回答有解／无解，不指出解法、不高亮 ----
-static func reachable_pools(state: Dictionary) -> Array:
-	var seen: Array = []
-	var frontier = [sum_packs(state.stock, state.tray)]
-	for step in range(state.chances + 1):
+# ---- 还能不能办成：只回答有解／无解，不指出解法、不高亮 ----
+# 从这堆货出发能得到的每一堆，连着「最少花几次机会」一起给出来：同一堆在更少的次数里
+# 已经出现过就不再记第二次，往前推演时剩下的机会才算得准。
+static func pools_by_cost(pool: Array, chances: int) -> Array:
+	var rows = [[pool, 0]]
+	var frontier = [pool]
+	for cost in range(1, chances + 1):
 		var next_frontier: Array = []
-		for pool in frontier:
-			if seen.has(pool): continue
-			seen.append(pool)
-			if step >= state.chances: continue
+		for source in frontier:
 			for op in OPS:
 				var out = []
 				var ok = true
 				for kind in range(KINDS):
-					if pool[kind] < op.from[kind]: ok = false
-					out.append(pool[kind] - op.from[kind] + op.to[kind])
-				if ok and packs_of(out) <= MAX_EACH * KINDS: next_frontier.append(out)
+					if source[kind] < op.from[kind]: ok = false
+					out.append(source[kind] - op.from[kind] + op.to[kind])
+				if not ok or packs_of(out) > MAX_EACH * KINDS: continue
+				if pool_cost(rows, out) >= 0: continue
+				rows.append([out, cost]); next_frontier.append(out)
 		frontier = next_frontier
-	return seen
+		if frontier.is_empty(): break
+	return rows
 
+static func pool_cost(rows: Array, pool: Array) -> int:
+	for row in rows:
+		if row[0] == pool: return row[1]
+	return -1
+
+# 脚前这一站：只问这一站的货还凑不凑得出来，不管交完之后还剩几站。
 static func can_serve(state: Dictionary) -> bool:
 	var index = station_of(state)
 	if index < 0 or index >= KINDS: return false
-	for pool in reachable_pools(state):
-		for a in range(pool[LARGE] + 1):
-			for b in range(pool[MEDIUM] + 1):
-				for c in range(pool[SMALL] + 1):
-					if rule_met(state, index, [a, b, c]): return true
+	var options = delivery_options(index, accepts_large(state, index))
+	for row in pools_by_cost(sum_packs(state.stock, state.tray), state.chances):
+		for packs in options:
+			if fits_packs(row[0], packs): return true
 	return false
 
+# 剩下的每一站一起往前推演。只看脚前这一站会把「这一站照样交得出去、后面再也凑不齐」
+# 当成活路，玩家要走到下一站才听得见自己已经走死——首领的三次验货恰恰是连着的三站。
+static func plan_ok(flag: int, pool: Array, chances: int, index: int) -> bool:
+	if index < 0: return false
+	if index >= KINDS: return true
+	var options = delivery_options(index, large_ok(flag, index))
+	for row in pools_by_cost(pool, chances):
+		var left = chances - row[1]
+		for packs in options:
+			if not fits_packs(row[0], packs): continue
+			if plan_ok(flag, without_packs(row[0], packs), left, index + 1): return true
+	return false
+
+static func can_finish(state: Dictionary) -> bool:
+	return plan_ok(state.flag, sum_packs(state.stock, state.tray), state.chances, station_of(state))
+
 static func dead_end(state: Dictionary) -> bool:
-	return state.stage == "puzzle" and not can_serve(state)
+	return state.stage == "puzzle" and not can_finish(state)
 
 # ---- 幕的推进 ----
 static func book_delivery(state: Dictionary) -> Dictionary:

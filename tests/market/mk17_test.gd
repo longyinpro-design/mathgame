@@ -299,8 +299,17 @@ func run() -> void:
 	var alive = pose("puzzle", Rules.FLAG_B, 3, [2, 0, 0], Rules.empty_packs(), [[1, 1, 0], [0, 3, 1], [0, 0, 0]], 1)
 	check(not Rules.dead_end(alive) and Rules.can_serve(alive), "同样到三站、还剩 1 次机会就不是死局")
 	check(not Rules.dead_end(loads(Rules.apply_op(opened(Rules.FLAG_A), 0), [1, 1, 0])), "开局摆好一站不是死局")
-	check(not Rules.dead_end(pose("puzzle", Rules.FLAG_B, 2, [3, 1, 2], Rules.empty_packs(), [[1, 1, 0], [0, 0, 0], [0, 0, 0]], 1)),
-		"旗B 二站还剩一次机会时仍有路")
+	# 只看脚前这一站的判法会在这里给出假活路：二站照样交得出去，交完才发现三站再凑不齐。
+	var doomed = pose("puzzle", Rules.FLAG_B, 2, [3, 1, 2], Rules.empty_packs(), [[1, 1, 0], [0, 0, 0], [0, 0, 0]], 1)
+	check(Rules.can_serve(doomed) and not Rules.can_finish(doomed), "旗B 二站剩一次机会：二站交得出去，三站就没货了")
+	check(Rules.dead_end(doomed), "把剩下的站一起往前推，这一格当场就认死")
+	var wasted = Rules.apply_op(Rules.apply_op(Rules.apply_op(opened(Rules.FLAG_A), 0), 0), 0)
+	check(wasted.stock == [3, 3, 3] and wasted.chances == 0 and wasted.station == 1, "一站里把三次机会全花在同一个方向")
+	check(Rules.can_serve(wasted) and not Rules.can_finish(wasted), "一站交得出去、三站却办不成：本站的活路不算活路")
+	check(Rules.dead_end(wasted), "死局在摆上托盘之前就认出来，不用走到下一站")
+	check(Rules.can_finish(opened(Rules.FLAG_A)) and Rules.can_finish(opened(Rules.FLAG_B)),
+		"两面旗开局都还有路：死局是走出来的，不是发牌发出来的")
+	check(not Rules.dead_end(stage_pose("lift")), "不在码头上那一格，dead_end 不开口")
 	# ---- 撤销整站交货：货和幕一起回来，不发明货物 ----
 	var rewind = Rules.undeliver(stuck)
 	check(not rewind.is_empty() and rewind.station == 2 and rewind.tray == [0, 3, 1], "退回上一站：那四包回到托盘")
@@ -522,6 +531,11 @@ func run() -> void:
 	check(game.buttons.undo.disabled and "上一站的货不回收" in game.buttons.undo.tooltip_text,
 		"没有本站摆法时撤销不亮，说明里指清退的是哪一段")
 	check(game.buttons.has("reset") and game.buttons.has("hint"), "码头给得出「重摆」与「请扣扣提醒」")
+	# 一站上那两块牌子都还没画出来：撤销的说明不能指向玩家摸不到的地方。
+	game.apply_committed(opened(Rules.FLAG_A), []); ready_input(game)
+	check(not game.buttons.has("plan") and not game.buttons.has("rewind"), "一站既没有退整站、也还没走死")
+	check("退回上一站的货" not in game.buttons.undo.tooltip_text and "回到关前规划" not in game.buttons.undo.tooltip_text,
+		"没有那两块牌子时，撤销只说「先把货摆上托盘」")
 	# ---- 键盘层：牌上写的那颗键，按下去必须和点这一下做出同一个动作 ----
 	var told = 0
 	var mistaken = 0

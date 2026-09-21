@@ -38,7 +38,7 @@ func stage_labels() -> Dictionary:
 		"ready": "开始验货", "complete": "再巡一次"}
 
 func restart_prompt() -> Array:
-	return ["回到关前重新规划？\n三站的货与三次封装机会都回到开局，只重摆本关。", "留在码头", "回到关前规划"]
+	return ["回到关前重新规划？\n三站的货、三次机会都回到开局，旗也重新掷一面。", "留在码头", "回到关前规划"]
 func reset_prompt() -> Array:
 	return ["把托盘上的货放回台面？\n已经用掉的封装机会不会退回来。", "继续摆放", "货放回台面"]
 
@@ -135,8 +135,16 @@ func tune_undo() -> void:
 	if not buttons.has("undo"): return
 	var restorable = not history.is_empty() and Rules.can_restore(state, history.back())
 	buttons.undo.disabled = not restorable or transient > 0
-	buttons.undo.tooltip_text = "退回本站上一步摆法（已经花掉的封装机会跟着货一起退）" if restorable \
-		else "本站还没有摆过货：上一站的货不回收，要重来请用「退回上一站的货」或「回到关前规划」"
+	if restorable:
+		buttons.undo.tooltip_text = "退回本站上一步摆法（已经花掉的封装机会跟着货一起退）"
+		return
+	# 这句只指真摆在桌上的牌子：一站、二站没有「退回上一站的货」，没走死时也没有「回到关前规划」，
+	# 照着不存在的牌子去摸，玩家只会更确信是自己算错了。
+	var exits: Array = []
+	if Rules.has_previous_delivery(state): exits.append("退回上一站的货")
+	if Rules.dead_end(state): exits.append("回到关前规划")
+	buttons.undo.tooltip_text = "本站还没有摆过货：上一站的货不回收" + \
+		("，要重来请用「" + "」或「".join(exits) + "」" if not exits.is_empty() else "，先把货摆上托盘")
 
 func exit_buttons() -> void:
 	# 从航图进来的场合由宿主给出「返回千灯航图」；单独启动本关时也要有一条回去的路。

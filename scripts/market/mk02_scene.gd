@@ -37,7 +37,8 @@ func line() -> String:
 		"arrival": return LINES[state.beat]
 		"approach": return "两条约定就钉在柜面上，扣扣把货物一件件搬过来。"
 		"ready": return "只能整组兑换：一次 2 颗铜果，或者一次 2 卷线。"
-		"puzzle": return "换出来的货先堆在台面：灯芯上交付架，给扣扣的线挂上修补台。"
+		"puzzle": return "线退不回来了：交付架只放得下 %d 根灯芯，回本关开头重摆。"%Rules.RACK_SLOTS \
+			if Rules.stranded(state) else "换出来的货先堆在台面：灯芯上交付架，给扣扣的线挂上修补台。"
 		"exchanging": return "扣扣抱着货物一件件搬……这一组已经算进去了。"
 		"delivery": return "码头工：5 根灯芯到位！扣扣：这两卷线……真的是留给我的？"
 		"complete": return "小岚：说好的回礼，一卷都不能少。育苗铺的第一封回信寄出去了。"
@@ -66,6 +67,11 @@ func build() -> void:
 		# 量词跟着货走：本章通篇是 8 颗铜果、2 卷线，这里不能改口叫「个」。
 		UIStyle.text(ui,"%s %d %s · 可换 %d 组"%["铜果" if rule == 0 else "线卷",pool,
 			"颗" if rule == 0 else "卷",times],Rect2(x,608,198,32),16)
+	# 走死了才多出来的这一枚：不代解、不高亮，只把还回得去的那扇门摆出来（铜鹭巡守同款）。
+	if Rules.stranded(state):
+		var escape = add_button("plan","回本关开头",Rect2(1020,586,235,48),confirm_restart)
+		escape.tooltip_text = "换出去的线退不回铜果，灯芯也退不回线卷：从这一幕的开头重新兑换，不动其他关卡与森林岛进度"
+		escape.disabled = transient > 0
 
 func extra() -> void:
 	if state.stage != "complete": return

@@ -91,6 +91,7 @@ func run() -> void:
 		await click("next")
 		check(game.state.stage == "puzzle" and game.world.parts.has("copper_fruit"),"kit-v1 parts are loaded with the table")
 		check(game.buttons.rack_0.size.x >= 48 and game.buttons.hook_0.size.y >= 48,"drop targets keep the 48 pixel logical floor")
+		check(not game.buttons.has("plan"),"台面还没走死，底栏不给那枚回本关开头的牌子")
 		check(game.world.scale.x > 1.09,"the camera is already at the counter when the player takes over")
 		check("第1位" in game.buttons.rack_0.tooltip_text and "第6位" in game.buttons.hook_0.tooltip_text
 			and "第7位" in game.buttons.hook_1.tooltip_text,
@@ -133,7 +134,19 @@ func run() -> void:
 		check(game.state.hook == [0,0],"nothing hangs when the line has all become wicks")
 		await click("deliver")
 		check(game.state.stage == "puzzle" and "捆货绳" in game.message,"the unmet promise is named before the hand-over")
+		# 换出去的线退不回来：这一格起玩家只能回本关开头，所以这条出路必须看得见、也按得动。
+		check(Rules.stranded(game.state),"六根灯芯一换出来，规则就认这是走死了")
+		check(game.buttons.has("plan") and not game.buttons.plan.disabled,"走死之后底栏给出回本关开头的那枚牌子")
+		check(game.buttons.plan.size.x >= 48 and game.buttons.plan.size.y >= 48,"那枚牌子也不低于 48 像素的触点下限")
+		var escape_rect = game.buttons.plan.get_global_rect()
+		check(escape_rect.position.x >= 0 and escape_rect.end.x <= 1280 and escape_rect.end.y <= 640,
+			"那枚牌子整块落在设计画幅里，也不压住底栏")
+		check(spilled_labels() == 0,"走死那句话没有爬出牌板")
 		await capture(prefix+"05-all-line-trap")
+		await click("plan")
+		check(game.modal and "重新体验" in game.buttons.confirm.text,"回本关开头之前先问一句")
+		await click("cancel")
+		check(not game.modal and game.state.a == 4 and game.state.b == 6,"取消之后一货未动，撤销的路还在")
 		for n in range(6): await key(KEY_Z)
 		check(game.state.a == 4 and game.state.b == 0 and game.state.rack.count(1) == 0,"six undos rewind the trap to twelve spools")
 		await key(KEY_Z)

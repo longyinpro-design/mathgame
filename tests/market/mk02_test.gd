@@ -137,6 +137,11 @@ func run() -> void:
 	check(game.state.stage == "puzzle" and "还有 1 处" in game.message,"the trap explains what is still missing")
 	game.hint(); game.hint(); game.hint()
 	check(game.state.hint == 3 and "留 2 卷给扣扣" in game.message,"the third hint gives the whole split")
+	# 两条约定都是单向的：这六根灯芯退不回线卷，重摆又按契约不退还已换好的组。
+	check(Rules.stranded(game.state),"六根灯芯换出来，规则认这是走死了")
+	check(game.buttons.has("plan"),"走死时台面上多出一枚回本关开头的牌子")
+	check(not Rules.stranded(build(4,5,31,3)),"少换一组就不算走死：五根灯芯加两卷线正是回礼")
+	check(not Rules.stranded(build(3,4,7,0)),"线还够挂的中间摆法不算走死")
 	for step in range(12):
 		if game.history.is_empty(): break
 		game.undo(); await create_timer(0.4).timeout
