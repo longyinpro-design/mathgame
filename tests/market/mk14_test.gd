@@ -1,20 +1,33 @@
 extends SceneTree
-# MK14 三枚砝码的小摊：无头规则、存档与真实场景检查。
+# MK14 三枚砝码的小摊 v2：无头规则、存档与真实场景检查。
 # 运行：godot --headless --path . --script tests/market/mk14_test.gd
+# 本关的新规矩只有一条：头一单的摆法随便摆，往后每一单只能从上一单记进账里的那一式挪一枚砝码。
+# 所以检查的重心不在「这一式配不配得平」，而在「哪一单能走在中间」：
+# 三单接成链一共 6 条顺序，走得完的只有 4→13→7 与 7→13→4；其余四条分别死在交完第一单或第二单之后。
 const Rules = preload("res://scripts/market/mk14_rules.gd")
 const Catalog = preload("res://scripts/market/chapter_catalog.gd")
 const Content = preload("res://scripts/content/content_catalog.gd")
 const Bridge = preload("res://scripts/market/market_bridge.gd")
 const Scene = preload("res://game/market_mk14.tscn")
-# 只在检查里对照第五幕那具铜秤的组装约定：本关运行时不依赖 MK11 的任何文件。
-const MK11World = preload("res://scripts/market/mk11_world.gd")
+const Level = preload("res://scripts/market/mk14_scene.gd")
+const World = preload("res://scripts/market/mk14_world.gd")
+const UIStyle = preload("res://scripts/cargo/skin.gd")
 const SAVE_DEFAULT = "user://profiles/market-mk14-1/save-v1.json"
-# 两单的参考摆法（下标 0/1/2 对应 1/3/9 三枚砝码）：
-# 5 = 货 + 3 + 1 对 9；8 = 货 + 1 对 9。同一具秤、同样三枚，只挪不换。
-const FIVE_GOODS = [1, 1, 0]
-const FIVE_FAR = [0, 0, 1]
-const EIGHT_GOODS = [1, 0, 0]
-const EIGHT_FAR = [0, 0, 1]
+# 订单下标：0=4 单位、1=7 单位、2=13 单位。三进制让每一单都只有一种摆法。
+const FOUR = 0
+const SEVEN = 1
+const THIRTEEN = 2
+const WIN_A = [FOUR, THIRTEEN, SEVEN]
+const WIN_B = [SEVEN, THIRTEEN, FOUR]
+const DEAD_A = [THIRTEEN, FOUR]
+const DEAD_B = [THIRTEEN, SEVEN]
+const HALF_A = [FOUR, SEVEN]
+const HALF_B = [SEVEN, FOUR]
+const BEAT_DONE = 2
+# 抬秤之后没配平的那一式：对面只有 9，货盘压着 4 单位的货与 1、3——两盘差 2 单位。
+const OFF_BALANCE = {"goods": [1, 1, 0], "far": [0, 0, 1]}
+const DEAD_LINE = "三单里只剩 7 单位那一单，可从 4 单位记下的摆法起，两枚砝码都得动。\n" \
+	+ "要接着走下去，就按「重摆」把三枚放回架上，从头挑一单。"
 var checks = 0
 var failures = 0
 var path = "/tmp/pixel-mk14-rules-" + str(Time.get_ticks_usec()) + ".json"
@@ -26,684 +39,754 @@ func check(ok: bool, label: String) -> void:
 	if not ok: failures += 1; push_error(label)
 	else: print("PASS ", label)
 
-# 手工拼一份现场：非 arrival 幕必须已经听完三句台词，与 advance 的走位一致。
-# "complete" 一栏永远是那两笔记完账的真摆法，因为完成态的定义就是「两单都记下了」。
-func pose(goods: Array, far: Array, stage: String = "puzzle", order: int = 0) -> Dictionary:
-	var value = Rules.fresh()
-	value.stage = stage; value.beat = 2
-	value.goods = goods.duplicate(); value.far = far.duplicate()
-	value.order = order; value.delivered = order
-	if stage not in ["arrival", "approach", "ready"]: value.weighs = 1
-	if order > 0:
-		value.built_goods[0] = FIVE_GOODS.duplicate(); value.built_far[0] = FIVE_FAR.duplicate()
-	if stage == "complete":
-		value.built_goods[0] = FIVE_GOODS.duplicate(); value.built_far[0] = FIVE_FAR.duplicate()
-		value.built_goods[1] = EIGHT_GOODS.duplicate(); value.built_far[1] = EIGHT_FAR.duplicate()
-		value.order = 1; value.delivered = 2
-		value.goods = EIGHT_GOODS.duplicate(); value.far = EIGHT_FAR.duplicate()
-	return value
-
-func named(lines: Array, word: String) -> bool:
-	for line in lines:
-		if word in line: return true
-	return false
-
-func settle(game: Node) -> void:
-	game.transient = 0.0
-	game.refresh()
-
-# 「· 键盘 X」这半句是热点对自己说的话：按那个键要做出跟点这下一模一样的动作才算数，
-# 否则玩家照着提示按键，等来的却是把砝码请到另一头。逐条按键与点击各演一遍，比状态。
-func advertised_audit(game: Node, ids: Array) -> Array:
-	var advertised = {"1": KEY_1, "2": KEY_2, "3": KEY_3}
-	var told = 0
-	var lied = 0
-	for id in ids:
-		var before = game.state.duplicate(true); var book = game.history.duplicate(true)
-		settle(game)
-		var tip: String = game.buttons[id].tooltip_text
-		var at = tip.find("键盘 ")
-		if at < 0: continue
-		told += 1
-		var key = advertised.get(tip.substr(at + 3).strip_edges(), -1)
-		if key == -1:
-			lied += 1; print("UNKNOWN key advertised by ", id, ": ", tip)
-		else:
-			for conn in game.buttons[id].get_signal_connection_list("pressed"):
-				conn["callable"].call()
-			var by_click = game.state.duplicate(true)
-			game.apply_committed(before, book); settle(game)
-			game.handle_key(int(key))
-			var by_key = game.state.duplicate(true)
-			game.apply_committed(before, book); settle(game)
-			if by_click != by_key:
-				lied += 1
-				print("KEY MISMATCH ", id, " tip 「", tip, "」 click ", by_click, " key ", by_key)
-	return [told, lied]
-
-# 用真动作把现场摆成指定那一式：摆不出来就说明这一步玩家根本点不到。
-func walk_to(goods: Array, far: Array) -> Dictionary:
-	var value = pose(Rules.empty_pan(), Rules.empty_pan())
+# 独立算一遍「两单的摆法之间挪了几枚」：不复用 Rules.moved_indices，免得把同一份代码验两遍。
+func moved_apart(units_from: int, units_to: int) -> int:
+	var from := {}
+	var to := {}
+	for spot in Rules.placements():
+		if Rules.balances(spot.goods, spot.far, units_from): from = spot
+		if Rules.balances(spot.goods, spot.far, units_to): to = spot
+	var hit := 0
 	for index in range(Rules.COUNT):
-		var side: int = Rules.OFF
-		if goods[index] == 1: side = Rules.GOODS
-		elif far[index] == 1: side = Rules.FAR
-		if side == Rules.OFF: continue
-		value = Rules.place_weight(value, index, side)
+		if from.goods[index] != to.goods[index] or from.far[index] != to.far[index]: hit += 1
+	return hit
+
+func arrangement(units: int) -> Dictionary:
+	var found: Array = Rules.arrangements_for(units)
+	return found[0] if found.size() == 1 else {}
+
+# 手工拼一份现场：账上的每一式都由那一单唯一的摆法算出来，非 arrival 幕一律算走完三句台词。
+func pose(stage: String, sequence: Array = [], order: int = Rules.NONE, goods: Array = [],
+		far: Array = [], weighs: int = 0, hint: int = 0, beat: int = BEAT_DONE) -> Dictionary:
+	var value = Rules.fresh()
+	value.stage = stage; value.beat = beat; value.hint = hint; value.weighs = weighs
+	value.order = order
+	value.goods = Rules.empty_pan() if goods.is_empty() else goods.duplicate(true)
+	value.far = Rules.empty_pan() if far.is_empty() else far.duplicate(true)
+	value.served = sequence.duplicate(true)
+	var built_goods = Rules.empty_records()
+	var built_far = Rules.empty_records()
+	for index in sequence:
+		var spot = arrangement(Rules.ORDERS[index])
+		built_goods[index] = spot.goods.duplicate(true)
+		built_far[index] = spot.far.duplicate(true)
+	value.built_goods = built_goods; value.built_far = built_far
 	return value
+
+func pan_of(sequence: Array, step: int) -> Array:
+	var spot = arrangement(Rules.ORDERS[sequence[step]])
+	return [spot.goods, spot.far]
+
+var typeface: FontFile
+func width_of(text: String, size_px: int) -> float:
+	if typeface == null: typeface = UIStyle.face()
+	var widest := 0.0
+	for line in text.split("\n"):
+		widest = maxf(widest, typeface.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, UIStyle.text_size(size_px)).x)
+	return widest
+
+# 台词板内框 798、20 号字：一长串汉字在 Godot 里是一个不断词，多一个字就整句画到板外。
+func fits_board(text: String) -> bool: return width_of(text, 20) <= 798.0
+# 回执纸内框 276、16 号字，同一道理。
+func fits_paper(text: String) -> bool: return width_of(text, 16) <= 276.0
+
+func perm(list: Array) -> Array:
+	if list.size() <= 1: return [list.duplicate(true)]
+	var out := []
+	for at in range(list.size()):
+		var rest: Array = list.duplicate(true)
+		var head: int = rest.pop_at(at)
+		for tail in perm(rest):
+			var line: Array = tail.duplicate(true)
+			line.push_front(head)
+			out.append(line)
+	return out
+
+func write_save(value: Dictionary) -> void:
+	var writer = FileAccess.open(path, FileAccess.WRITE)
+	writer.store_string(JSON.stringify(value))
+	writer.close()
+
+func reopen(paused: bool = true) -> Variant:
+	var game = Scene.instantiate(); game.save_path = path; game.paused = paused
+	root.add_child(game)
+	return game
 
 func run() -> void:
-	create_timer(60).timeout.connect(func(): push_error("MK14 rule watchdog"); quit(1))
-	# ---- 开局：状态是常量，不是巧合 ----
+	create_timer(90).timeout.connect(func(): push_error("MK14 rule watchdog"); quit(1))
+	# ---- 开局存档与公开常量 ----
 	check(Rules.validate(Rules.fresh()), "fresh model valid")
 	check(Rules.fresh().sample == "market-mk14-1", "fresh carries the mk14 sample id")
-	check(Rules.fresh().stage == "arrival" and Rules.fresh().beat == 0, "fresh opens at the street mouth")
-	check(Rules.fresh().order == 0 and Rules.fresh().delivered == 0, "fresh opens before the first order")
-	check(Rules.fresh().goods == [0, 0, 0] and Rules.fresh().far == [0, 0, 0], "fresh leaves all three weights on the rack")
-	check(Rules.fresh().built_goods == [[0, 0, 0], [0, 0, 0]], "fresh books no arrangement yet")
-	check(Rules.fresh().weighs == 0 and Rules.fresh().hint == 0, "fresh has lifted no beam and used no hint")
-	check(Rules.WEIGHTS == [1, 3, 9] and Rules.WEIGHT_TOTAL == 13, "the rack lends 1, 3 and 9 only")
-	check(Rules.ORDERS == [5, 8], "the two new orders are 5 then 8 units")
-	check(Rules.COUNT == 3 and Rules.WEIGHT_KITS.size() == 3, "three physical weights, three kit parts, no fourth")
-	check(Rules.CARTS == ["cart_left", "cart_middle", "cart_right"], "the two orders and the hand-off use the kit's three carts")
+	check(Rules.fresh().stage == "arrival" and Rules.fresh().beat == 0, "fresh opens on the three of them talking, not on a scale")
+	check(Rules.fresh().order == Rules.NONE, "fresh has taken no order: all three carts are still in the street")
+	check(Rules.fresh().served.is_empty(), "fresh has booked nothing: the chain starts with the player's first pick")
+	check(Rules.fresh().goods == Rules.empty_pan() and Rules.fresh().far == Rules.empty_pan(), "all three weights start on the rack")
+	check(Rules.fresh().weighs == 0 and Rules.fresh().hint == 0, "fresh opens without a lifted beam or a used hint")
+	check(Rules.WEIGHTS == [1, 3, 9] and Rules.COUNT == 3, "the stall lends exactly the ternary set 1、3、9")
+	check(Rules.ORDERS == [4, 7, 13], "the street brings 4、7、13 单位, and 13 is the one that must sit in the middle")
+	check(Rules.ORDER_TAGS == ["桥头灯行", "中街油铺", "河下米行"], "each order carries its own buyer")
+	check(Rules.CARTS.size() == Rules.ORDERS.size(), "one cart per order — the manifest's three anchors are exactly enough")
+	check(Rules.ORDER_KITS == ["parcel_small", "parcel_medium", "parcel_large"], "the parcels grow with the units they hold")
+	check(Rules.WEIGHT_KITS == ["weight_small", "weight_hex", "weight_stepped"], "the three weights keep MK11's shapes")
+	check(Rules.NEXT == [Rules.FAR, Rules.OFF, Rules.GOODS], "one click steps 架上 → 对面那盘 → 货盘 → 架上")
+	check(Rules.BEATS == 3 and Rules.HINT_TIERS == 3 and Rules.FULL_TILT == 3, "three lines, three hints, three units to sink the beam")
 	check(Rules.STAGES == ["arrival", "approach", "ready", "puzzle", "weighing", "result", "delivery", "complete"],
-		"stage list matches the shipped beats")
-	check(Rules.ANIMATIONS == ["approach", "weighing", "delivery"], "only the three transitions animate")
-	# ---- 数学：同一组砝码配平两单，且每一单只有一解 ----
-	check(Rules.balances(FIVE_GOODS, FIVE_FAR, 5), "5 + 3 + 1 = 9 balances the first order")
-	check(Rules.balances(EIGHT_GOODS, EIGHT_FAR, 8), "8 + 1 = 9 balances the second order")
-	check(Rules.arrangements_for(5).size() == 1 and Rules.arrangements_for(8).size() == 1,
-		"each order has exactly one arrangement with these three weights")
-	check(Rules.arrangements_for(5)[0].goods == FIVE_GOODS and Rules.arrangements_for(8)[0].goods == EIGHT_GOODS,
-		"the shipped reference arrangements are the unique ones")
-	check(Rules.placements().size() == 27 and Rules.span_units() == range(1, 14),
-		"27 placements span 1..13 with one arrangement each")
-	check(Rules.spans_all(), "1..13 are all solvable, so the receipt line about it is the truth")
-	var one_pan := Rules.one_pan_sums()
-	check(one_pan == [0, 1, 3, 4, 9, 10, 12, 13], "one-pan readings only reach the subset sums of 1/3/9")
-	check(not one_pan.has(5) and not one_pan.has(8), "neither order can be made by piling weights on one pan")
-	check(Rules.arrangement_caption(5) == "货 5 + 砝码 3 + 砝码 1 = 砝码 9", "the third hint reads its wording out of the math")
-	check("配不出来" in Rules.arrangement_caption(14), "an amount these weights cannot make says so")
-	# ---- 真动作：一枚砝码在三个去处之间走 ----
-	var empty := pose(Rules.empty_pan(), Rules.empty_pan())
-	check(Rules.side_of(empty, 0) == Rules.OFF, "a fresh weight stands on the rack")
-	var to_far := Rules.place_weight(empty, 1, Rules.FAR)
-	check(Rules.side_of(to_far, 1) == Rules.FAR and to_far.goods[1] == 0, "a weight can be asked onto the far pan")
-	var to_goods := Rules.place_weight(to_far, 1, Rules.GOODS)
-	check(Rules.side_of(to_goods, 1) == Rules.GOODS and to_goods.far[1] == 0,
-		"the same weight crosses the beam instead of being duplicated")
-	check(Rules.place_weight(to_goods, 1, Rules.GOODS).is_empty(), "a weight already on that pan is not booked twice")
-	check(Rules.return_weight(to_goods, 1).goods[1] == 0, "a weight goes back to the rack")
-	check(Rules.return_weight(Rules.return_weight(to_goods, 1), 1).is_empty(), "an empty rack slot gives nothing back")
-	check(Rules.cycle(empty, 0).far[0] == 1, "the first click lends the weight to the far pan")
-	check(Rules.side_of(Rules.cycle(Rules.cycle(empty, 0), 0), 0) == Rules.GOODS, "the second click brings it to the goods pan")
-	check(Rules.side_of(Rules.cycle(Rules.cycle(Rules.cycle(empty, 0), 0), 0), 0) == Rules.OFF, "the third click puts it back on the rack")
-	check(Rules.cycle(empty, 3).is_empty() and Rules.cycle(empty, -1).is_empty(), "a fourth weight does not exist to be moved")
-	check(Rules.place_weight(empty, 0, Rules.OFF).is_empty(), "the rack is not a pan to place a weight on")
-	check(Rules.place_weight(empty, 0, 7).is_empty(), "a pan that is not there refuses the weight")
-	check(Rules.place_weight(pose(Rules.empty_pan(), Rules.empty_pan(), "arrival"), 0, Rules.FAR).is_empty(),
-		"nothing can be placed before the player walks in")
-	check(Rules.place_weight(pose(Rules.empty_pan(), Rules.empty_pan(), "ready"), 0, Rules.FAR).is_empty(),
-		"the rack stays shut until the table opens")
-	check(Rules.place_weight(pose(FIVE_GOODS, FIVE_FAR, "weighing"), 0, Rules.GOODS).is_empty(),
-		"no weight moves while the beam is lifted")
-	check(Rules.place_weight(pose(FIVE_GOODS, FIVE_FAR, "complete"), 0, Rules.GOODS).is_empty(),
-		"the stall is closed once both orders are booked")
-	check(walk_to(FIVE_GOODS, FIVE_FAR).goods == FIVE_GOODS, "the reference arrangement is reachable by clicking")
-	check(walk_to(EIGHT_GOODS, EIGHT_FAR).far == EIGHT_FAR, "the second reference arrangement is reachable too")
-	check(Rules.next_side(empty, 0) == Rules.FAR and Rules.next_side(to_far, 1) == Rules.GOODS,
-		"the tooltip knows where each weight goes next")
-	# ---- 提交闸口与如实回话 ----
-	check(Rules.shortfalls(empty).size() == 1 and "架上" in Rules.shortfalls(empty)[0],
-		"an all-on-rack submit is refused and names what is still missing")
-	check(Rules.ready_to_weigh(pose([0, 0, 0], [0, 0, 1])) and not Rules.ready_to_weigh(empty),
-		"the gate only asks for a first weight, never for correctness")
-	var naive := pose(Rules.empty_pan(), [1, 1, 0])
-	check(Rules.difference(naive) == -1, "the naive one-pan 5 leaves the goods pan heavier by one")
-	check(not Rules.solved(naive), "the naive one-pan 5 is not solved")
-	check(Rules.result_lines(naive).size() == 2, "the refusal says which pan sank and which promise is unmet")
-	check(Rules.heavier_word(naive) == "货盘这一头", "the beam names the goods pan as the heavy side")
-	check("5 单位" in Rules.promise_line(naive) and "差 1 单位" in Rules.promise_line(naive),
-		"the refusal quotes the 5-unit promise and the one-unit gap the player made")
-	check(Rules.result_lines(pose(FIVE_GOODS, FIVE_FAR)).is_empty(), "a balanced order is given no refusal at all")
-	check(Rules.solved(pose(FIVE_GOODS, FIVE_FAR)) and Rules.solved(pose(EIGHT_GOODS, EIGHT_FAR, "puzzle", 1)),
-		"both orders read as solved with the same three weights")
-	check(Rules.tilt(pose([1, 1, 1], Rules.empty_pan())) == -1.0, "an over-loaded goods pan bottoms the beam out")
-	# ---- 幕的推进：两单连着走 ----
-	var arriving := Rules.advance(Rules.fresh())
+		"stage list is the walk-in, the carts, the scale, the beam and the receipt")
+	check(Rules.ANIMATIONS == ["approach", "weighing", "delivery"], "only the walk-in, the lift and the hand-over animate")
+	# ---- 数学：每一单只有一解，两单之间挪几枚是定死的事实 ----
+	check(Rules.spans_all(), "1 至 13 每一单都只有一种摆法配得平，而且各只一种")
+	for units in Rules.ORDERS:
+		check(Rules.arrangements_for(units).size() == 1, "%d 单位 has exactly one arrangement" % units)
+	check(Rules.moved_indices(4, 13) == [2], "4 → 13 moves only the 9, off the rack")
+	check(Rules.moved_indices(13, 7) == [1], "13 → 7 moves only the 3, across the beam")
+	check(Rules.moved_indices(7, 13) == [1], "and back it is the same single weight")
+	check(Rules.moved_indices(13, 4) == [2], "13 → 4 is one weight too")
+	check(Rules.moved_indices(4, 7) == [1, 2], "4 → 7 would move two — this level's trap")
+	check(Rules.moved_indices(7, 4) == [1, 2], "and 7 → 4 the same two")
+	var disagree := 0
+	for a in Rules.ORDERS:
+		for b in Rules.ORDERS:
+			if a == b: continue
+			if moved_apart(a, b) != Rules.moved_indices(a, b).size(): disagree += 1
+	check(disagree == 0, "moved_indices agrees with an independent scan over all 27 placements")
+	check(Rules.one_move(4, 13) and Rules.one_move(13, 4) and Rules.one_move(13, 7) and Rules.one_move(7, 13),
+		"13 is one weight away from both of the other two")
+	check(not Rules.one_move(4, 7) and not Rules.one_move(7, 4), "the two nearest-looking orders are the farthest apart by weights")
+	check(Rules.distant_pair() == [4, 7, 2], "the receipt names the 4-vs-7 pair and the two weights it costs")
+	check(Rules.distant_line() == "4 与 7 只差 3 单位，却要动两枚砝码", "and states it as arithmetic, not as a hint")
+	# ---- 六条顺序：走得完的只有两条 ----
+	var finished := []
+	var broken := []
+	for order in perm([FOUR, SEVEN, THIRTEEN]):
+		var got = Rules.serve_orders(order)
+		if not got.is_empty() and got.stage == "complete": finished.append(order)
+		else: broken.append(order)
+	check(finished.size() == 2, "exactly 2 of the 6 orders the player could pick run all the way through")
+	check(finished == [WIN_A, WIN_B], "and they are 4→13→7 and 7→13→4: 13 has to be the middle order")
+	check(broken.size() == 4, "the other four break the one-weight chain")
+	# 从 13 开局的两条：前两单都兑得出去，死的是第三单——所以拿不到 complete，而不是走不动。
+	for seq in [DEAD_A, DEAD_B]:
+		var stalled = Rules.serve_orders(seq)
+		check(not stalled.is_empty() and stalled.served == seq and stalled.stage != "complete",
+			"%s gets two orders out and dies on the third" % str(seq))
+		check(Rules.stuck(stalled), "and the stall is reported as stuck, not as an unsolved puzzle")
+	# 4 与 7 互为前后单：第二单当场就写不进账，压根到不了抬秤那一步。
+	for seq in [HALF_A, HALF_B]:
+		check(Rules.serve_orders(seq).is_empty(), "%s is refused at the second pick: two weights is not one move" % str(seq))
+	check(not Rules.serve_orders([THIRTEEN, FOUR]).is_empty() and not Rules.serve_orders([THIRTEEN, SEVEN]).is_empty(),
+		"starting from 13 still gets two orders out — it only dies on the third")
+	check(not Rules.serve_orders([FOUR, THIRTEEN]).is_empty() and not Rules.serve_orders([SEVEN, THIRTEEN]).is_empty(),
+		"the two winning chains both survive their first two steps")
+	check(Rules.serve_orders([]) == pose_open(), "an empty sequence is just the open counter")
+	# ---- 记账与迁移：回执上那几行全部来自真账 ----
+	var book = Rules.serve_orders(WIN_A)
+	check(book.served == WIN_A and Rules.delivered(book) == 3, "the ledger keeps the order the player actually served")
+	check(Rules.migration_parts(book) == ["起手 4 单位：对面 3、1 · 架上 9",
+		"4 → 13：只挪 9（架上→对面）", "13 → 7：只挪 3（对面→货盘）"],
+		"the migration restates each step as the weight the player moved, and where it went")
+	var other = Rules.serve_orders(WIN_B)
+	check(Rules.migration_parts(other)[0] == "起手 7 单位：对面 9、1 · 货盘 3", "the other chain starts from 7's own arrangement")
+	check(Rules.migration_parts(other)[1] == "7 → 13：只挪 3（货盘→对面）", "and moves the 3 back across the beam")
+	check(Rules.migration_parts(pose("puzzle")) == [], "nothing has been booked yet, so there is nothing to restate")
+	var crowded := 0
+	for sequence in [WIN_A, WIN_B]:
+		for line in Rules.migration_parts(Rules.serve_orders(sequence)):
+			if not fits_paper(line): crowded += 1
+	check(crowded == 0, "every migration line fits the receipt paper")
+	check(fits_paper(Rules.distant_line()) and fits_paper("1 至 13 每单只一解"), "the two closing lines fit the paper too")
+	# ---- 挑单：三辆车都是入口 ----
+	var open_counter = pose("puzzle")
+	check(Rules.can_choose(open_counter, FOUR) and Rules.can_choose(open_counter, THIRTEEN),
+		"the open counter lets any of the three carts be picked")
+	var took = Rules.choose(open_counter, THIRTEEN)
+	check(not took.is_empty() and took.order == THIRTEEN and open_counter.order == Rules.NONE,
+		"picking a cart is a real move: 13 单位的货被搬上货盘")
+	check(Rules.cargo_units(took) == 13 and Rules.cargo_on_pan(took), "the picked order's units are the ones压在盘上")
+	check(Rules.choose(open_counter, FOUR) != open_counter, "choosing is not a no-op")
+	check(Rules.choose(open_counter, 3).is_empty() and Rules.choose(open_counter, -1).is_empty(),
+		"a cart that is not in the street cannot be picked")
+	check(Rules.choose(pose("arrival"), FOUR).is_empty() and Rules.choose(pose("ready"), FOUR).is_empty(),
+		"nothing can be picked before the player reaches the stall")
+	check(Rules.choose(pose("weighing", [], FOUR, arrangement(4).goods, arrangement(4).far, 1), SEVEN).is_empty(),
+		"the beam cannot be lifted over a second order")
+	check(Rules.choose(book, FOUR).is_empty(), "the stall is closed once the receipt is out")
+	var one_booked = pose("puzzle", [FOUR], Rules.NONE, arrangement(4).goods, arrangement(4).far, 1)
+	check(Rules.choose(one_booked, FOUR).is_empty(), "an order already handed over is not on the street any more")
+	check(not Rules.choose(one_booked, SEVEN).is_empty() and not Rules.choose(one_booked, THIRTEEN).is_empty(),
+		"the other two carts are still there to pick")
+	check(Rules.choose(one_booked, FOUR).is_empty() and not Rules.is_served(pose("puzzle"), FOUR),
+		"the ledger decides which cart is empty, not the picture")
+	check(Rules.is_served(one_booked, FOUR) and Rules.remaining(one_booked) == [SEVEN, THIRTEEN],
+		"what is left in the street is read off the ledger")
+	check(Rules.remaining_units(one_booked) == [7, 13], "and stated in units")
+	# ---- 只许挪一枚：本关的规矩本身 ----
+	var picked = Rules.choose(open_counter, FOUR)
+	var first_lift = Rules.place_weight(picked, 2, Rules.FAR)
+	check(not first_lift.is_empty() and Rules.moved_count(first_lift) == 0,
+		"the first order has no baseline yet: everything is free to move")
+	check(Rules.baseline(open_counter).is_empty() and Rules.baseline_caption(open_counter).is_empty(),
+		"and with no booked arrangement the plaque above the beam has nothing to state")
+	var booked_pans = pose("puzzle", [FOUR], Rules.NONE, arrangement(4).goods, arrangement(4).far, 1)
+	check(Rules.moved_count(booked_pans) == 0 and Rules.can_touch(booked_pans, 0),
+		"right after a hand-over the pans hold the booked arrangement and every weight is free")
+	check(Rules.baseline_caption(booked_pans) == "4 单位的摆法：对面 3、1 · 架上 9",
+		"the plaque states the booked arrangement in the weights, not as an answer")
+	var second = Rules.choose(booked_pans, THIRTEEN)
+	var nudged = Rules.place_weight(second, 2, Rules.FAR)
+	check(not nudged.is_empty() and Rules.moved_count(nudged) == 1, "one weight off the rack is a legal second order")
+	check(Rules.touch_refusal(nudged, 1) == "9 单位那一枚已经挪过了：一单只许挪一枚，先把它挪回原处。",
+		"reaching for a second weight is refused by naming the one already moved, in this level's own words")
+	check(Rules.touch_refusal(nudged, 2).is_empty(), "the weight already moved is never refused")
+	check(not Rules.can_touch(nudged, 0) and not Rules.can_touch(nudged, 1), "the two untouched weights are locked out")
+	check(Rules.can_touch(nudged, 2), "and the one already moved stays movable — putting it back is not a second move")
+	check(Rules.place_weight(nudged, 1, Rules.GOODS).is_empty(), "the 3 cannot join the scale while the 9 is the moved one")
+	check(Rules.return_weight(nudged, 2).far == [1, 1, 0], "taking that one weight back leaves 4's arrangement intact")
+	var reopened = Rules.return_weight(nudged, 2)
+	check(not reopened.is_empty() and Rules.moved_count(reopened) == 0, "one step back reopens the choice")
+	check(not Rules.place_weight(reopened, 1, Rules.GOODS).is_empty(),
+		"putting that one weight back reopens the choice: any of the three may go up again")
+	check(Rules.cycle(second, 2) == nudged, "one click on the rack steps the chosen weight onto the far pan")
+	var stepped = Rules.cycle(nudged, 2)
+	check(stepped.goods[2] == 1 and stepped.far[2] == 0, "the next click steps it across to the goods pan")
+	check(Rules.cycle(stepped, 2).goods[2] == 0, "and the third puts it back on the rack")
+	var forced = Rules.arrange(second, arrangement(13).goods, arrangement(13).far)
+	check(not forced.is_empty() and Rules.moved_count(forced) == 1, "13 is reachable from 4: one weight, the 9")
+	check(Rules.arrange(second, arrangement(7).goods, arrangement(7).far).is_empty(),
+		"7 is not: two weights away, so the helper is gated by the same validate")
+	check(not Rules.within_one_move(pose("puzzle", [FOUR], Rules.NONE, arrangement(7).goods,
+		arrangement(7).far, 1)), "and the two-weight layout is reported as outside one move")
+	# ---- 死局：说清楚，并指出退路 ----
+	var dead = pose("puzzle", DEAD_A, Rules.NONE, arrangement(4).goods, arrangement(4).far, 2)
+	check(Rules.stuck(dead), "13 then 4 leaves 7 two weights away — the chain is dead")
+	check(Rules.stuck_line(dead) == DEAD_LINE, "the dead end names the surviving order, the baseline and the way out")
+	check(Rules.stuck_line(pose("puzzle", DEAD_B, Rules.NONE, arrangement(7).goods, arrangement(7).far, 2))
+		.contains("只剩 4 单位那一单"), "and it names the other dead end's surviving order")
+	check(not Rules.stuck(one_booked) and not Rules.stuck(open_counter), "the open counter and a fresh ledger are never 走死")
+	check(not Rules.stuck(book), "a finished ledger has nothing left to reach")
+	check(Rules.reachable_units(one_booked) == [13], "what is reachable is computed from the ledger")
+	check(Rules.reachable_units(pose("puzzle", [FOUR, THIRTEEN], Rules.NONE, arrangement(13).goods,
+		arrangement(13).far, 2)) == [7], "and narrows to the last order")
+	check(Rules.reachable_units(open_counter) == [4, 7, 13], "before the first hand-over every order is fair game")
+	check(fits_board(Rules.stuck_line(dead).split("\n")[0]) and fits_board(Rules.stuck_line(dead).split("\n")[1]),
+		"both lines of the dead end fit the dialogue board")
+	# ---- 幕的推进 ----
+	var arriving = Rules.advance(Rules.fresh())
 	check(arriving.beat == 1 and arriving.stage == "arrival", "the first line hands over to the second")
 	arriving = Rules.advance(Rules.advance(arriving))
-	check(arriving.beat == 2 and arriving.stage == "approach", "the third line walks the player to the stall")
-	check(Rules.advance(arriving).stage == "ready", "the walk-in ends at the counter")
-	var opened := Rules.advance(Rules.advance(arriving))
-	check(opened.stage == "puzzle" and opened.goods == [0, 0, 0], "the walk-in never touches the weights")
-	check(Rules.advance(opened).is_empty(), "an untouched rack cannot lift the beam")
-	var first := pose(FIVE_GOODS, FIVE_FAR)
-	check(Rules.advance(first).stage == "weighing" and Rules.advance(first).weighs == 2, "lifting the beam counts the weigh")
-	check(Rules.advance(Rules.advance(first)).stage == "delivery", "a balanced first order goes straight to the hand-off")
-	var off_level := pose([1, 0, 0], Rules.empty_pan())
-	check(Rules.advance(Rules.advance(off_level)).stage == "result", "an unbalanced lift shows the result board")
-	check(Rules.advance(Rules.advance(Rules.advance(off_level))).stage == "puzzle",
-		"the result board hands the same arrangement back, nothing is deducted")
-	var handed := Rules.advance(Rules.advance(Rules.advance(first)))
-	check(handed.stage == "puzzle" and handed.order == 1 and handed.delivered == 1,
-		"the first hand-off books order one and calls order two")
-	check(handed.goods == FIVE_GOODS and handed.far == FIVE_FAR,
-		"the second order starts with the first order's weights still in place")
-	check(handed.built_goods[0] == FIVE_GOODS and handed.built_far[0] == FIVE_FAR,
-		"the booked record is the arrangement actually built")
-	check(Rules.advance(pose([1, 1, 0], [0, 0, 1], "delivery", 1)).is_empty(),
-		"the second order cannot be handed over while its pans disagree")
-	check(Rules.advance(pose(EIGHT_GOODS, EIGHT_FAR, "puzzle", 1)).stage == "weighing",
-		"order two may be weighed once order one is booked")
-	var done := Rules.advance(Rules.advance(Rules.advance(pose(EIGHT_GOODS, EIGHT_FAR, "puzzle", 1))))
-	check(done.stage == "complete" and done.delivered == 2, "the second hand-off closes the stall")
-	check(Rules.advance(done).is_empty(), "complete invents no next stage")
-	check(Rules.advance(pose(FIVE_GOODS, FIVE_FAR, "nowhere")).is_empty(), "an unknown stage advances nowhere")
-	# ---- 撤销、重摆与快照 ----
-	var moved := Rules.return_weight(pose(FIVE_GOODS, FIVE_FAR, "puzzle", 1), 1)
-	check(moved.goods[1] == 0, "the transfer step itself is one real move")
-	check(Rules.restore(moved, {"goods": FIVE_GOODS.duplicate(), "far": FIVE_FAR.duplicate()}).goods == FIVE_GOODS,
-		"undo puts the weight back where the previous order left it")
-	check(Rules.restore(pose(FIVE_GOODS, FIVE_FAR, "puzzle", 1), {"goods": [1, 1, 0], "far": [1, 0, 0]}).is_empty(),
-		"undo refuses a snapshot that uses one weight twice")
-	check(Rules.restore(pose(FIVE_GOODS, FIVE_FAR, "puzzle", 1), {"goods": [1, 1, 0]}).is_empty(),
-		"a snapshot missing a pan is refused")
-	check(Rules.restore(pose(FIVE_GOODS, FIVE_FAR, "weighing", 1),
-		{"goods": FIVE_GOODS.duplicate(), "far": FIVE_FAR.duplicate()}).is_empty(),
-		"undo cannot reach into a lifted beam")
-	var rewound := Rules.restore(pose(EIGHT_GOODS, EIGHT_FAR, "puzzle", 1),
-		{"goods": FIVE_GOODS.duplicate(), "far": FIVE_FAR.duplicate()})
-	check(rewound.order == 1 and rewound.delivered == 1 and rewound.weighs == 1,
-		"undo rewinds the arrangement only, never the booked order")
-	var cleared := Rules.cleared(pose(FIVE_GOODS, FIVE_FAR, "puzzle", 1))
-	check(cleared.goods == [0, 0, 0] and cleared.far == [0, 0, 0], "重摆 puts all three weights back on the rack")
-	check(cleared.delivered == 1 and cleared.order == 1, "重摆 keeps the order that has already been handed over")
-	check(Rules.cleared(pose(FIVE_GOODS, FIVE_FAR, "weighing", 1)).is_empty(), "重摆 is not offered while the beam is lifted")
-	# ---- 存档 schema：残缺、伪造与非法现场 ----
-	for bad in [null, {}, [], "x", 5.0, [0, 0]]: check(not Rules.validate(bad), "reject record " + str(bad))
-	var forged := pose(FIVE_GOODS, FIVE_FAR); forged.sample = "market-mk11-1"
+	check(arriving.beat == BEAT_DONE and arriving.stage == "approach", "the third line walks the player to the stall")
+	check(Rules.advance(arriving).stage == "ready", "approach stops before player control")
+	var opened = Rules.advance(Rules.advance(arriving))
+	check(opened.stage == "puzzle" and opened.order == Rules.NONE and opened.goods == Rules.empty_pan(),
+		"the walk-in never touches the goods")
+	check(opened == open_counter, "and lands on the same open counter the rules describe")
+	var nothing = Rules.advance(open_counter)
+	check(nothing.is_empty(), "an empty pan with no order on it cannot be lifted")
+	var reasons = Rules.shortfalls(open_counter)
+	check(reasons.size() == 2, "no order picked and no weight up: two plain facts, no verdict")
+	check(reasons[0] == "街上三辆车还没有一辆被你点中：先挑一单，衡伯才把货搬上货盘。",
+		"the missing order is stated as the shop's own reason")
+	check(reasons[1] == "三枚砝码都还在架上：先请一枚上秤，空盘配不出这一单的货。",
+		"the empty pans are the second reason")
+	check(Rules.shortfalls(picked).size() == 1, "a picked order with nothing on the pans is one reason short")
+	check(Rules.shortfalls(Rules.arrange(pose("puzzle", [], FOUR), arrangement(4).goods, arrangement(4).far)).is_empty(),
+		"once a weight stands on a pan the beam is free to lift — the rules never pre-judge the maths")
+	var lift = Rules.advance(Rules.arrange(pose("puzzle", [], FOUR), arrangement(4).goods, arrangement(4).far))
+	check(lift.stage == "weighing" and lift.weighs == 1, "lifting the beam costs one weigh and keeps the arrangement")
+	var unbalanced = Rules.advance(Rules.arrange(pose("puzzle", [], FOUR), OFF_BALANCE.goods, OFF_BALANCE.far))
+	check(Rules.advance(unbalanced).stage == "result", "an unbalanced beam comes back as a result, not a scolding")
+	check(Rules.result_lines(unbalanced).size() == 2 and "沉下去了" in Rules.result_line(unbalanced)
+		and "还压" in Rules.result_line(unbalanced), "the result states which side sank and what still sits on it")
+	check(not "错了" in Rules.result_line(unbalanced) and not "笨" in Rules.result_line(unbalanced),
+		"and it never grades the player")
+	check(fits_board(Rules.result_line(unbalanced).split("\n")[0]), "the result's first line fits the board")
+	var balanced = Rules.arrange(pose("puzzle", [], FOUR), arrangement(4).goods, arrangement(4).far)
+	var handed = Rules.advance(Rules.advance(balanced))
+	check(handed.stage == "delivery" and Rules.balanced(handed), "a level beam hands the order over")
+	check(Rules.delivery_line(handed) == "衡伯画押：桥头灯行的 4 单位当场配平。\n还有 2 单在街上，下一单只许挪一枚砝码。",
+		"the first hand-over counts what is still in the street, not what has already been booked")
+	var after = Rules.advance(handed)
+	check(after.stage == "puzzle" and after.order == Rules.NONE and after.served == [FOUR],
+		"the booked order goes back to its cart and the pans stay where the player left them")
+	check(after.goods == arrangement(4).goods and after.far == arrangement(4).far,
+		"so the next order really does start from the arrangement just booked")
+	var penultimate = Rules.advance(Rules.advance(Rules.arrange(
+		pose("puzzle", [FOUR], THIRTEEN), arrangement(13).goods, arrangement(13).far)))
+	check(penultimate.stage == "delivery" and "还有 1 单在街上" in Rules.delivery_line(penultimate),
+		"the penultimate hand-over says the last one is still in the street")
+	var last = Rules.advance(Rules.advance(Rules.arrange(
+		pose("puzzle", [FOUR, THIRTEEN], SEVEN), arrangement(7).goods, arrangement(7).far)))
+	check(last.stage == "delivery" and "三单都兑完了" in Rules.delivery_line(last),
+		"the closing hand-over says the three weights were never added to")
+	check(Rules.advance(last).stage == "complete", "the third hand-over closes the ledger")
+	check(Rules.advance(book).is_empty(), "complete has no next stage to invent")
+	check(Rules.advance(pose("elsewhere")).is_empty(), "an unknown stage advances nowhere")
+	check(Rules.advance({"stage": "puzzle"}).is_empty() and Rules.advance({}).is_empty(),
+		"a record without its beats is never advanced")
+	# ---- 重摆与撤销：链子是一环扣一环的 ----
+	var mid = pose("puzzle", [FOUR, THIRTEEN], Rules.NONE, arrangement(13).goods, arrangement(13).far, 2)
+	var wiped = Rules.cleared(mid)
+	check(not wiped.is_empty() and wiped.served.is_empty() and wiped.order == Rules.NONE,
+		"重摆 rewinds the whole chain: a partial chain is not a redo")
+	check(wiped.goods == Rules.empty_pan() and wiped.far == Rules.empty_pan(), "all three weights go back to the rack")
+	check(wiped.built_goods == Rules.empty_records() and wiped.built_far == Rules.empty_records(), "the ledger is blank again")
+	check(wiped.weighs == mid.weighs, "how many times the beam was lifted is a fact about the street, kept")
+	check(Rules.cleared(pose("arrival")).is_empty() and Rules.cleared(pose("delivery", [], FOUR,
+		arrangement(4).goods, arrangement(4).far, 1)).is_empty(), "重摆 only belongs to the counter")
+	var host = Level.new()
+	var snap: Dictionary = host.snapshot(mid)
+	check(snap.order == Rules.NONE and snap.goods == arrangement(13).goods, "the undo snapshot carries the pans and which order is on them")
+	check(Rules.restore(mid, snap).served == mid.served, "undo cannot un-book an order: the ledger is not in the snapshot")
+	var carrying = pose("puzzle", [FOUR], THIRTEEN, arrangement(13).goods, arrangement(13).far, 2)
+	var rewind = Rules.restore(carrying, {"goods": arrangement(4).goods, "far": arrangement(4).far, "order": Rules.NONE})
+	check(not rewind.is_empty() and rewind.order == Rules.NONE, "undo can put a picked order back on its cart")
+	check(Rules.restore(carrying, {"goods": arrangement(4).goods, "far": arrangement(4).far}).is_empty(),
+		"a snapshot that forgets which order was on is refused")
+	check(Rules.restore(carrying, {"goods": arrangement(4).goods, "far": arrangement(4).far, "order": FOUR}).is_empty(),
+		"a snapshot cannot re-book an order that has already been handed over")
+	check(Rules.restore(carrying, {"goods": [1, 0, 0], "far": [1, 0, 0], "order": Rules.NONE}).is_empty(),
+		"a snapshot standing one weight on both pans at once is refused")
+	check(Rules.restore(carrying, {"goods": arrangement(7).goods, "far": arrangement(7).far, "order": Rules.NONE}).is_empty(),
+		"a snapshot two weights away from the booked arrangement is refused")
+	check(Rules.restore(carrying, {"goods": arrangement(13).goods, "far": arrangement(13).far, "order": "2"}).is_empty(),
+		"a snapshot written with a cart number as text is refused")
+	check(Rules.restore(pose("arrival"), snap).is_empty() and Rules.restore(pose("weighing", [], FOUR,
+		arrangement(4).goods, arrangement(4).far, 1), snap).is_empty(), "undo only works at the counter")
+	# 离树探针用完就放掉：漏掉一个 Control，整关审计会在退出时报「resources still in use」。
+	host.free()
+	# ---- 说法：盘、式、货单 ----
+	check(Rules.order_caption(SEVEN) == "订单二 · 7 单位 · 中街油铺",
+		"the order sheet is public: units and buyer, nothing about how to weigh it")
+	check(Rules.equation_of(arrangement(4).goods, arrangement(4).far, 4) == "货 4 = 砝码 3 + 砝码 1",
+		"the equation reads the pans, cargo side against the far side")
+	check(Rules.pan_caption(balanced, Rules.FAR) == "对面那盘：砝码 3 + 砝码 1 = 4 单位", "the pan caption counts what stands on it")
+	check(Rules.arrangement_caption(7) == "货 7 + 砝码 3 = 砝码 9 + 砝码 1",
+		"the third hint restates the maths, not an author's answer")
+	check(Rules.one_pan_sums() == [0, 1, 3, 4, 9, 10, 12, 13], "one-pan sums of 1、3、9 — and 7 is not among them")
+	check(Rules.cart_caption(one_booked, FOUR) == "桥头灯行 4 单位 · 已交货", "the cart plaque knows an emptied cart")
+	check(Rules.cart_caption(carrying, THIRTEEN) == "河下米行 13 单位 · 上秤了", "and the one whose parcel is on the beam")
+	check(Rules.cart_caption(open_counter, SEVEN) == "中街油铺 7 单位 · 在车上", "and the two still waiting in the street")
+	# ---- 存档 schema ----
+	for bad in [null, {}, [], "x", 5.0, [0, 0], true, 3]:
+		check(not Rules.validate(bad), "reject record " + str(bad))
+	var forged = pose("complete", WIN_A, Rules.NONE, arrangement(7).goods, arrangement(7).far, 3)
+	var intact = forged.duplicate(true)
+	forged.sample = "market-mk03-1"
 	check(not Rules.validate(forged), "another level's save is rejected")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.stage = "measuring"
-	check(not Rules.validate(forged), "unknown stage rejected")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.beat = 1
-	check(not Rules.validate(forged), "a stage past the walk-in cannot claim an unfinished dialogue")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.hint = 4
+	forged = intact.duplicate(true); forged.stage = "elsewhere"
+	check(not Rules.validate(forged), "an unknown stage is rejected")
+	forged = intact.duplicate(true); forged.beat = 3
+	check(not Rules.validate(forged), "a fourth opening line is not in the shipped script")
+	forged = pose("puzzle", [], FOUR, arrangement(4).goods, arrangement(4).far, 0, 0, 0)
+	check(not Rules.validate(forged), "the counter cannot open before the lines are finished")
+	forged = intact.duplicate(true); forged.erase("served")
+	check(not Rules.validate(forged), "a missing ledger is corruption, not an empty street")
+	forged = intact.duplicate(true); forged.served = [FOUR, FOUR, SEVEN]
+	check(not Rules.validate(forged), "the same order cannot be handed over twice")
+	forged = intact.duplicate(true); forged.served = [FOUR, SEVEN, THIRTEEN, FOUR]
+	check(not Rules.validate(forged), "a ledger longer than the street's three orders is rejected")
+	forged = intact.duplicate(true); forged.served = [FOUR, SEVEN, 3]
+	check(not Rules.validate(forged), "an order number above the three in the street is rejected")
+	forged = intact.duplicate(true); forged.served = [FOUR, 2.0, SEVEN]
+	check(not Rules.validate(forged) and Rules.validate(Content.normalize_numbers(forged)),
+		"a whole number stored as a float is normalized back")
+	forged = intact.duplicate(true); forged.order = SEVEN
+	check(not Rules.validate(forged), "an order cannot be both picked and booked")
+	forged = intact.duplicate(true); forged.order = 9
+	check(not Rules.validate(forged), "a cart that is not in the street cannot be the current order")
+	forged = intact.duplicate(true); forged.goods = [1, 0, 0]; forged.far = [1, 0, 0]
+	check(not Rules.validate(forged), "one weight standing on both pans at once is using it twice")
+	forged = intact.duplicate(true); forged.goods = [0.0, 1.0, 0.0]; forged.far = [1.0, 0.0, 1.0]
+	check(not Rules.validate(forged) and Rules.validate(Content.normalize_numbers(forged)), "floats in a pan normalize back")
+	forged = intact.duplicate(true); forged.goods = [0, 0]
+	check(not Rules.validate(forged), "a pan with two slots is not a three-weight pan")
+	forged = intact.duplicate(true); forged.goods = [2, 0, 0]
+	check(not Rules.validate(forged), "a pan slot holding two of one weight is corruption")
+	forged = intact.duplicate(true); forged.built_goods[SEVEN] = Rules.empty_pan()
+	check(not Rules.validate(forged), "a booked order whose ledger was wiped is corruption")
+	forged = intact.duplicate(true); forged.built_far[FOUR] = [1, 0, 1]
+	check(not Rules.validate(forged), "a booked arrangement that does not balance its own order is corruption")
+	forged = intact.duplicate(true); forged.built_goods[SEVEN] = arrangement(4).goods; forged.built_far[SEVEN] = arrangement(4).far
+	check(not Rules.validate(forged), "a receipt that booked 4 单位 twice is rejected")
+	check(not Rules.validate(pose("puzzle", [FOUR, SEVEN], Rules.NONE, arrangement(7).goods, arrangement(7).far, 2)),
+		"4 then 7 cannot be written down at all: two weights is not one move")
+	forged = intact.duplicate(true); forged.goods = arrangement(4).goods; forged.far = arrangement(4).far
+	check(not Rules.validate(forged), "the finished receipt cannot sit on a stale arrangement")
+	forged = pose("puzzle", [FOUR], Rules.NONE, arrangement(7).goods, arrangement(7).far, 1)
+	check(not Rules.validate(forged), "the pans may sit at most one weight away from the booked arrangement")
+	forged = intact.duplicate(true); forged.weighs = -1
+	check(not Rules.validate(forged), "a negative weigh count is corruption")
+	forged = intact.duplicate(true); forged.hint = 4
 	check(not Rules.validate(forged), "hint level is capped by the shipped hints")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.hint = -1
+	forged = intact.duplicate(true); forged.hint = -1
 	check(not Rules.validate(forged), "a negative hint count is corruption")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.weighs = -2
-	check(not Rules.validate(forged), "a beam cannot have been lifted minus twice")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.weighs = 1.5
-	check(not Rules.validate(forged), "a fractional weigh count is rejected")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.goods = [1, 1, 0, 0]
-	check(not Rules.validate(forged), "a fourth weight on the pan is rejected")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.goods = [1, 2, 0]
-	check(not Rules.validate(forged), "a weight cannot be counted twice on one pan")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.far = [1, 0, 1]
-	check(not Rules.validate(forged), "the same weight standing on both pans at once is rejected")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.far = [0, 0, 0.5]
-	check(not Rules.validate(forged), "a halved weight is corruption")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.goods = "110"
-	check(not Rules.validate(forged), "a written pan is not a read pan")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.order = 5
-	check(not Rules.validate(forged), "an order id that was never sent is rejected")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.delivered = 2
-	check(not Rules.validate(forged), "nothing may be booked as delivered before it is handed over")
-	forged = pose(FIVE_GOODS, FIVE_FAR, "puzzle", 1); forged.delivered = 0
-	check(not Rules.validate(forged), "order two cannot be worked while order one is still owed")
-	forged = pose(FIVE_GOODS, FIVE_FAR, "complete"); forged.built_goods[0] = EIGHT_GOODS.duplicate()
-	check(not Rules.validate(forged), "a booked record that never balanced its own order is rejected")
-	forged = pose(FIVE_GOODS, FIVE_FAR, "complete"); forged.built_far[1] = [0, 0, 0]
-	check(not Rules.validate(forged), "an empty booked record cannot have delivered eight units")
-	forged = pose(FIVE_GOODS, FIVE_FAR, "complete"); forged.goods = FIVE_GOODS.duplicate()
-	check(not Rules.validate(forged), "the closed stall must show the arrangement it actually booked")
-	forged = pose(FIVE_GOODS, FIVE_FAR, "result")
-	check(not Rules.validate(forged), "a result board cannot stand on a level beam")
-	forged = pose([1, 0, 0], Rules.empty_pan(), "delivery")
-	check(not Rules.validate(forged), "a delivery whose pans never agreed is corruption")
-	forged = pose(FIVE_GOODS, FIVE_FAR, "weighing"); forged.weighs = 0
-	check(not Rules.validate(forged), "the beam cannot be mid-lift with no weigh recorded")
-	forged = Rules.fresh(); forged.goods = [0, 0, 1]
-	check(not Rules.validate(forged), "nothing is on the scale before the player reaches it")
-	forged = pose(FIVE_GOODS, FIVE_FAR, "ready")
-	check(not Rules.validate(forged), "the rack cannot be emptied before the table opens")
-	forged = pose(FIVE_GOODS, FIVE_FAR); forged.erase("far")
-	check(not Rules.validate(forged), "a missing field is corruption, not a default")
-	check(Rules.validate(pose(FIVE_GOODS, FIVE_FAR)) and Rules.validate(pose(EIGHT_GOODS, EIGHT_FAR, "puzzle", 1)),
-		"both reference arrangements reload as legal saves")
-	check(Rules.validate(pose(FIVE_GOODS, FIVE_FAR, "complete")), "the two booked orders reload at the last stage")
-	var round_trip = Content.normalize_numbers(JSON.parse_string(JSON.stringify(pose(FIVE_GOODS, FIVE_FAR, "complete"))))
-	check(round_trip == pose(FIVE_GOODS, FIVE_FAR, "complete") and Rules.validate(round_trip),
-		"the nested booked records survive a JSON round trip")
+	forged = pose("weighing", [FOUR], Rules.NONE, arrangement(4).goods, arrangement(4).far, 1)
+	check(not Rules.validate(forged), "the beam cannot be lifted over an empty order")
+	forged = pose("delivery", [], FOUR, Rules.empty_pan(), Rules.empty_pan(), 1)
+	check(not Rules.validate(forged), "a delivery of an unbalanced scale is corruption")
+	forged = pose("result", [], FOUR, arrangement(4).goods, arrangement(4).far, 1)
+	check(not Rules.validate(forged), "the result board cannot stand while the beam is actually level")
+	forged = pose("complete", [FOUR, SEVEN, THIRTEEN], Rules.NONE, arrangement(7).goods, arrangement(7).far, 3)
+	check(not Rules.validate(forged), "a ledger whose middle link is two weights away never becomes a receipt")
+	check(Rules.validate(intact), "the shipped chain reloads at the receipt")
+	check(Rules.validate(open_counter) and Rules.validate(carrying), "an unfinished counter is still a legal save")
+	check(Rules.validate(pose("puzzle", [FOUR], SEVEN, arrangement(4).goods, arrangement(4).far, 1)),
+		"picking the next order over the booked pans is a legal save")
+	var round_trip = Content.normalize_numbers(JSON.parse_string(JSON.stringify(intact)))
+	check(round_trip == intact and Rules.validate(round_trip), "the finished ledger survives a JSON round trip")
 	check(Rules.validate(Content.normalize_numbers(JSON.parse_string(JSON.stringify(Rules.fresh())))),
 		"the opening record survives a JSON round trip")
-	# ---- 画面只复述，不预告 ----
-	check(Rules.equation(pose(FIVE_GOODS, FIVE_FAR)) == "货 5 + 砝码 3 + 砝码 1 = 砝码 9",
-		"the live board reads the player's own arrangement")
-	check(Rules.equation(empty) == "货 5 = 空盘", "an untouched rack reads as the goods against an empty far pan")
-	check(not "平" in Rules.equation(pose(FIVE_GOODS, FIVE_FAR)) and not "差" in Rules.equation(empty),
-		"the reading board never judges")
-	check(Rules.pan_caption(pose(FIVE_GOODS, FIVE_FAR), Rules.FAR) == "对面那盘：砝码 9 = 9 单位",
-		"a pan caption totals what stands on it")
-	check(Rules.order_caption(1) == "订单二 · 8 单位 · 中街油铺", "the order slip is published verbatim")
-	check(Rules.order_units(9) == 0 and Rules.order_name(9) == "订单", "an order that was never sent reads as nothing")
-	check(Rules.built_equation(pose(FIVE_GOODS, FIVE_FAR, "puzzle", 1), 0) == "货 5 + 砝码 3 + 砝码 1 = 砝码 9",
-		"the booked first order still reads its own equation")
-	check(Rules.built_equation(pose(FIVE_GOODS, FIVE_FAR, "puzzle", 1), 7) == "", "a booked record for a phantom order is blank")
-	check(Rules.migration_parts(pose(FIVE_GOODS, FIVE_FAR, "puzzle", 1)) == [],
-		"no migration is claimed before both orders are booked")
-	var parts := Rules.migration_parts(pose(FIVE_GOODS, FIVE_FAR, "complete"))
-	check(parts == ["1 留在货盘", "3 从货盘挪到砝码架", "9 留在对面那盘"],
-		"the migration line is read out of the two booked records")
-	check("挪到" in Rules.migration_caption(pose(FIVE_GOODS, FIVE_FAR, "complete")), "the transfer is what gets named")
-	# ---- 文案与柜面（离树探针，用完即释） ----
+	# ---- 台词、提示与回执（离树探针） ----
 	var probe = Scene.instantiate(); probe.configure()
-	check(probe.save_path == SAVE_DEFAULT, "the level defaults to the catalogue's market-mk14-1 profile")
+	check(probe.save_path == SAVE_DEFAULT, "the level defaults to the market-mk14-1 profile")
+	check(probe.scene_id == "oil" and probe.level_id == "MK14", "the level declares its kit scene and id")
+	check(probe.title == Catalog.title("MK14"), "the sign title matches the chapter catalogue")
+	check(probe.rules == Rules and probe.world_script == World, "the host is wired to the mk14 rules and world")
+	check(probe.durations.has("delivery") and probe.zoom_stages == ["puzzle", "weighing", "result"],
+		"the beam lifts close and the hand-over pulls back to the courtyard")
+	# 提示要说「你手里这一单」，所以离树探针也得先有一份现场：状态由宿主在 _ready 里装好。
+	probe.state = Rules.fresh()
+	check(probe.hint_texts().size() == Rules.HINT_TIERS, "three hints ship and no more")
+	check(probe.submit_label() == "抬秤验收", "the submit button lifts the beam")
+	check(probe.snapshot(Rules.fresh()) == {"goods": [0, 0, 0], "far": [0, 0, 0], "order": Rules.NONE},
+		"the snapshot helper ships the three fields undo needs")
+	probe.state = pose("puzzle")
+	check(probe.cleared_state() == Rules.cleared(probe.state), "重摆 defers to the rules")
 	probe.free()
 	probe = Scene.instantiate(); probe.save_path = path; probe.configure()
 	check(probe.save_path == path, "configure never overwrites an injected test path")
-	check(probe.scene_id == "oil" and probe.level_id == "MK14", "the level declares its kit scene and id")
-	check(probe.title == Catalog.title("MK14"), "the sign title matches the chapter catalogue")
-	check(probe.rules == Rules and probe.world_script != null, "the host is wired to the mk14 rules and world")
-	check(probe.durations.has("weighing") and probe.zoom_stages.has("puzzle"), "the lift keeps the camera at the scale")
-	probe.state = pose(FIVE_GOODS, FIVE_FAR)
-	var hints: Array = probe.hint_texts()
-	check(hints.size() == Rules.HINT_TIERS, "three hints ship and no more")
-	for spoken in hints:
-		check(not spoken.is_empty() and spoken.count("\n") == 1, "hint %s stays on the two-line board" % spoken.left(4))
-	check("货 5 + 砝码 3" in hints[2], "the third hint demonstrates the arrangement the math allows")
-	probe.state = pose(EIGHT_GOODS, EIGHT_FAR, "puzzle", 1)
-	check("货 8" in probe.hint_texts()[2], "the third hint follows the order actually on the scale")
-	check("\n" not in probe.goal_line() and "\n" not in probe.status_line(), "the standing boards stay single lines")
-	probe.state = pose(Rules.empty_pan(), Rules.empty_pan())
-	check("上秤 0 枚" in probe.status_line(), "the status counts only what the player lifted")
-	probe.state = pose(FIVE_GOODS, FIVE_FAR)
-	check("上秤 3 枚" in probe.status_line(), "the status follows the weights on the scale")
-	for beat in range(Rules.BEATS):
-		var opening := Rules.fresh(); opening.beat = beat
-		probe.state = opening
-		var spoken: String = probe.line()
-		check(not spoken.is_empty() and spoken.count("\n") <= 1, "arrival line %d stays inside the two-line board" % (beat + 1))
+	probe.state = open_counter
+	check("\n" not in probe.goal_line() and "\n" not in probe.status_line(), "the goal and status lines hold one unbroken line")
+	check("挪一枚" in probe.goal_line() and "点车" in probe.goal_line(),
+		"the goal states the ask and this level's one new rule")
+	check(width_of(probe.goal_line(), 22) <= 790.0, "the goal line fits the sign it is drawn on")
+	check("已交 0 单" in probe.status_line() and "还没接单" in probe.status_line(),
+		"the status line reads the ledger and the current pick, nothing the beam has not already shown")
+	probe.state = pose("puzzle", [FOUR], THIRTEEN, arrangement(4).goods, arrangement(4).far, 1)
+	check("这一单挪了 0 枚" in probe.status_line() and "已交 1 单" in probe.status_line(),
+		"and it counts the weights the player has moved in this order")
+	for spoken in Level.LINES:
+		check(fits_board(spoken), "an opening line fits the board: " + spoken.left(8))
+	var spoken_stages := {}
 	for stage in Rules.STAGES:
-		if stage == "arrival": probe.state = Rules.fresh()
-		elif stage == "result": probe.state = pose([1, 0, 0], Rules.empty_pan())
-		else: probe.state = pose(FIVE_GOODS, FIVE_FAR, stage)
-		var told: String = probe.line()
-		check(not told.is_empty() and told.count("\n") <= 1, "stage %s speaks in at most two lines" % stage)
-	for order in range(Rules.ORDERS.size()):
-		probe.state = pose(FIVE_GOODS if order == 0 else EIGHT_GOODS, FIVE_FAR, "delivery", order)
-		check("砝码" in probe.delivery_line(), "the hand-off of order %d names what did not change" % (order + 1))
-	for stage in ["arrival", "ready", "result", "complete"]:
-		probe.state = Rules.fresh() if stage == "arrival" else pose(FIVE_GOODS, FIVE_FAR, stage)
-		check(not probe.stage_labels().has(stage) or not probe.stage_labels()[stage].is_empty(),
-			"stage %s names its own next step" % stage)
-	# 热点文字：只复述现场，永不判对错；每一枚、每一盘、每一辆车都有中文说明。
-	probe.state = pose(FIVE_GOODS, FIVE_FAR)
-	for index in range(Rules.COUNT):
-		var tip: String = probe.rack_tip(index)
-		check(Rules.weight_name(index) in tip and "点一下" in tip, "rack slot %d names its weight and its next step" % index)
-		check(not "沉" in tip and not "差" in tip, "rack slot %d gives no reading of the beam" % index)
-	for side in [Rules.GOODS, Rules.FAR]:
-		var read: String = probe.pan_hint(side)
-		check(Rules.pan_name(side) in read and "抬了秤才知道" in read, "the pan tooltip describes, then defers the verdict")
-		check(not "沉" in read and not "差" in read, "the pan tooltip never pre-announces which side sank")
-	for index in range(Rules.CARTS.size()):
-		var slip: String = probe.cart_hint(index)
-		check(not slip.is_empty() and ("单位" in slip or "交货车" in slip), "cart %d tells its own story" % index)
-	probe.state = pose(Rules.empty_pan(), Rules.empty_pan())
-	check("货 5" in probe.pan_hint(Rules.GOODS), "the goods pan tooltip counts the real parcel on it")
-	check("空盘" in probe.pan_hint(Rules.FAR), "an empty far pan is read as empty, not as zero")
+		var shaped = open_counter if stage == "puzzle" else book
+		if stage in ["weighing", "result", "delivery"]: shaped = pose("puzzle", [FOUR], FOUR, arrangement(4).goods, arrangement(4).far, 1)
+		if stage == "result": shaped = pose("result", [], FOUR, OFF_BALANCE.goods, OFF_BALANCE.far, 1)
+		if stage == "weighing": shaped = pose("weighing", [], FOUR, arrangement(4).goods, arrangement(4).far, 1)
+		if stage == "delivery": shaped = pose("delivery", [], FOUR, arrangement(4).goods, arrangement(4).far, 1)
+		if stage == "approach": shaped = pose("approach")
+		if stage == "ready": shaped = pose("ready")
+		shaped = shaped.duplicate(true); shaped.stage = stage
+		probe.state = shaped
+		var said: String = probe.line()
+		check(not said.is_empty() and fits_board(said.split("\n")[0]), "%s speaks in lines the board can hold" % stage)
+		spoken_stages[stage] = said
+	check("制动还插着" in spoken_stages["approach"], "the walk-in says the beam is still locked")
+	check("点街上那三辆车" in spoken_stages["ready"], "the briefing sends the player to the carts")
+	# 死局那句话不在循环里：柜面那一幕的说法完全取决于账上还剩什么，得单独摆一份走死的现场。
+	probe.state = walked_dead()
+	check("重摆" in probe.line() and "只剩 7 单位" in probe.line(),
+		"a dead chain is spoken on the counter itself, and points at the way out")
+	for tier in probe.hint_texts():
+		check(not tier.is_empty() and tier.count("\n") <= 1, "hint %s stays inside the sign board" % tier.left(4))
+		check(fits_board(tier.split("\n")[0]), "and a hint line fits the board: " + tier.left(6))
+		for word in ["错了", "笨", "不行", "重新听"]: check(not word in tier, "no hint grades the player")
+	check("挪一枚" in probe.hint_texts()[0], "the first tier states the rule the level is built on")
+	check("中间" in probe.hint_texts()[2], "the third tier demonstrates one step, in the maths' own words")
+	check("→" in probe.hint_texts()[2] and probe.hint_texts()[2].count("→") >= 2,
+		"and it shows the whole winning order, which is what the level cannot say without doing the player's work")
+	# 接了单的那一支：第三级提示说的是玩家手里这一单，不是作者另挑的一单。
+	probe.state = pose("puzzle", [FOUR], SEVEN, arrangement(4).goods, arrangement(4).far, 1)
+	for tier in probe.hint_texts():
+		check(fits_board(tier.split("\n")[0]), "an order in hand keeps the hint inside the board: " + tier.left(6))
+	check("中街油铺" in probe.hint_texts()[2], "and its third tier names that order's own arrangement")
+	probe.state = book
+	var paper: Array = probe.receipt_lines()
+	check(paper.size() == 6, "the receipt ships six lines: title, three steps, the pair, the maths")
+	for line in paper: check(fits_paper(line), "receipt line fits its paper: " + line.left(8))
+	check(paper[1] == "起手 4 单位：对面 3、1 · 架上 9", "and the receipt opens on the order the player actually picked first")
+	check(probe.receipt_rect().end.x < 338 and probe.receipt_rect().position.y > 68
+		and probe.receipt_rect().end.y < 267, "the receipt panel keeps clear of the board, the sign and the cart")
+	probe.state = pose("puzzle", [FOUR], THIRTEEN, arrangement(4).goods, arrangement(4).far, 1)
+	check("退回街上" in probe.reset_prompt()[0], "the redo warning says the booked order goes back to the street too")
+	probe.state = open_counter
+	check("还没交出去" in probe.reset_prompt()[0], "an un-booked counter is warned with its own words")
+	check("留在小摊" in probe.restart_prompt()[1], "replaying the scene can be declined")
 	probe.free()
-	# ---- 真实场景：开局、命中区、按钮 ----
+	# ---- 真实场景：按钮、命中区、每一幕重画 ----
 	var game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame
 	check(game.state.stage == "arrival" and game.buttons.has("next"), "a fresh scene opens on the dialogue")
-	check(not game.buttons.has("deliver"), "the lift button waits for the stall")
-	check(game.world.scene_id == "oil" and game.world.stations.has("scale_foot"),
-		"the scale is drawn from the oil courtyard stations")
-	check(game.world.has_part("scale_stand") and game.world.has_part("weight_hex"),
-		"the kit manifest lends the scale parts and the three weights")
-	var stand: float = float(game.world.parts["scale_stand"].suggested_width) / game.world.atlas_w("scale_stand")
-	var beam: float = float(game.world.parts["scale_beam"].suggested_width) / game.world.atlas_w("scale_beam")
-	var pan: float = float(game.world.parts["scale_pan"].suggested_width) / game.world.atlas_w("scale_pan")
-	check(maxf(absf(stand - beam), absf(stand - pan)) < 0.0025,
-		"the manifest's own assembly note agrees on one factor for the three scale parts")
-	check(absf(game.world.unit_scale() - MK11World.SCALE_FACTOR) < 0.0001,
-		"the borrowed scale stands at the same assembly factor as the fifth-act scale")
-	var chain: Dictionary = game.world.parts["scale_pan"]
-	check(chain.anchor_px == chain.attachments_px.suspension,
-		"the pan hangs by its own anchor, so the drawn pan can never slip off the beam hook")
-	var pivot: Vector2 = game.world.beam_pivot()
-	var foot: Vector2 = game.world.scale_foot()
-	check(absf(pivot.x - foot.x) < 2.0 and pivot.y < foot.y,
-		"the beam pivots on the stand's own spine, above its foot")
-	var chain_closed := true
-	var arms := []
-	for side in [Rules.GOODS, Rules.FAR]:
-		var hook: Vector2 = game.world.beam_hook(side, 0.0)
-		var dish: Vector2 = game.world.pan_cargo(side)
-		arms.append(absf(hook.x - pivot.x))
-		if absf(hook.y - pivot.y) > 0.01 or dish.y <= hook.y: chain_closed = false
-	check(chain_closed, "both hooks ride level with the pivot and both dishes hang below their hook")
-	check(absf(arms[0] - arms[1]) < 3.0 and arms[0] > 120.0,
-		"the two pans hang from arms of the same length, well clear of the pillar")
-	check(Rules.WEIGHT_KITS == MK11World.WEIGHT_SPRITES and game.world.WEIGHT_WIDTHS == MK11World.WEIGHT_WIDTHS,
-		"the 1, 3 and 9 are the same three props at the same size as in the fifth act")
-	var rects: Array = []
-	for index in range(Rules.COUNT): rects.append(game.world.rack_rect(index))
-	for side in [Rules.GOODS, Rules.FAR]: rects.append(game.world.pan_rect(side))
-	for index in range(Rules.CARTS.size()): rects.append(game.world.cart_rect(index))
-	var sized := true
+	check(not game.buttons.has("deliver"), "the beam button waits for the stall")
+	check(game.world.scene_id == "oil" and game.world.stations.has("scale_foot"), "the stall is drawn from the oil stations")
+	check(game.world.cart_station(FOUR) == game.world.station("cart_left")
+		and game.world.cart_station(SEVEN) == game.world.station("cart_middle")
+		and game.world.cart_station(THIRTEEN) == game.world.station("cart_right"),
+		"each order stands on the cart the manifest names")
+	for at in range(Rules.BEATS): game.advance()
+	check(game.state.stage == "approach", "the three lines walk the player to the stall")
+	game.skip_animation()
+	check(game.state.stage == "ready", "approach stops before player control")
+	game.advance()
+	check(game.state.stage == "puzzle", "the stall is handed to the player")
+	var small_target := 0
+	var labelled := 0
+	var targets := 0
+	for id in game.buttons:
+		if not id.begins_with("rack_") and not id.begins_with("cart_") and not id.begins_with("pan_"): continue
+		targets += 1
+		var b: Control = game.buttons[id]
+		if b.size.x < 48 or b.size.y < 48: small_target += 1
+		if b.tooltip_text.is_empty(): labelled += 1
+	check(targets == Rules.COUNT + Rules.CARTS.size() + 2, "three weights, two pans and three carts are all clickable")
+	check(small_target == 0, "every one of them is a 48 pixel target or bigger")
+	check(labelled == 0, "and every one carries its own tooltip")
 	var framed := true
-	for rect in rects:
-		if rect.size.x < 48 or rect.size.y < 48: sized = false
-		if rect.position.x < 0 or rect.position.y < 0 or rect.end.x > 1280 or rect.end.y > 720: framed = false
-	var clean := true
-	for first_index in range(rects.size()):
-		for second in range(first_index + 1, rects.size()):
-			if rects[first_index].intersects(rects[second]): clean = false
-	check(sized, "every hotspot is at least 48 logical pixels wide and tall")
-	check(framed, "every hotspot stays inside the 1280x720 frame")
-	check(clean, "no two hotspots fight over the same pixel")
-	var tray_half: float = game.world.suggested("receiving_tray") / 2.0
-	var on_tray := true
-	for index in range(Rules.COUNT):
-		var slot: Rect2 = game.world.rack_rect(index)
-		if slot.position.x < game.world.rack_foot().x - tray_half or slot.end.x > game.world.rack_foot().x + tray_half:
-			on_tray = false
-	check(on_tray, "all three rack hit boxes sit on the receiving tray that holds the weights")
-	game.queue_free(); await process_frame
-	game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame
-	game.commit(pose(Rules.empty_pan(), Rules.empty_pan()))
-	check(game.state.stage == "puzzle" and game.history.is_empty(), "a saved stall opens without history")
-	var hotspots := []
-	for index in range(Rules.COUNT): hotspots.append("rack_%d" % index)
-	for side in [Rules.GOODS, Rules.FAR]: hotspots.append("pan_%d" % side)
-	for index in range(Rules.CARTS.size()): hotspots.append("cart_%d" % index)
-	var present := true
-	var labelled := true
-	for id in hotspots:
-		if not game.buttons.has(id): present = false; continue
-		if game.buttons[id].tooltip_text.is_empty(): labelled = false
-	check(present, "all 8 stall hotspots are registered")
-	check(labelled, "every hotspot carries a Chinese tooltip")
-	check(game.buttons.has("deliver") and not game.buttons.deliver.disabled, "the lift button is live on an untouched rack")
-	check(game.buttons.has("undo") and game.buttons.undo.disabled, "nothing to undo on a fresh rack")
-	check(game.buttons.has("reset") and game.buttons.has("hint"), "the stall offers 重摆 and 请扣扣提醒")
-	# 架上的三种现场各量一遍：这格空着、这枚站在对面那盘、这枚站在货盘，提示话术都不一样。
-	var told = 0
-	var mistaken = 0
-	for layout in [[Rules.empty_pan(), Rules.empty_pan()],
-			[Rules.empty_pan(), [1, 0, 0]], [[1, 0, 0], Rules.empty_pan()]]:
-		game.apply_committed(pose(layout[0], layout[1]), [])
-		settle(game)
-		var verdict = advertised_audit(game, hotspots)
-		told += int(verdict[0]); mistaken += int(verdict[1])
-	check(mistaken == 0 and told == Rules.COUNT * 3,
-		"砝码热点写出的快捷键，按下去就是点它那一下（%d 枚，%d 处说错）" % [told, mistaken])
-	game.apply_committed(pose(Rules.empty_pan(), Rules.empty_pan()), []); settle(game)
-	# ---- 每一幕真的重画一遍：绘制代码一崩就会带着 SCRIPT ERROR 退出来 ----
-	var looks := []
-	for stage in Rules.STAGES:
-		looks.append(pose(Rules.empty_pan(), Rules.empty_pan(), stage))
-		looks.append(pose(FIVE_GOODS, FIVE_FAR, stage))
-	looks.append(pose([1, 1, 1], Rules.empty_pan(), "puzzle"))
-	looks.append(pose(Rules.empty_pan(), [1, 1, 1], "puzzle"))
-	looks.append(pose(FIVE_GOODS, FIVE_FAR, "puzzle", 1))
-	looks.append(pose(EIGHT_GOODS, EIGHT_FAR, "puzzle", 1))
-	looks.append(pose([0, 1, 0], [1, 0, 1], "puzzle", 1))
-	for look in looks:
-		if not Rules.validate(look): continue
-		game.apply_committed(look, [])
-		for at in [0.0, 0.5, 1.0]:
-			game.paused = true; game.world.progress = at; await process_frame
-	check(is_instance_valid(game.world) and not game.modal, "every stage repaints without breaking the scale")
-	game.paused = false
-	# ---- 文字与画面共用同一套算术：盘子装得下，字也出不了板 ----
-	var font: Font = game.world.font
-	var overflow := 0
-	var offenders := ""
-	var offscreen := 0
-	for look in looks:
-		if not Rules.validate(look): continue
-		game.apply_committed(look, [])
-		await process_frame
-		for plank in game.world.signs():
-			var wide: float = font.get_string_size(plank["text"], HORIZONTAL_ALIGNMENT_LEFT, -1, plank["size"]).x
-			if wide > plank["rect"].size.x - 20:
-				overflow += 1; offenders = plank["text"]
-			var rect: Rect2 = plank["rect"]
-			if rect.position.x < 0 or rect.end.x > 1280 or rect.end.y > 720: offscreen += 1
-	check(overflow == 0, "no board ever overflows its plank (%s)" % offenders)
-	check(offscreen == 0, "no board leaves the 1280x720 frame")
-	game.apply_committed(pose(FIVE_GOODS, FIVE_FAR), [])
-	var row: Array = game.world.pan_row(Rules.GOODS)
-	check(row.size() == Rules.pan_count(game.state, Rules.GOODS) + 1,
-		"the goods pan seats the parcel and every weight on one row")
-	check(game.world.pan_items(Rules.FAR) == Rules.on_list_state(game.state, Rules.FAR),
-		"the far pan's row is exactly the weights standing on it")
-	check(absf(row[0].x - game.world.parcel_on_pan(0).x) < 0.01, "the parcel stands in the row's first slot")
-	game.apply_committed(pose([1, 1, 1], Rules.empty_pan()), [])
-	var dish: Vector2 = game.world.pan_cargo(Rules.GOODS)
-	var scale_half: float = game.world.part_width("scale_pan", game.world.unit_scale()) / 2.0
-	var full: Array = game.world.pan_row(Rules.GOODS)
-	var items: Array = game.world.pan_items(Rules.GOODS)
-	var left: float = dish.x
-	var right: float = dish.x
-	for slot in range(items.size()):
-		var half: float = game.world.parcel_width(0) / 2.0 if items[slot] == game.world.PARCEL_SLOT \
-			else game.world.weight_width(items[slot]) / 2.0
-		left = minf(left, full[slot].x - half); right = maxf(right, full[slot].x + half)
-	check(left >= dish.x - scale_half and right <= dish.x + scale_half,
-		"a fully loaded goods pan still fits inside the drawn dish")
-	# ---- 纪念物那一横排也得装在自己的小盘里，摊子上的每一样东西都还在画面内 ----
-	game.apply_committed(pose(EIGHT_GOODS, EIGHT_FAR, "complete"), [])
-	var mini_half: float = game.world.part_width("scale_pan",
-		game.world.unit_scale() * game.world.SOUVENIR_SCALE) / 2.0
-	var seated := true
-	for side in [Rules.GOODS, Rules.FAR]:
-		var centre: Vector2 = game.world.cargo_at(game.world.souvenir_foot() + game.world.SOUVENIR_BASE,
-			game.world.unit_scale() * game.world.SOUVENIR_SCALE, side, 0.0)
-		var mini_items: Array = game.world.souvenir_items(side)
-		var mini_row: Array = game.world.souvenir_row(side)
-		for slot in range(mini_items.size()):
-			var mini_w: float = game.world.parcel_width(1) * game.world.SOUVENIR_SCALE \
-				if mini_items[slot] == game.world.PARCEL_SLOT \
-				else game.world.weight_width(mini_items[slot]) * game.world.SOUVENIR_SCALE
-			if mini_row[slot].x - mini_w / 2.0 < centre.x - mini_half: seated = false
-			if mini_row[slot].x + mini_w / 2.0 > centre.x + mini_half: seated = false
-	check(seated, "the miniature pans seat the booked arrangement the same way the real ones do")
-	var placed := true
-	for spot in [game.world.scale_foot(), game.world.rack_foot(), game.world.souvenir_foot(),
-			game.world.keeper_foot()]:
-		var point: Vector2 = spot
-		if point.x < 40 or point.y < 40 or point.x > 1240 or point.y > 700: placed = false
-	check(placed, "the scale, the rack, the souvenir and the keeper all stand inside the courtyard")
-	# ---- 贴脸镜头下的扣扣：不能被窗框切掉，也不能踩上摊子上的货 ----
-	# 镜头是宿主每帧算出来的派生值，这里先叫它按新那一幕换算一次，再读它自己写回的 scale。
-	game.apply_committed(pose(FIVE_GOODS, FIVE_FAR, "puzzle"), [])
-	game.update_camera()
-	var leaned: Vector2 = game.world.position
-	var close_up: float = game.world.scale.x
-	check(absf(close_up - 1.10) < 0.002 and leaned.distance_to(Vector2(-64, -43)) < 0.002,
-		"配秤这一幕镜头真的贴到铜秤跟前")
-	var keeper: Rect2 = game.world.keeper_rect()
-	check(keeper.position.x * close_up + leaned.x >= 0.0
-		and keeper.end.x * close_up + leaned.x <= 1280.0
-		and keeper.position.y * close_up + leaned.y >= 0.0,
-		"扣扣在贴脸镜头下整只都还在画面里，左边那半个圆码没被窗框切掉")
-	# 谁盖住谁与镜头无关：她在世界坐标里挨着砝码架，就量这一格。
-	var clear := true
-	var crowded := ""
-	for index in range(Rules.COUNT):
-		var seat: float = game.world.rack_spot(index).x - game.world.weight_width(index) / 2.0
-		if game.world.keeper_rect().end.x > seat:
-			clear = false; crowded = "第 %d 格砝码在 %.1f，她画到 %.1f" % [index + 1, seat, keeper.end.x]
-	check(clear, "扣扣没有压到架上那三枚砝码（%s）" % crowded)
-	# ---- 车顶板上那句「在哪儿」与货真正站的那一格是同一件事 ----
-	# 交付那一幕两单同时在场：本单从秤盘飞回交货车、下一单从车上推上秤。
-	# 牌子只跟着 parcel_leg 的落点走，才不会对着已经落定的货说反话。
-	var pitches := {0: [FIVE_GOODS, FIVE_FAR], 1: [EIGHT_GOODS, EIGHT_FAR]}
-	var mismatch := 0
-	var seen := 0
-	var wrong := ""
-	for look in [["arrival", 0], ["approach", 0], ["puzzle", 0], ["delivery", 0],
-			["approach", 1], ["puzzle", 1], ["delivery", 1], ["complete", 1]]:
-		for step in range(9):
-			var stage: String = look[0]
-			var order: int = int(look[1])
-			var pitch: Array = pitches[order] if stage not in ["arrival", "approach"] \
-				else [Rules.empty_pan(), Rules.empty_pan()]
-			var scene = pose(pitch[0], pitch[1], stage, order)
-			if not Rules.validate(scene): continue
-			game.apply_committed(scene, [])
-			game.world.progress = step / 8.0
-			seen += 1
-			for index in range(Rules.ORDERS.size()):
-				var spot: int = game.world.parcel_spot(index)
-				var want := " · 在车上"
-				if spot == game.world.SPOT_PAN: want = " · 上秤了"
-				elif spot == game.world.SPOT_DONE: want = " · 已交货"
-				var plank: String = game.world.cart_caption(index)
-				if not plank.ends_with(want):
-					mismatch += 1
-					wrong = "%s %d 成 · %s 写着「%s」，货却算 %d" % [stage, int(step * 100 / 8), plank, want, spot]
-	check(mismatch == 0 and seen == 63,
-		"每一块车顶板说的都是那单货此刻真站的地方（%d 个现场，%s）" % [seen, wrong])
-	# 交付那一幕的头一格里，两单货正同时被搬：一块说「已交货」的时机与一块说「上秤了」的时机
-	# 都得落在飞行过半之后，且两单各自的说法互不串台。
-	game.apply_committed(pose(FIVE_GOODS, FIVE_FAR, "delivery", 0), [])
-	game.world.progress = 1.0
-	check(game.world.parcel_spot(0) == game.world.SPOT_DONE
-		and game.world.parcel_spot(1) == game.world.SPOT_PAN
-		and game.world.cart_caption(0).ends_with("已交货")
-		and game.world.cart_caption(1).ends_with("上秤了"),
-		"交付收势时本单已停进交货车、下一单已经站上秤盘，两块牌各说各的")
-	# ---- 重摆那一句只说此刻真在账上的事 ----
-	game.apply_committed(pose(Rules.empty_pan(), Rules.empty_pan(), "puzzle", 0), [])
-	check(game.reset_prompt()[0].contains("这一单还没交出去")
-		and not game.reset_prompt()[0].contains("不会重来"),
-		"第一单还没交出去时，重摆不承诺「已经交出去的那一单」")
-	game.apply_committed(pose(EIGHT_GOODS, EIGHT_FAR, "puzzle", 1), [])
-	check(game.reset_prompt()[0].contains("已经配平交出去的那一单不会重来"),
-		"第二单在秤前时，重摆说清前一单不退回来")
-	# ---- 实际操作：摆 → 抬 → 交 → 挪 → 再抬 → 再交 ----
-	game.apply_committed(pose(Rules.empty_pan(), Rules.empty_pan()), [])
-	game.do_cycle(0); game.do_cycle(0)
-	check(game.state.goods[0] == 1 and game.history.size() == 2, "two clicks seat the 1-unit weight on the goods pan")
-	game.read_pan(Rules.FAR)
-	check("对面那盘" in game.message and game.state.far == [0, 0, 0], "reading an empty pan changes nothing")
-	game.read_order(0)
-	check("桥头灯行" in game.message, "the order slip can be read out again")
+	for id in game.buttons:
+		if not id.begins_with("rack_") and not id.begins_with("cart_"): continue
+		var rect: Rect2 = game.buttons[id].get_global_rect()
+		if rect.position.x < 0 or rect.position.y < 0 or rect.end.x > 1280 or rect.end.y > 640: framed = false
+	check(framed, "every weight and cart target stays inside the frame and clear of the button bar")
+	check(game.buttons.cart_0.tooltip_text.contains("4 单位") and game.buttons.cart_2.tooltip_text.contains("13 单位"),
+		"the cart tooltips state the units written on the order sheet")
+	check(game.buttons.cart_0.tooltip_text.contains("键盘 A"), "and name the key that picks that cart")
+	check(game.buttons.rack_2.tooltip_text.contains("9 单位") and game.buttons.rack_2.tooltip_text.contains("对面那盘"),
+		"the rack tooltip names the weight and where one click takes it")
+	check(game.buttons.deliver.disabled == false, "the submit button is live at the counter")
+	check(game.buttons.undo.disabled, "nothing to undo on an untouched stall")
+	# ---- 挑单：接单、再点同一辆车、货上盘 ----
+	game.do_choose(THIRTEEN)
+	check(game.state.order == THIRTEEN and game.message.is_empty(), "picking a cart lifts 13 单位的货 onto the pan")
+	check(game.world.parcel_spot(THIRTEEN) == game.world.SPOT_CART, "the parcel starts its hop from its own cart")
+	check(game.world.parcel_spot(FOUR) == game.world.SPOT_CART, "the two carts left in the street still say 在车上")
+	game.world.clock = game.world.pick_at + World.PICK_TIME
+	check(game.world.parcel_spot(THIRTEEN) == game.world.SPOT_PAN,
+		"once the hop is over the plaque reads the same leg the picture drew")
+	game.do_choose(THIRTEEN)
+	check(game.state.order == THIRTEEN and "已经接了" in game.message, "clicking the same cart again says where that order stands")
+	game.do_choose(SEVEN)
+	check(game.state.order == SEVEN, "before anything is booked the player may still change their mind")
+	game.do_choose(THIRTEEN)
+	check(game.state.order == THIRTEEN and not game.modal, "and change it back")
+	# 13 那一式：三枚各点一下，全站到对面那盘。
+	game.do_cycle(0); game.do_cycle(1); game.do_cycle(2)
+	check(game.state.far == [1, 1, 1] and game.state.goods == [0, 0, 0], "9、3、1 all step onto the far pan")
 	game.advance()
-	check(game.state.stage == "weighing" and game.buttons.has("skip"), "the beam lifts with pause and skip available")
-	check(not game.buttons.has("rack_0"), "the rack stays shut while the beam is lifted")
+	check(game.state.stage == "weighing", "the beam lifts on the player's own arrangement")
+	check(game.buttons.has("pause") and game.buttons.has("skip"), "the lift animates with pause and skip")
+	check(not game.buttons.has("rack_0"), "the stall's hotspots are gone while the beam is moving")
 	game.skip_animation()
-	check(game.state.stage == "result" and "货盘这一头" in game.line(), "six against nothing sinks the goods pan and says so")
-	game.advance()
-	check(game.state.stage == "puzzle" and game.state.goods[0] == 1, "the result board hands the same arrangement back")
-	for step in range(8):
-		if game.state.goods == FIVE_GOODS and game.state.far == FIVE_FAR: break
-		var want := -1
-		for index in range(Rules.COUNT):
-			var seat: int = Rules.GOODS
-			if FIVE_FAR[index] == 1: seat = Rules.FAR
-			elif FIVE_GOODS[index] != 1: seat = Rules.OFF
-			if Rules.side_of(game.state, index) != seat: want = index; break
-		if want < 0: break
-		game.do_cycle(want)
-	check(game.state.goods == FIVE_GOODS and game.state.far == FIVE_FAR, "the player can reach the reference arrangement by clicking")
-	game.advance(); game.skip_animation()
-	check(game.state.stage == "delivery", "the balanced first order is handed over")
+	check(game.state.stage == "delivery", "a level beam hands the order straight over")
 	game.skip_animation()
-	check(game.state.order == 1 and game.state.delivered == 1 and game.state.goods == FIVE_GOODS,
-		"the second order arrives on the same scale with the weights where they were left")
-	check(game.state.built_goods[0] == FIVE_GOODS, "the first arrangement is booked as it was actually built")
-	for index in range(Rules.COUNT):
-		var seat: int = Rules.GOODS
-		if EIGHT_FAR[index] == 1: seat = Rules.FAR
-		elif EIGHT_GOODS[index] != 1: seat = Rules.OFF
-		var guard := 0
-		while Rules.side_of(game.state, index) != seat and guard < 4:
-			guard += 1; game.do_cycle(index)
-	check(game.state.goods == EIGHT_GOODS and game.state.far == EIGHT_FAR,
-		"one weight stepping off the pan settles the second order")
-	game.advance(); game.skip_animation()
-	check(game.state.stage == "delivery" and game.state.order == 1, "the second order is handed over too")
-	game.skip_animation()
-	check(game.state.stage == "complete" and game.state.delivered == 2 and Rules.validate(game.state),
-		"the stall closes with both orders in the book")
-	check(game.buttons.has("back_hub") or game.buttons.has("open_hub"), "the finished stall offers a way back to the chart")
-	var receipt := ""
-	for child in game.ui.get_children():
-		if child is Label: receipt += child.text
-	check("3 从货盘挪到砝码架" in receipt, "the receipt repeats the transfer that really happened")
-	check("1 至 13" in receipt, "the receipt notes what this set of weights can span")
-	check(game.world.souvenir_items(Rules.GOODS).size() == Rules.pan_count(game.state, Rules.GOODS) + 1,
-		"the souvenir re-plays the booked arrangement, not an authored one")
-	# ---- 存档事务：坏一次就不许留下半个现场 ----
-	game.apply_committed(pose(Rules.empty_pan(), Rules.empty_pan()), [])
+	check(game.state.stage == "puzzle" and game.state.served == [THIRTEEN], "the booked order returns to the stall")
+	check(game.state.order == Rules.NONE, "with no order on the pans the next pick is the player's again")
+	check(game.world.parcel_spot(THIRTEEN) == game.world.SPOT_DONE, "the handed-over parcel is back on its own cart")
+	# ---- 第二单：只许挪一枚，第二枚当场被拦 ----
+	game.do_choose(SEVEN)
+	game.do_cycle(1)
+	check(game.state.goods == [0, 1, 0] and Rules.moved_count(game.state) == 1, "the 3 steps across the beam")
+	game.do_cycle(0)
+	check(game.state.far == [1, 0, 1] and "已经挪过了" in game.message, "reaching for the 1 is refused by name")
+	check("一单只许挪一枚" in game.message, "and the refusal states the rule it hit")
+	game.message = ""
+	game.do_return(0)
+	check(game.state.goods == [0, 1, 0] and game.state.far == [1, 0, 1], "the untouched 1 cannot be dropped back either")
 	game.do_cycle(2)
-	var bytes := FileAccess.get_file_as_bytes(path)
-	game.repository.fail_at = "replace"; game.do_cycle(1)
-	check(game.modal and game.state.far == [0, 0, 1] and FileAccess.get_file_as_bytes(path) == bytes,
-		"a failed save keeps the rack exactly as it was")
-	game.repository.fail_at = ""; game.retry_save()
-	check(game.state.far == [0, 1, 1] and not game.modal, "retry publishes the move as one step")
+	check(game.state.far == [1, 0, 1] and "3 单位那一枚已经挪过了" in game.message,
+		"nor the 9, while the 3 is the one this order already spent")
 	game.undo()
-	check(game.state.far == [0, 0, 1], "undo rewinds the retried move")
+	check(game.state.goods == [0, 0, 0] and game.message.is_empty(), "undo takes the 3 back onto the far pan and withdraws that sentence")
+	check(not game.buttons.rack_0.tooltip_text.contains("已经挪过了"), "a fresh baseline locks nothing out")
+	game.do_cycle(1)
+	check(Rules.moved_count(game.state) == 1, "and the 3 can be moved again")
+	game.do_choose(SEVEN)
+	check(game.state.order == SEVEN, "re-picking the order on the pan changes nothing but the message")
+	# ---- 交完第二单，走进死局：说法与退路都在柜面上 ----
+	game.advance(); game.skip_animation(); game.skip_animation()
+	check(game.state.served == [THIRTEEN, SEVEN], "7 单位那一单也记进账里")
+	check(game.state.goods == arrangement(7).goods and game.state.far == arrangement(7).far,
+		"the pans keep 7's booked arrangement for the last order to move from")
+	check(Rules.stuck(game.state), "and the last order is two weights away: the chain is dead")
+	check("重摆" in game.line() and "只剩 4 单位" in game.line(), "the counter says it plainly and points at 重摆")
+	check(game.buttons.has("deliver") and not game.buttons.deliver.disabled, "the beam can still be lifted — it just will not balance")
+	game.advance()
+	check(game.state.stage == "puzzle" and not game.message.is_empty(), "an empty ledger cannot be handed over, so the reason shows")
+	# 提示只是扣扣多说话：三级问完，现场一枚砝码也没动，奖励一分不扣。
+	var asked = game.state.duplicate(true)
 	game.hint(); game.hint(); game.hint(); game.hint()
-	check(game.state.hint == 3, "hints stop at the third tier")
-	check("货 5 + 砝码 3" in game.message, "the third hint reads the first order's only arrangement")
-	var kept: Dictionary = game.state.duplicate(true)
-	game.reset_layout()
-	check(game.state.goods == [0, 0, 0] and game.state.hint == kept.hint, "重摆 clears the pans and keeps the hints used")
-	game.repository.fail_at = "open"; game.advance()
-	check(not game.modal and game.state.stage == "puzzle", "an empty rack refuses the lift before anything is written")
-	game.repository.fail_at = ""; game.do_cycle(1)
-	game.repository.fail_at = "open"; game.advance()
-	check(game.modal and game.state.stage == "puzzle", "a failed lift save cannot start the animation")
+	check(game.state.hint == Rules.HINT_TIERS, "the hint counter stops at the shipped tiers")
+	check("中间" in game.message and "4→13→7" in game.message, "the last tier names the order that has to sit in the middle")
+	check(game.state.goods == asked.goods and game.state.far == asked.far, "asking never touches the pans")
+	game.message = ""
+	game.do_reset()
+	check(game.state.served.is_empty() and game.state.goods == Rules.empty_pan(), "重摆 blanks the whole chain in the scene")
+	check(game.message.is_empty() and game.line() != DEAD_LINE, "and the dead end's sentence is withdrawn with the layout")
+	# ---- 走完一条真链：全程键盘，再看回执 ----
+	game.handle_key(KEY_A)
+	check(game.state.order == FOUR, "A picks the first cart")
+	game.handle_key(KEY_1); game.handle_key(KEY_2)
+	check(game.state.far == [1, 1, 0], "1 and 2 step the 1、3 onto the far pan")
+	game.handle_key(KEY_3)
+	check(game.state.far == [1, 1, 1], "3 would put the 9 up too — 4 单位 does not need it")
+	game.handle_key(KEY_W)
+	check(game.state.far == [1, 0, 1] and game.state.goods == [0, 0, 0],
+		"W is really wired: it drops the 3 straight back on the rack")
+	game.handle_key(KEY_2)
+	check(game.state.far == [1, 1, 1], "and one more press of 2 steps it back onto the pan")
+	game.handle_key(KEY_E)
+	check(game.state.far == [1, 1, 0], "E puts the 9 straight back on the rack")
+	game.advance()
+	check(game.state.stage == "weighing", "the submit button lifts the beam")
+	game.skip_animation(); game.skip_animation()
+	check(game.state.served == [FOUR], "the first step of the winning chain is booked")
+	game.handle_key(KEY_D)
+	check(game.state.order == THIRTEEN, "D picks 13, the order that has to sit in the middle")
+	game.handle_key(KEY_3)
+	check(game.state.far == [1, 1, 1] and Rules.moved_count(game.state) == 1, "one weight, the 9, and the pans read 13")
+	game.advance(); game.skip_animation(); game.skip_animation()
+	game.handle_key(KEY_S)
+	check(game.state.order == SEVEN and game.state.served == [FOUR, THIRTEEN], "then 中街油铺 for the last order")
+	game.handle_key(KEY_2)
+	check(game.state.goods == [0, 1, 0] and game.state.far == [1, 0, 1],
+		"one click carries the 3 across the beam — 7 is one weight from 13")
+	check(Rules.moved_count(game.state) == 1 and Rules.balanced(game.state),
+		"and that single weight is all this order asks for")
+	game.advance(); game.skip_animation(); game.skip_animation()
+	check(game.state.stage == "complete" and Rules.validate(game.state), "the third hand-over closes the ledger")
+	check(game.state.served == WIN_A, "and the chain the receipt reports is the one the player walked")
+	var paper_label: Label = null
+	for child in game.ui.get_children():
+		if child is Label and "回执 · 一单只挪一枚" in child.text: paper_label = child
+	check(paper_label != null, "the receipt is drawn on the panel")
+	check(paper_label != null and paper_label.text.contains("起手 4 单位"), "it restates the order the player actually picked first")
+	check(paper_label != null and paper_label.text.contains("4 与 7 只差 3 单位"), "and closes on the maths it was built to teach")
+	check(paper_label != null and width_of(paper_label.text, 16) <= 276.0, "the receipt holds its own paper")
+	# 纸面量的是真高度：主题把 16 号字落到 18 像素，六行压不压得下只有排版器说了算。
+	var stacked := 0.0
+	if paper_label != null:
+		for row in range(paper_label.get_line_count()): stacked += paper_label.get_line_height(row)
+	check(paper_label != null and paper_label.get_line_count() == game.receipt_lines().size()
+		and paper_label.position.y + stacked <= game.receipt_rect().end.y,
+		"every receipt line is written on the paper, none hangs off its bottom edge")
+	check(game.buttons.has("next") and game.buttons.next.text == "再配一次", "the receipt offers to redo the errand")
+	var boards: Array = game.world.signs()
+	var apart := true
+	for a in range(boards.size()):
+		for b in range(a + 1, boards.size()):
+			if boards[a]["rect"].intersects(boards[b]["rect"]): apart = false
+	check(apart, "no two stall plaques are printed on top of each other")
+	var overflow := 0
+	for board in boards:
+		if width_of(board["text"], board["size"]) > board["rect"].size.x - 20.0: overflow += 1
+	check(overflow == 0, "every plaque holds its own words inside its board")
+	# ---- 每一幕真的重画一遍：绘制代码一崩就会带着 SCRIPT ERROR 退出来 ----
+	for stage in Rules.STAGES:
+		var looks := [book, mid]
+		if stage in ["weighing", "result", "delivery"]:
+			looks.append(pose("puzzle", [], FOUR, arrangement(4).goods, arrangement(4).far, 1))
+			looks.append(pose("result", [], FOUR, OFF_BALANCE.goods, OFF_BALANCE.far, 1))
+		if stage == "puzzle": looks.append(dead)
+		for look in looks:
+			var shaped = look.duplicate(true)
+			shaped.stage = stage
+			if stage in ["weighing", "result", "delivery"] and shaped.order < 0: shaped.order = FOUR
+			if stage in ["delivery"] and not Rules.balanced(shaped):
+				shaped.goods = arrangement(4).goods; shaped.far = arrangement(4).far
+			if stage in ["arrival", "approach", "ready"]:
+				shaped.order = Rules.NONE; shaped.served = []; shaped.weighs = 0
+				shaped.goods = Rules.empty_pan(); shaped.far = Rules.empty_pan()
+				shaped.built_goods = Rules.empty_records(); shaped.built_far = Rules.empty_records()
+			if stage == "complete": shaped = book.duplicate(true)
+			if not Rules.validate(shaped): continue
+			game.apply_committed(shaped, [])
+			for at in [0.0, 0.5, 1.0]:
+				game.paused = true; game.world.progress = at; await process_frame
+	check(is_instance_valid(game.world) and not game.modal, "every stage repaints without breaking the stall")
+	game.paused = false
+	# ---- 存档事务：现场写盘、失败保护、从档里接着走 ----
+	# 宿主的规矩是「写不进去就当没发生过」：状态、画面与磁盘三份必须一起停在上一次成功的那一步。
+	game.apply_committed(mid, [])
+	var bytes = FileAccess.get_file_as_bytes(path)
+	game.repository.fail_at = "replace"; game.do_reset()
+	check(game.modal and game.state.served == [FOUR, THIRTEEN] and FileAccess.get_file_as_bytes(path) == bytes,
+		"a redo whose save fails never reaches the table, and the old file keeps every byte")
 	game.repository.fail_at = ""; game.retry_save()
-	check(game.state.stage == "weighing", "retry lifts the beam at the arrangement actually saved")
+	check(not game.modal and game.state.served.is_empty(), "retry publishes the redo as one move")
+	game.repository.fail_at = "open"; game.do_choose(THIRTEEN)
+	check(game.modal and game.state.order == Rules.NONE, "a pick that cannot be saved never reaches the pans")
+	game.repository.fail_at = ""; game.retry_save()
+	check(not game.modal and game.state.order == THIRTEEN, "retry publishes the pick as one move")
 	game.queue_free(); await process_frame
-	# ---- 重进现场：读档读回的是玩家真正摆过的那一式 ----
-	game = Scene.instantiate(); game.save_path = path; root.add_child(game); game.paused = true; await process_frame
-	check(game.state.stage == "weighing" or game.state.stage == "puzzle", "the reopened stall resumes where the player left it")
-	check(Rules.validate(game.state), "the resumed stage is still a legal save")
+	game = reopen(); await process_frame
+	check(game.state.served.is_empty() and game.state.order == THIRTEEN, "the reload resumes the pick the disk agreed to")
+	check(game.world.pick_seen == THIRTEEN, "the world notices the resumed pick instead of treating it as untouched")
+	game.world.clock = game.world.pick_at + World.PICK_TIME
+	check(game.world.parcel_spot(THIRTEEN) == game.world.SPOT_PAN,
+		"and that parcel is standing on the pan once its own hop is over")
 	game.queue_free(); await process_frame
-	var mid := pose(FIVE_GOODS, FIVE_FAR, "weighing", 1)
-	var writer := FileAccess.open(path, FileAccess.WRITE); writer.store_string(JSON.stringify(mid)); writer.close()
-	game = Scene.instantiate(); game.save_path = path; root.add_child(game); game.paused = true; await process_frame
-	check(game.state.order == 1 and game.world.state.order == 1, "a saved second order reloads onto the same scale")
-	check(game.buttons.has("pause") and game.buttons.has("skip"), "the resumed lift can be paused or skipped again")
-	check(not game.buttons.has("open_hub"), "a running lift keeps the way out for later")
+	write_save(pose("puzzle", [FOUR, SEVEN], Rules.NONE, arrangement(7).goods, arrangement(7).far, 2))
+	game = reopen(); await process_frame
+	check(game.modal and game.repository.protected and game.state.stage == "arrival",
+		"a two-weight ledger is protected and the stall reopens clean")
 	game.queue_free(); await process_frame
-	writer = FileAccess.open(path, FileAccess.WRITE)
-	writer.store_string(JSON.stringify(pose(FIVE_GOODS, FIVE_FAR, "complete"))); writer.close()
+	write_save(pose("puzzle", [], FOUR, arrangement(4).goods, arrangement(4).far, 0))
+	game = reopen(); await process_frame
+	check(Rules.validate(game.state) and game.state.order == FOUR and not game.modal,
+		"an unfinished pick resumes where it stopped")
+	check(game.buttons.has("deliver"), "the lifted-never button is back for the player's own hand")
+	game.queue_free(); await process_frame
+	write_save(pose("weighing", [], FOUR, arrangement(4).goods, arrangement(4).far, 1))
+	game = reopen(); await process_frame
+	check(game.state.stage == "weighing" and game.buttons.has("skip"), "a beam caught mid-lift resumes its animation")
+	game.queue_free(); await process_frame
+	write_save(pose("delivery", [FOUR], THIRTEEN, arrangement(13).goods, arrangement(13).far, 2))
+	game = reopen(); await process_frame
+	check(game.state.stage == "delivery" and game.world.parcel_spot(THIRTEEN) == game.world.SPOT_PAN,
+		"a resumed hand-over starts with the parcel still on the pan")
+	game.world.progress = 1.0
+	check(game.world.parcel_spot(THIRTEEN) == game.world.SPOT_DONE,
+		"and the same leg carries it back to its own cart as the animation closes")
+	# 交付木牌要分清头一单和后面的单子：第一式是从架上一枚一枚摆起来的，
+	# 把它写成「只挪了一枚」就是替玩家记下一件没发生过的事。
+	var plates := {"first": "", "later": ""}
+	for served_before in [[], [FOUR]]:
+		game.apply_committed(pose("delivery", served_before, THIRTEEN,
+			arrangement(13).goods, arrangement(13).far, 1 + served_before.size()), [])
+		for board in game.world.signs():
+			if "签了收" in board["text"]:
+				if served_before.is_empty(): plates.first = board["text"]
+				else: plates.later = board["text"]
+	check(plates.first == "订单三 签了收 · 这一式从架上摆起",
+		"the first hand-over says the arrangement was built off the rack")
+	check(plates.later == "订单三 签了收 · 只挪了一枚砝码",
+		"only a hand-over that really moved one weight may say so")
+	game.queue_free(); await process_frame
+	write_save({"stage": "complete", "sample": "market-mk13-1"})
+	game = reopen(); await process_frame
+	check(game.modal and game.repository.protected, "another level's receipt is rejected, not adopted")
+	game.recover_protected()
+	check(not game.modal and game.state.stage == "arrival", "keeping the old file and starting over is the only way through")
+	game.queue_free(); await process_frame
+	write_save(pose("puzzle"))
 	Bridge.origin = "hub"
 	game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame
 	check(game.origin == "hub" and Bridge.origin.is_empty(), "the chart hand-off is consumed once")
-	check(game.buttons.has("back_hub"), "arriving from the chart offers the way back")
+	check(game.buttons.has("leave_hub") and not game.buttons.has("open_hub"),
+		"a stall entered from the chart keeps one way back, mid-placement included")
 	game.queue_free(); await process_frame
+	write_save(book)
 	game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame
-	check(game.origin != "hub" and game.buttons.has("open_hub"), "a standalone sample still finds a way back to the chart")
-	check(game.buttons.open_hub.text == "回千灯航图", "the exit contract copies mk03's button verbatim")
+	check(game.state.stage == "complete" and game.buttons.has("open_hub") and not game.buttons.has("back_hub"),
+		"a standalone launch of a finished stall still finds its way back to the chart")
+	check(game.buttons.has("next") and game.buttons.next.text == "再配一次", "the receipt offers to redo the errand")
+	var door: Button = game.buttons.open_hub
+	check(door.position == Vector2(690, 646) and door.size == Vector2(280, 54), "the way out keeps the chapter's own rect")
+	game.confirm_restart()
+	check(game.modal and game.state.stage == "complete", "replaying the stall asks first")
+	game.close_modal()
+	check(game.state.served == WIN_A and Rules.validate(game.state), "cancelling keeps the ledger the player built")
 	game.queue_free(); await process_frame
-	var file := FileAccess.open(path, FileAccess.WRITE); file.store_string("{broken"); file.close()
-	game = Scene.instantiate(); game.save_path = path; root.add_child(game); await process_frame
-	check(game.modal and game.repository.protected and FileAccess.get_file_as_string(path) == "{broken",
-		"a corrupt save is protected without overwrite")
-	game.queue_free(); await process_frame
-	# ---- 目录一致性 ----
-	check(Catalog.scene("MK14") == "res://game/market_mk14.tscn", "the catalogue points at the shipped scene")
-	check(Catalog.save_path("MK14") == SAVE_DEFAULT, "the catalogue save path is the one this level writes")
-	check(Catalog.LEVELS["MK14"].kit == "oil", "the catalogue keeps mk14 on the oil kit scene")
-	check(Catalog.opens_after("MK14") == "MK11" and Catalog.is_side("MK14"), "mk14 is the side stall that opens after MK11")
-	check(Catalog.act("MK14") == 5, "the side stall belongs to the fifth act")
-	check("5" in Catalog.goal("MK14") and "8" in Catalog.goal("MK14"), "the catalogue goal names the same two orders")
-	check(ResourceLoader.exists(Catalog.scene("MK14")) and Catalog.built("MK14"), "the chart can now light MK14")
-	check(Catalog.available("MK14", ["MK11"]) and not Catalog.available("MK14", ["MK10"]),
-		"MK14 opens for a player who finished MK11 only")
 	DirAccess.remove_absolute(path)
 	print("MARKET MK14 RULES ", checks - failures, "/", checks, " PASS")
 	quit(1 if failures else 0)
+
+func pose_open() -> Dictionary: return pose("puzzle")
+func walked_dead() -> Dictionary: return pose("puzzle", DEAD_A, Rules.NONE, arrangement(4).goods, arrangement(4).far, 2)

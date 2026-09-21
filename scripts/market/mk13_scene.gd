@@ -1,9 +1,12 @@
 extends "res://scripts/market/level_host.gd"
 # MK13 扣扣的旧围巾（可选支线，MK04 之后开门）：柜面上摊着两包 5 段与三包 3 段补边布，
-# 柜头立着一把 11 格的样边尺。玩家把整包拿起来摊到尺上（最多三包，包不能剪开），
-# 再按「交给扣扣补边」。缺多少、多多少，只在提交之后按玩家自己拿的段数讲给他听。
+# 柜头立着一把 11 格的对折样边尺——第 6 格正中压着折线。玩家把整包拿起来按拿的先后摊到尺上，
+# 再按「交给扣扣补边」。交的条件有两条：11 格摊满，且对折过来两头一段对一段。
+# 只看段数，摊满 11 格有三条走法（5+3+3、3+5+3、3+3+5），对折这一条把前两种和最后一种都挡在门外：
+# 5 段那一包必须压在折线上，两边各余 3 格。差几段、齐不齐都不写在底栏里，尺面自己数得出来。
 # 补好的边先出现在扣扣的围巾上，接着是她学徒第一次送货的那一小段故事；
 # 要不要把补好的边戴在外面，是玩家自愿的选择，只写进本关自己的存档。
+# 台词与提示按行写死：一长串汉字在 Godot 里是一个不可断的词，会自动画到框外。
 const Rules = preload("res://scripts/market/mk13_rules.gd")
 const World = preload("res://scripts/market/mk13_world.gd")
 const PACKAGE_KEYS = [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5]
@@ -12,8 +15,8 @@ const RECEIPT = Rect2(96, 232, 432, 180)
 const RECEIPT_TEXT = Rect2(112, 244, 404, 160)
 const LINES = [
 	"扣扣：我这条围巾的边磨开了，一段一段数下来，正好缺 11 段补边布。\n育苗铺只按整包卖：一包 3 段，或者一包 5 段。",
-	"扣扣：我攒的铜果只够拿三包。最先看中的就是柜上那两包 5 段……\n可两包是 10 段，还差 1 段，1 段的包他们没有。",
-	"小岚：那就先别交钱。包不能剪开，也不退半包。\n柜头那把样边尺有 11 格：把包摊上去，一段一段数给自己看。",
+	"扣扣：补这条边得把围巾对折着来，缝完两头要一样长。\n折过来哪一段对不上哪一段，戴出去一边长一边短，比现在还难看。",
+	"小岚：包不能剪开，也不退半包。柜头这把样边尺有 11 格，折线正压在第 6 格上。\n把包摊上去，两头一段对一段地照齐了，扣扣才肯收钱。",
 ]
 const STORY = [
 	"扣扣：这条围巾是我当学徒第一次送货那天，师父用剩下的布头给我围上的。\n那天我拉一车铃铛去东堤，怕出错，一路都在数轮子响了几声。",
@@ -32,10 +35,12 @@ func configure() -> void:
 func goal_line() -> String:
 	# 故事与交货之后不再挂目标：那一段是回报，不是题目。
 	if state.get("stage", "") in ["story"]: return ""
-	return "围巾的边要 11 段：只用 3 段或 5 段的整包，最多拿 3 包"
+	return "整包摊满 11 格 · 对折过来两头要一段对一段"
 
+# 底栏只报尺面上数得出的事：摊了几包、几段。差几段、齐不齐都不写在这里——
+# 尺上的格子本来就从 1 编到 11，折线就压在第 6 格上，那是玩家自己眼睛该做的两次比对。
 func status_line() -> String:
-	return "%d 包 · %d 段 · %s" % [Rules.carried(state), Rules.total(state), Rules.gap_text(state)]
+	return "%d 包 · %d 段摊在尺上" % [Rules.carried(state), Rules.total(state)]
 
 func submit_label() -> String: return "交给扣扣补边"
 
@@ -47,17 +52,17 @@ func stage_labels() -> Dictionary:
 
 func restart_prompt() -> Array: return ["重新体验补围巾这一幕？", "留在育苗铺", "重新体验"]
 func reset_prompt() -> Array:
-	return ["把摊在样边尺上的包全部退回柜面？\n已经数过的段数会跟着退回去，钱一文没花。", "继续挑包", "全部退回柜面"]
+	return ["把摊在样边尺上的包全部退回柜面？\n段数与折线都会跟着退回去，钱一文没花。", "继续挑包", "全部退回柜面"]
 
 func line() -> String:
 	match state.stage:
 		"arrival": return LINES[state.beat]
-		"approach": return "柜头立着育苗铺的样边尺：11 格，一格一段补边布。"
-		"ready": return "整包拿起来摊到尺上，数够了再交给扣扣去缝。"
-		"puzzle": return "点柜面上的整包，它就摊到样边尺的空格里；再点那一截就退回柜面。\n钱只够拿三包，包不能剪开。"
+		"approach": return "柜头立着育苗铺的样边尺：11 格，一格一段补边布，折线压在第 6 格上。"
+		"ready": return "整包拿起来摊到尺上，对折照得齐了再交给扣扣去缝。"
+		"puzzle": return "点柜面上的整包，它就摊到样边尺的空格里；再点那一截就退回柜面。\n包不能剪开，摊不下的那一包拿不起来。"
 		"delivery": return "扣扣把量好的补边布一针一针缝上围巾的边……"
 		"story": return STORY[state.beat]
-		"complete": return "小岚：一段不多，一段不少。这条边往后就是你的了。"
+		"complete": return "小岚：摊得满，折得齐。这条边往后就是你的了。"
 	return ""
 
 func build() -> void:
@@ -65,7 +70,7 @@ func build() -> void:
 		var segs: int = Rules.segs(id)
 		var held = Rules.in_hand(state, id)
 		var tip = "这包 %d 段已经摊在样边尺上：点一下退回柜面" % segs if held else \
-			"整包 %d 段，不能剪开：点一下拿起来，摊到样边尺的空格里" % segs
+			"整包 %d 段，不能剪开：尺上还剩 %d 格，摊得下就点一下拿起来" % [segs, Rules.free_slots(state)]
 		add_hotspot("stock_%d" % id, world.stock_rect(id), toggle_package.bind(id), tip)
 	for slot in range(Rules.carried(state)):
 		var pid: int = Rules.run_package(state, slot)
@@ -83,8 +88,8 @@ func extra() -> void:
 	UIStyle.text(ui, receipt_text(), RECEIPT_TEXT, 18)
 
 func receipt_text() -> String:
-	return "回执 · 育苗铺补边布\n拿的包：%s = %d 段\n围巾的边：%d 段，一段不多、一段不少\n柜上还剩：%s" % [
-		Rules.packages_line(state), Rules.total(state), Rules.NEED, Rules.left_line(state)]
+	return "回执 · 育苗铺补边布\n拿的包：%s = %d 段\n对折过来：两头一段挨着一段，正好齐\n柜上还剩：%s" % [
+		Rules.packages_line(state), Rules.total(state), Rules.left_line(state)]
 
 func exit_buttons() -> void:
 	# 从航图进来的场合由宿主给出「返回千灯航图」；单独启动本关时也要有一条回去的路。
@@ -97,10 +102,12 @@ func cleared_state() -> Dictionary:
 	var next = state.duplicate(true); next.hand = []
 	return next
 
+# 三级提示：提醒对折这件事 → 缩小「哪一包压折线」这个关键选择 → 示范一步。
+# 提示只多说话，奖励一分不扣；最短的那一级不替玩家点包。
 func hint_texts() -> Array:
-	return ["柜上只有 3 段和 5 段两种整包：包不能剪开，也不退半包，一次最多拿三包。",
-		"一包两包最多只有 10 段，凑不到 11：要凑够，非拿三包不可。\n三包里有几种摆法，摊上去，样边尺会替你数。",
-		"三包要凑 11 段：5 + 3 + 3 = 11。\n两包 5 段是 10 段，第三包没有 1 段的——把那两包换开试试。"]
+	return ["围巾是对折着补的：从第 6 格折过去，两头要一段对一段。\n包只有 3 段和 5 段两种，不能剪开，摊满 11 格为止。",
+		"压着折线的那一包若是 3 段，两头各余 4 格：4 段摊不成整包。\n是 5 段就各余 3 格，正好一边一包 3 段。",
+		"先点一包 3 段摊到最左边，再点一包 5 段：它正好跨过折线。\n最后再点一包 3 段，落在最右边那三格上。"]
 
 # 柜面上的包一换，上一句按旧拿法说的话当场就不成立了：撤销与「重摆」也走这里，
 # 先收回那句话，再让样边尺自己报新数——玩家看到的永远是自己此刻手上的段数。

@@ -1,11 +1,14 @@
 extends "res://scripts/market/kit_world.gd"
-# MK14 三枚砝码的小摊：油庭院前景那具货栈铜秤、架上的三枚砝码、接连送来的两单真货。
-# 底景、铜秤三构件、砝码、油纸封包、接货车、接货托盘与回执全部来自 kit-v1 拆件包；
+# MK14 三枚砝码的小摊：油庭院前景那具货栈铜秤、架上的三枚砝码、街上停着的三单真货。
+# 底景、铜秤三构件、砝码、油纸封包、车与回执全部来自 kit-v1 拆件包；
 # 坐标只来自 manifest `oil` 场景（scale_foot / cart_left / cart_middle / cart_right）与
 # delivery_cart 自己的 cargo_left / cargo_right 挂点，砝码排与盘内站位都由 grid() 算出来，
 # 关卡里不另立第二套站位、也不手写任何 manifest 已经给出的挂点关系。
+# 三单货一人一辆车：谁先上秤由玩家点车挑，挑中那一下车顶板才写「上秤了」，交完跟着自己那辆车走。
+# 上一单记进账里的那一式钉在秤座上方——那是玩家自己走过的路，不是答案；
+# 这一关的规矩正是「往后每一单只能从上一单那一式挪一枚砝码」。
 # 秤在摆放过程中始终锁着（braked），读数只在提交之后的抬秤里出现；判分只在规则层，
-# 画面只复述玩家自己摆出来的那一式，永远不预告它平不平。
+# 画面只复述玩家自己摆出来的那一式，永远不预告这一式平不平、下一单该接哪一单。
 const Rules = preload("res://scripts/market/mk14_rules.gd")
 const BACKDROP = preload("res://assets/runtime/market/kit-v1/backgrounds/oil-courtyard-clean-v1.png")
 const KOUKOU_TIE = preload("res://assets/runtime/market/characters/koukou-v1/tie-parcel.png")
@@ -21,7 +24,7 @@ const SCALE_PARTS = ["scale_stand", "scale_beam", "scale_pan"]
 # 最外侧那件的外缘必须落在 239×0.85 = 203 像素宽的盘沿（±101.6）之内，
 # 所以货与砝码的宽度都被这条盘沿算死，不由作者凭手感写。
 const WEIGHT_WIDTHS = [40.0, 46.0, 40.0]
-const PARCEL_WIDTHS = [46.0, 52.0]
+const PARCEL_WIDTHS = [42.0, 47.0, 52.0]
 const PAN_PITCH = 50.0
 const PAN_LIFT = 6.0
 # 砝码架摆在铜秤左手边的地上：三格 56 像素一排，全部落在 receiving_tray 的 174 宽之内。
@@ -40,8 +43,11 @@ const CARRY_ARC = 46.0
 const MAX_ANGLE = 0.14
 const DROP_TIME = 0.24
 const DROP_LIFT = 18.0
+# 挑单之后货从车上走到货盘要多久：只决定演出快慢，不参与判分。
+const PICK_TIME = 0.6
 # 迷你铜秤纪念物：同一套构件、同一个挂点链，只整体再缩 0.42；它立在右下角的空地上，
-# 三块牌子压在它头顶，离右边那辆车与按钮排都留出距离。
+# 牌子压在它头顶，离右边那辆车与按钮排都留出距离。
+# 纪念物只重演最后一单真正记下的那一式：货与砝码同一条横排，与真秤的排法同一个算法。
 const SOUVENIR_SCALE = 0.42
 const SOUVENIR_FOOT = Vector2(470, 63)
 const SOUVENIR_BASE = Vector2(0, -30)
@@ -59,6 +65,11 @@ const SPOT_PAN = 1
 const SPOT_DONE = 2
 var drop_seen := [0, 0, 0]
 var drop_at := [-100.0, -100.0, -100.0]
+# 挑单那一下的搬运：货从自己那辆车走到货盘，用的是世界自己的时钟。
+# 这一段不占用宿主的 progress——它发生在「秤前」那一幕当中，
+# 宿主只在 approach/weighing/delivery 三幕里推进 progress，暂停与跳过也只对着那三幕。
+var pick_seen := -2
+var pick_at := -100.0
 
 func ready_level() -> void:
 	scene_id = "oil"; backdrop = BACKDROP
@@ -180,30 +191,26 @@ func weight_height(index: int) -> float:
 func parcel_width(index: int) -> float:
 	return PARCEL_WIDTHS[clampi(index, 0, Rules.ORDERS.size() - 1)]
 
-# ---- 两单货的位置：车上等着、盘上压着、交完回到交货车 ----
+# ---- 三单货的位置：各自停在各自的车上、挑中才上秤、交完回自己那辆车 ----
 # 一单货此刻的行程：[起点, 终点, 走了几成, 起点算站在哪儿, 终点算站在哪儿]。
 # amount < 0 表示没在飞，货就稳稳站在 from 那一处。画面落点与车顶板那句「在哪儿」
-# 都从这一条读，交付那一幕里两块牌子不会再各算一套。
+# 都从这一条读，挑单与交付那两段不会出现两块牌子各说一套的情况。
+func home_bed(index: int) -> Vector2: return cart_bed(index, 0)
+
 func parcel_leg(index: int) -> Array:
 	if index < 0 or index >= Rules.ORDERS.size():
 		return [scale_foot(), scale_foot(), -1.0, SPOT_CART, SPOT_CART]
-	if index < state.order:
-		return [cart_bed(2, index), cart_bed(2, index), -1.0, SPOT_DONE, SPOT_DONE]
-	if index > state.order:
-		# 交付那一幕，下一单的货同时被推上秤：这段飞行也算进落点，与真秤那一单同一条公式。
-		if index == state.order + 1 and state.stage == "delivery":
-			return [cart_bed(index, 0), parcel_on_pan(index), smoothstep(0.4, 1.0, progress), SPOT_CART, SPOT_PAN]
-		return [cart_bed(index, 0), cart_bed(index, 0), -1.0, SPOT_CART, SPOT_CART]
+	if Rules.is_served(state, index):
+		return [home_bed(index), home_bed(index), -1.0, SPOT_DONE, SPOT_DONE]
+	if state.order != index:
+		return [home_bed(index), home_bed(index), -1.0, SPOT_CART, SPOT_CART]
 	match state.stage:
-		"arrival":
-			return [cart_bed(index, 0), cart_bed(index, 0), -1.0, SPOT_CART, SPOT_CART]
-		"approach":
-			return [cart_bed(index, 0), parcel_on_pan(index), smoothstep(0.2, 1.0, progress), SPOT_CART, SPOT_PAN]
 		"delivery":
-			return [parcel_on_pan(index), cart_bed(2, index), smoothstep(0.15, 0.9, progress), SPOT_PAN, SPOT_DONE]
-		"complete":
-			return [cart_bed(2, index), cart_bed(2, index), -1.0, SPOT_DONE, SPOT_DONE]
-	return [parcel_on_pan(index), parcel_on_pan(index), -1.0, SPOT_PAN, SPOT_PAN]
+			return [parcel_on_pan(index), home_bed(index), smoothstep(0.15, 0.9, progress), SPOT_PAN, SPOT_DONE]
+		"arrival", "approach", "ready":
+			return [home_bed(index), home_bed(index), -1.0, SPOT_CART, SPOT_CART]
+	return [home_bed(index), parcel_on_pan(index), clampf((clock - pick_at) / PICK_TIME, 0.0, 1.0),
+		SPOT_CART, SPOT_PAN]
 
 func parcel_foot(index: int) -> Vector2:
 	var leg: Array = parcel_leg(index)
@@ -213,12 +220,6 @@ func parcel_foot(index: int) -> Vector2:
 func parcel_spot(index: int) -> int:
 	var leg: Array = parcel_leg(index)
 	return int(leg[4]) if float(leg[2]) >= 0.5 else int(leg[3])
-
-# 交付那一幕里，下一单的货同时被推上秤：迁移就这么演出来。
-func next_parcel_foot() -> Vector2:
-	var index: int = state.order + 1
-	if index >= Rules.ORDERS.size(): return Vector2.INF
-	return parcel_foot(index)
 
 func carry(from: Vector2, to: Vector2, amount: float) -> Vector2:
 	return from.lerp(to, amount) + Vector2(0, -CARRY_ARC * sin(amount * PI))
@@ -244,12 +245,14 @@ func beam_angle() -> float:
 	if Rules.balanced(state): return MAX_ANGLE * 0.55 * sin(progress * PI * 2.4) * (1.0 - progress)
 	return MAX_ANGLE * Rules.tilt(state) * smoothstep(0.1, 0.72, progress)
 
-# 砝码挪盘的那一下用世界自己的时钟下落，不占用宿主的落地锁。
+# 砝码挪盘的那一下用世界自己的时钟下落，不占用宿主的落地锁；挑单那一下的搬运同理。
 func track_changes() -> void:
 	for index in range(Rules.COUNT):
 		var side: int = Rules.side_of(state, index)
 		if drop_seen[index] != side:
 			drop_at[index] = clock; drop_seen[index] = side
+	if pick_seen != state.order:
+		pick_at = clock; pick_seen = state.order
 
 func drop(index: int) -> float:
 	return clampf((clock - drop_at[index]) / DROP_TIME, 0.0, 1.0)
@@ -325,7 +328,11 @@ func draw_weight(index: int, foot: Vector2) -> void:
 	words(str(Rules.WEIGHTS[index]), at + Vector2(-5, -weight_height(index) - 6), 15, INK_GOLD)
 
 # 迷你铜秤纪念物：同一套构件、同一个挂点公式，只是整体再缩 SOUVENIR_SCALE；
-# 它上头重演的是玩家真正记进账里的那一式，不是作者写死的答案。
+# 它上头重演的是玩家真正记进账里的最后一式，不是作者写死的答案。
+func souvenir_order() -> int:
+	var served: Array = state.served
+	return int(served[served.size() - 1]) if served.size() else -1
+
 # 纪念物只重演最后一单真正记下的那一式：货与砝码同一条横排，与真秤的排法同一个算法。
 func souvenir_pitch() -> float:
 	return part_width("scale_pan", unit_scale() * SOUVENIR_SCALE) * 0.24
@@ -342,18 +349,19 @@ func draw_souvenir() -> void:
 	kit("receiving_tray", foot, suggested("receiving_tray"))
 	var base: Vector2 = foot + SOUVENIR_BASE
 	draw_scale_frame(base, unit_scale() * SOUVENIR_SCALE, 0.0)
+	var last: int = souvenir_order()
 	for side in [Rules.GOODS, Rules.FAR]:
 		var items: Array = souvenir_items(side)
 		var row: Array = souvenir_row(side)
 		for slot in range(items.size()):
 			if items[slot] == PARCEL_SLOT:
-				kit(Rules.ORDER_KITS[Rules.ORDERS.size() - 1], row[slot],
-					parcel_width(Rules.ORDERS.size() - 1) * SOUVENIR_SCALE)
+				kit(Rules.ORDER_KITS[last], row[slot], parcel_width(last) * SOUVENIR_SCALE)
 			else:
 				kit(Rules.WEIGHT_KITS[items[slot]], row[slot], weight_width(items[slot]) * SOUVENIR_SCALE)
 
 func souvenir_items(side: int) -> Array:
-	var last: int = Rules.ORDERS.size() - 1
+	var last: int = souvenir_order()
+	if last < 0: return []
 	var list := []
 	if side == Rules.GOODS: list.append(PARCEL_SLOT)
 	for weight in Rules.on_list(state.built_goods[last], state.built_far[last], side): list.append(weight)
@@ -380,7 +388,7 @@ func sign_board(text: String, at: Vector2, wide: float, size_px: int, plaque_boa
 
 func signs() -> Array:
 	var boards := []
-	if not state.has("delivered"): return boards
+	if not state.has("served"): return boards
 	for index in range(Rules.CARTS.size()):
 		if state.stage == "complete": break
 		var at := cart_station(index)
@@ -390,34 +398,43 @@ func signs() -> Array:
 		var dish := pan_cargo(side)
 		boards.append(sign_board(pan_label(side), Vector2(dish.x, dish.y + 26), 96.0, 14, false))
 	if state.stage == "puzzle":
-		boards.append(sign_board(Rules.equation(state), Vector2(690, 592), 340.0, 15, true))
+		# 上一单记进账里的那一式：这是玩家自己走过的路，也是这一单「只许挪一枚」的起点。
+		if not state.served.is_empty():
+			boards.append(sign_board(Rules.baseline_caption(state), Vector2(690, 558), 340.0, 15, true))
+		# 还没挑单就还没有式子可念：牌子上只说街上那三辆车在等。
+		var current := "点街上那三辆车，挑一单先上秤" if state.order < 0 else Rules.equation(state)
+		boards.append(sign_board(current, Vector2(690, 592), 340.0, 15, true))
 		# 这块牌子说的是左手边那一排砝码，就钉在架子正下方：挪动架子它跟着走，不会指错。
-		boards.append(sign_board("三枚砝码 · 点一下挪地方", Vector2(rack_foot().x, 600), 248.0, 15, true))
+		boards.append(sign_board("三枚砝码 · 一单只挪一枚", Vector2(rack_foot().x, 600), 248.0, 15, true))
 	if state.stage == "weighing":
 		boards.append(sign_board("制动已松 · 秤杆抬起来", Vector2(670, 596), 260.0, 15, true))
 	if state.stage == "result":
 		boards.append(sign_board("两盘差 %d 单位 · 这一单还不能走" % absi(Rules.difference(state)),
 			Vector2(690, 596), 340.0, 15, true))
 	if state.stage == "delivery":
-		boards.append(sign_board("%s 签了收 · 砝码一枚没换" % Rules.order_name(state.order),
+		# 头一单是从架上摆起来的：牌上写「只挪了一枚」就是把没发生过的事当事实报给玩家。
+		var how := "这一式从架上摆起" if state.served.is_empty() else "只挪了一枚砝码"
+		boards.append(sign_board("%s 签了收 · %s" % [Rules.order_name(state.order), how],
 			Vector2(690, 596), 320.0, 15, true))
 	if state.stage == "complete":
 		var foot: Vector2 = souvenir_foot()
-		boards.append(sign_board("迷你铜秤 · 两单的摆法", Vector2(foot.x, foot.y - 250), SOUVENIR_PLANK, 14, true))
-		for index in range(Rules.ORDERS.size()):
-			boards.append(sign_board(Rules.built_equation(state, index),
-				Vector2(foot.x, foot.y - 220 + index * 30), SOUVENIR_PLANK, 13, true))
+		boards.append(sign_board("迷你铜秤 · 三单的摆法", Vector2(foot.x, foot.y - 250), SOUVENIR_PLANK, 14, true))
+		# 三行的式子挪到秤座下方那一条横排：柜面那一幕的式子牌就钉在这儿，同一个位置、同一个宽度。
+		# 纪念物头顶那块 240 的横板装不下「货 7 + 砝码 3 = 砝码 9 + 砝码 1」这么长的一行。
+		for step in range(state.served.size()):
+			var index: int = state.served[step]
+			boards.append(sign_board("%d. %s" % [step + 1, Rules.built_equation(state, index)],
+				Vector2(690, 540 + step * 30), 340.0, 13, true))
 	return boards
 
 # 车顶板上只写「哪一单、几单位、现在在哪」：完整说法留在热点文字与回执里。
-# 「在哪」读的是 parcel_spot()，与货此刻真正站的那一格同一个来源：交付那一幕里
-# 货已经落上秤盘（或已经停进交货车）时，牌上不会再写着「在车上」。
+# 说法取自规则层的 cart_caption，与热点文字同一份来源；「在哪」由 parcel_spot() 决定，
+# 与货此刻真正站的那一格同一个来源：货已经落上秤盘（或已经回到自己那辆车）时，
+# 牌上不会再写着「在车上」。
 func cart_caption(index: int) -> String:
-	if index >= Rules.ORDERS.size(): return "交货车 · 已交 %d 单" % state.delivered
-	var text := "%s · %d 单位" % [Rules.ORDER_NAMES[index], Rules.ORDERS[index]]
-	var spot := parcel_spot(index)
-	if spot == SPOT_DONE: return text + " · 已交货"
-	if spot == SPOT_PAN: return text + " · 上秤了"
+	var text := "%s · %d 单位" % [Rules.ORDER_TAGS[index], Rules.ORDERS[index]]
+	if parcel_spot(index) == SPOT_DONE: return text + " · 已交货"
+	if parcel_spot(index) == SPOT_PAN: return text + " · 上秤了"
 	return text + " · 在车上"
 
 func pan_label(side: int) -> String:

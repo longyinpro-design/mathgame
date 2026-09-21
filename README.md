@@ -52,8 +52,8 @@
 | MK10 无论回哪封信 | 四 · 没有人收到的回信 | 选一条能同时覆盖两种订单箱数的船 | [契约](docs/production/market_mk10_sample.md) · [验证](docs/playtest/market-mk10-fare/verification.json) |
 | MK11 砝码也能站在货物旁 | 五 · 公平不只是一样多 | 用 1、3、9 三枚砝码称出恰好 7 单位灯油 | [契约](docs/production/market_mk11_sample.md) · [验证](docs/playtest/market-mk11-scale/verification.json) |
 | MK12 不一样多，也都够用 | 五 · 公平不只是一样多 | 按三处各自的需要分封油，一壶不剩 | [契约](docs/production/market_mk12_sample.md) · [验证](docs/playtest/market-mk12-oil/verification.json) |
-| MK13 扣扣的旧围巾 | 二 · 支线（MK04 后开放） | 只用整包补边布凑出恰好 11 段 | [契约](docs/production/market_mk13_sample.md) · [验证](docs/playtest/market-mk13-scarf/verification.json) |
-| MK14 三枚砝码的小摊 | 五 · 支线（MK11 后开放） | 为 5 与 8 两笔订单分别配一次秤 | [契约](docs/production/market_mk14_sample.md) · [验证](docs/playtest/market-mk14-scale/verification.json) |
+| MK13 扣扣的旧围巾 | 二 · 支线（MK04 后开放） | 整包摊满对折样边尺的 11 格，且对折两头齐 | [契约](docs/production/market_mk13_sample.md) · [验证](docs/playtest/market-mk13-scarf/verification.json) |
+| MK14 三枚砝码的小摊 | 五 · 支线（MK11 后开放） | 只许挪一枚砝码，把 4、7、13 三单依次配平 | [契约](docs/production/market_mk14_sample.md) · [验证](docs/playtest/market-mk14-scale/verification.json) |
 | MK15 不会越换越多的铜果 | 四 · 支线（MK09 后开放） | 实演一个闭环，回到 12 颗铜果 | [契约](docs/production/market_mk15_sample.md) · [验证](docs/playtest/market-mk15-copper-nut/verification.json) |
 | MK16 给森林寄回一份礼物 | 五 · 支线（MK12 后开放） | 挑 3 样纪念物，带上绿叶章和信纸 | [契约](docs/production/market_mk16_sample.md) · [验证](docs/playtest/market-mk16-gift/verification.json) |
 | MK17 铜鹭巡守 · 三次验货 | 六 · 首领一 | 三次验货：用有限的重新封装通过三个码头的装载约定 | [契约](docs/production/market_mk17_sample.md) · [验证](docs/playtest/market-mk17-inspection/verification.json) |

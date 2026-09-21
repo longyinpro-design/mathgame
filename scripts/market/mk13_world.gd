@@ -1,8 +1,11 @@
 extends "res://scripts/market/kit_world.gd"
-# MK13 育苗铺的补边布柜面：左柜两包 5 段、中柜三包 3 段，柜头立着一把 11 格的样边尺。
+# MK13 育苗铺的补边布柜面：左柜两包 5 段、中柜三包 3 段，柜头立着一把 11 格的对折样边尺。
 # 货是实物库存：拿起来就离开柜面（柜上只留一个淡影），摊到样边尺上按段数一格一格压过去；
-# 退回柜面则反过来。围巾始终在扣扣脖子上，补好的边只在交货之后一段一段出现在她的围巾下沿。
-# 柜面不判分：样边尺只如实数段数，够不够要到「交给扣扣补边」之后才知道。
+# 退回柜面则反过来。尺上第 6 格正中立着折痕，左右两条臂各 5 格——围巾要对着这条折线折过去补，
+# 所以两头照不照得上是尺面上看得见的事，画面只把折线、两条等长的臂和格子编号摆出来，
+# 齐不齐要到「交给扣扣补边」之后才由规则层说话。
+# 围巾始终在扣扣脖子上，补好的边只在交货之后一段一段出现在她的围巾下沿。
+# 柜面不判分：样边尺只如实数玩家摊上去的段数。
 const Rules = preload("res://scripts/market/mk13_rules.gd")
 const BACKDROP = preload("res://assets/runtime/market/kit-v1/backgrounds/nursery-exchange-clean-v1.png")
 const KOUKOU_TIE = preload("res://assets/runtime/market/characters/koukou-v1/tie-parcel.png")
@@ -49,6 +52,9 @@ func board_frame() -> Rect2:
 
 func slot_foot(index: int) -> Vector2:
 	return board_centre() + Vector2((index - (Rules.NEED - 1) / 2.0) * SLOT_PITCH, -SLOT_DROP)
+
+# 折痕就在第 6 格正中：规则层的 Rules.CREASE 是同一个数，画面不另立一条中线。
+func crease_x() -> float: return slot_foot(Rules.CREASE - 1).x
 
 func cell_rect(index: int) -> Rect2:
 	var at = slot_foot(index)
@@ -152,11 +158,32 @@ func draw_board() -> void:
 			draw_rect(rect, Color(0.08, 0.06, 0.05, 0.88))
 			draw_rect(rect, Color(0.44, 0.33, 0.20, 0.9), false, 1.0)
 			words(str(index + 1), rect.position + Vector2(5, 5), 10, Color("9c8461"))
+	# 折线压在格子上头：摊满 11 格时它穿过中间那一包的正中，读者一眼看得出哪一格是折痕。
+	draw_fold(frame)
 	for slot in range(state.hand.size()):
 		if Rules.run_start(state, slot) >= laid(): continue
 		var count: int = Rules.run_segs(state, slot)
 		var mid = slot_foot(Rules.run_start(state, slot) + int(count / 2.0))
 		words("%d 段" % count, mid + Vector2(-14, -34), 14, PATCH[count])
+
+# 折痕与两条等长的臂：这是尺子本身的构造，不是判分。
+# 折线压在中间那一格的正中，两条臂各自从第 1 格、第 11 格量到折痕，读者拿它比对自己的那一摊。
+func draw_fold(frame: Rect2) -> void:
+	var x := crease_x()
+	var at := frame.position.y + 4.0
+	while at < frame.end.y - 2.0:
+		draw_line(Vector2(x, at), Vector2(x, minf(at + 3.0, frame.end.y - 2.0)), Color("f0dfb4", 0.55), 1.0)
+		at += 6.0
+	draw_colored_polygon(PackedVector2Array([Vector2(x - 4, frame.position.y + 1), Vector2(x + 4, frame.position.y + 1),
+		Vector2(x, frame.position.y + 7)]), Color("f0dfb4", 0.7))
+	# 两条臂：第 1~5 格与第 7~11 格各一条，端点都落在格子边线上，关于折痕对称。
+	var arm := frame.end.y - 8.0
+	var arms := [[cell_rect(0).position.x, cell_rect((Rules.NEED - 3) / 2).end.x],
+		[cell_rect((Rules.NEED + 1) / 2).position.x, cell_rect(Rules.NEED - 1).end.x]]
+	for band in arms:
+		draw_line(Vector2(band[0], arm), Vector2(band[1], arm), Color("d8bd8a", 0.75), 1.0)
+		draw_line(Vector2(band[0], arm - 3), Vector2(band[0], arm + 3), Color("d8bd8a", 0.75), 1.0)
+		draw_line(Vector2(band[1], arm - 3), Vector2(band[1], arm + 3), Color("d8bd8a", 0.75), 1.0)
 
 func draw_stock() -> void:
 	for id in range(Rules.packages()):
@@ -178,13 +205,16 @@ func draw_signs() -> void:
 	plaque(Rules.shelf_caption(state, Rules.THREE), shelf_plaque(Rules.THREE), 15)
 	if state.stage == "puzzle":
 		plaque(Rules.gauge_caption(state), board_plaque(), 15, INK_GOLD if Rules.total(state) > 0 else INK_LIGHT)
-		plaque("整包不能剪开 · 一次最多 3 包", rule_plaque(), 14)
+		plaque("包不能剪开 · 对折要两头齐", rule_plaque(), 14)
 	if state.stage == "delivery":
 		plaque("扣扣在缝边 · 已缝 %d 段" % sewn(), board_plaque(), 15, INK_GOLD)
 	if state.stage in ["story", "complete"]:
 		plaque("围巾的边 · %d 段全缝上了" % Rules.NEED, board_plaque(), 15, INK_GOLD)
-		plaque("补好的边 · %s" % ("戴在外面" if state.worn == 1 else "藏在领子里"), look_plaque(), 14,
-			INK_GOLD if state.worn == 1 else INK_LIGHT)
+		plaque(look_caption(), look_plaque(), 14, INK_GOLD if state.worn == 1 else INK_LIGHT)
+
+# 外观牌的说法单独成函数：审计量的就是牌上这一行，改字不会让量到的仍是旧字面。
+func look_caption() -> String:
+	return "补好的边 · %s" % ("戴在外面" if state.worn == 1 else "藏在领子里")
 
 func shelf_plaque(size: int) -> Rect2:
 	return Rect2(296, 502, 226, 26) if size == Rules.FIVE else Rect2(534, 502, 214, 26)
@@ -192,5 +222,7 @@ func shelf_plaque(size: int) -> Rect2:
 func board_plaque() -> Rect2: return Rect2(756, 508, 286, 26)
 
 # 柜规牌与外观牌各占一条：审计据此量字数，也据此确认它们没有叠在一起。
-func rule_plaque() -> Rect2: return Rect2(534, 532, 214, 24)
+# 柜规这一条要说两句「包不能剪开 · 对折要两头齐」，194 的内宽装不下 211 的字面，
+# 所以整块牌子往左挪 34 像素：左边那两格空地既没有货也没有别的牌子压着。
+func rule_plaque() -> Rect2: return Rect2(500, 532, 248, 24)
 func look_plaque() -> Rect2: return Rect2(756, 538, 214, 24)
