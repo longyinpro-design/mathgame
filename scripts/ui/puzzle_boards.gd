@@ -43,6 +43,15 @@ static func draw_pair(host: Control, definition: Dictionary, run: Dictionary) ->
 	for i in range(3):
 		host.text(["甲灯","乙灯","丙灯"][i],Rect2(places[i]-Vector2(0,30),Vector2(160,28)),20)
 		number(host,"weight_"+str(i),state.weights[i],Rect2(places[i],Vector2(181,38)),p.weight_min,p.weight_max,func(value: int): host.rule({"kind":"weight","index":i,"value":value}))
+	# 证明条落在灯上方的空带里：先把三次合称加起来，再折出一套灯架的重。
+	# 原先这段文案把 94 和 47 都念了出来，玩家在盘面上从来不需要自己算，
+	# 而现在要自己填的那两个数（见 Pair.strict 的分界）正是它们。
+	# 位置放在 210–280 这一带，是因为再往下就是四只同伴站的地方：
+	# ground_occlusion 会拿演员身体逐个和控件求交，压在灯下那一行必然相撞。
+	host.text("先算总量：三次合称一共多少格？",Rect2(42,212,470,30),20,true)
+	number(host,"sum",int(state.get("sum",0)),Rect2(522,211,230,32),0,120,func(value: int): host.rule({"kind":"sum","value":value}))
+	host.text("每架灯都被称了两次。一套灯架的总重是：",Rect2(42,248,470,30),20,true)
+	number(host,"total",state.total,Rect2(522,247,230,32),0,60,func(value: int): host.rule({"kind":"total","value":value}))
 	host.button("try","点亮村灯",Rect2(1040,558,192,38),host.rule.bind({"kind":"try"}),enabled)
 
 static func order_text(order: Array) -> String:
@@ -60,7 +69,9 @@ static func draw_machine(host: Control, definition: Dictionary, run: Dictionary)
 		var id: String = p.modules[i].id
 		host.button("module_"+id,MODULE_NAMES[id],Rect2(86+i*182,318,157,46),host.rule.bind({"kind":"order","value":state.order+[id]}),enabled and id not in state.order and state.order.size() < p.slots)
 	host.button("clear_order","清空槽位",Rect2(1018,318,180,46),host.rule.bind({"kind":"order","value":[]}),enabled)
-	host.text("（可选）押一注：先写下你猜的输出，启动后对答案。",Rect2(84,378,520,28),19,true)
+	# 押注改成必填：机器没启动之前不给看输出，所以这一栏必须是玩家先写下的判断，
+	# 而不是「先启动再看看要不要押」。
+	host.text("押一注（必填）：写下算出的输出，再启动。",Rect2(84,378,520,28),19,true)
 	host.text("输入%d →"%int(p.predict_input),Rect2(620,380,168,26),19,true)
 	number(host,"prediction",state.prediction,Rect2(796,374,170,36),0,100,func(value: int): host.rule({"kind":"predict","value":value}))
 	host.button("try","启动机器",Rect2(1018,374,180,36),host.rule.bind({"kind":"try"}),enabled)

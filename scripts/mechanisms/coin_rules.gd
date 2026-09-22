@@ -5,11 +5,25 @@ const OUTCOMES = ["left","right","equal"]
 static func fresh(params: Dictionary) -> Dictionary:
 	var nodes = {"root":{"left":[],"right":[]}}
 	for id in OUTCOMES: nodes[id] = {"left":[],"right":[],"answers":{"left":-1,"right":-1,"equal":-1}}
-	return {"nodes":nodes,"outcome_count":0,"secret_id":0,"observation":[],"tested":false}
+	# proof 标记：从这一版起，动手摆方案之前要先说清「至少称几次才够」。
+	# 旧存档没有这个键（也没有 min_weighings，原先那栏叫 outcome_count 且没有入口），
+	# 仍按「两称覆盖九种」判定，不会被判成无效。
+	return {"nodes":nodes,"min_weighings":0,"secret_id":0,"observation":[],"tested":false,"proof":true}
+
+# 一次天平只有 3 种结果（左重/右重/平），所以 k 次最多分开 3^k 种情况。
+# 九颗要分开，最少几次？——由「3 的幂追上九」推出，不是写死的 2。
+static func minimal_weighings(params: Dictionary) -> int:
+	var cases = 1; var weighings = 0
+	while cases < int(params.coin_count):
+		cases *= 3; weighings += 1
+	return weighings
 
 static func valid(params: Dictionary, state: Variant) -> bool:
-	if not state is Dictionary or not state.has_all(["nodes","outcome_count","secret_id","observation","tested"]): return false
-	if not state.nodes is Dictionary or state.nodes.size() != 4 or not state.nodes.has_all(["root","left","right","equal"]) or not Numbers.integer(state.outcome_count,0,9) or not Numbers.integer(state.secret_id,0,params.coin_count-1) or not state.observation is Array or not state.tested is bool: return false
+	if not state is Dictionary or not state.has_all(["nodes","secret_id","observation","tested"]): return false
+	if not state.get("proof",false) is bool: return false
+	if not state.nodes is Dictionary or state.nodes.size() != 4 or not state.nodes.has_all(["root","left","right","equal"]) or not Numbers.integer(state.secret_id,0,params.coin_count-1) or not state.observation is Array or not state.tested is bool: return false
+	# min_weighings 是这一版新增的「至少要称几次」；旧档没有它就按原判据。
+	if state.get("proof",false) and not Numbers.integer(state.min_weighings,0,9): return false
 	for id in state.nodes:
 		var node = state.nodes[id]
 		if not node is Dictionary or not node.has_all(["left","right"]) or not node.left is Array or not node.right is Array: return false
@@ -82,10 +96,13 @@ static func apply(params: Dictionary, state: Dictionary, action: Dictionary) -> 
 		"answer":
 			if action.get("node") not in OUTCOMES or action.get("outcome") not in OUTCOMES or not Numbers.integer(action.get("coin"),0,params.coin_count-1): return {"accepted":false,"feedback":"把称量的每一种结果连到异晶身份。"}
 			next.nodes[action.node].answers[action.outcome] = int(action.coin)
-		"outcome_count":
-			if not Numbers.integer(action.get("value"),0,9): return {"accepted":false,"feedback":"数一数一次天平最多有几种结果。"}
-			next.outcome_count = int(action.value)
+		"min_weighings":
+			if not Numbers.integer(action.get("value"),0,9): return {"accepted":false,"feedback":"先说说九颗至少要称几次才够。"}
+			next.min_weighings = int(action.value)
 		"try":
+			# 没想清楚「一次最多分开几种情况」就先摆方案，等于把这一关的洞察整段跳过。
+			if state.get("proof",false) and int(next.min_weighings) != minimal_weighings(params):
+				return {"accepted":false,"feedback":"先回答那个问题：一次天平最多分出 3 种结果，要把 %d 种情况都分开，至少要称几次？"%int(params.coin_count)}
 			next.tested = true
 			var derived = derived_answers(params,next.nodes)
 			for first in OUTCOMES:
@@ -110,4 +127,6 @@ static func apply(params: Dictionary, state: Dictionary, action: Dictionary) -> 
 
 static func complete(params: Dictionary, state: Dictionary) -> bool:
 	if not state.tested: return false
+	# 这一版起，方案之前的那句判断也要成立（见 fresh 的 proof 标记）。
+	if state.get("proof",false) and int(state.min_weighings) != minimal_weighings(params): return false
 	return distinguished(params,state.nodes) == int(params.coin_count)

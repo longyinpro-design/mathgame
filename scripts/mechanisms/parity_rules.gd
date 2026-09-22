@@ -1,8 +1,46 @@
 extends RefCounted
 const Numbers = preload("res://scripts/cargo/rules.gd")
 
+# 三个目标各自走不到的原因，按固定顺序排：0 能走到 / 1 奇偶拦住 / 2 五步凑不出。
+# 8 与 9 都到不了，但原因不同——把这一点分开正是本关 insight 里那句
+# 「奇偶只能排除9，恰好五步还有另一约束」。
+const CLASSIFY_REASONS = [
+	"能走到",
+	"奇偶拦住",
+	"五步凑不出",
+]
+
 static func fresh(_params: Dictionary) -> Dictionary:
-	return {"path":[],"repair":[],"classifications":[-1,-1,-1],"flip_loss":0,"endpoints":[],"tested":false}
+	# proof 标记：从这一版起，两条路都走通之后还要给三个目标判因、说清改一次向的代价。
+	# 旧存档没有这个键，仍按「两条路走通」判定，不会被判成无效。
+	return {"path":[],"repair":[],"classifications":[-1,-1,-1],"flip_loss":0,"endpoints":[],"tested":false,"proof":true}
+
+# 起点出发、恰好 steps 步、中途不越界，所有能停下的位置。用来判「能不能走到」。
+static func endings(params: Dictionary) -> Array:
+	var here: Array = [int(params.start)]
+	for i in int(params.steps):
+		var reachable: Array = []
+		for spot in here:
+			for move in params.moves:
+				var at: int = int(spot)+int(move)
+				if at >= int(params.minimum) and at <= int(params.maximum) and at not in reachable: reachable.append(at)
+		here = reachable
+	return here
+
+static func reason_for(params: Dictionary, target: int) -> int:
+	if target in endings(params): return 0
+	# 每步都是 ±2（同奇偶），落点的奇偶和起点锁死，这是第一类排除的前提。
+	if absi(target-int(params.start))%2 != 0: return 1
+	return 2
+
+static func classifications_expected(params: Dictionary) -> Array:
+	var result: Array = []
+	for target in params.targets: result.append(reason_for(params,int(target)))
+	return result
+
+# 把一步 +2 换成 −2，终点正好少这段跨度（不是先给出4再让玩家背）。
+static func flip_gap(params: Dictionary) -> int:
+	return absi(int(params.moves[0])-int(params.moves[1]))
 
 static func path_valid(params: Dictionary, path: Variant, repair: bool) -> bool:
 	if not path is Array or path.size() > params.steps: return false
@@ -15,6 +53,7 @@ static func path_valid(params: Dictionary, path: Variant, repair: bool) -> bool:
 
 static func valid(params: Dictionary, state: Variant) -> bool:
 	if not state is Dictionary or not state.has_all(["path","repair","classifications","flip_loss","endpoints","tested"]): return false
+	if not state.get("proof",false) is bool: return false
 	if not path_valid(params,state.path,false) or not path_valid(params,state.repair,true) or not state.classifications is Array or state.classifications.size() != 3 or not state.endpoints is Array or not state.tested is bool: return false
 	for choice in state.classifications:
 		if not Numbers.integer(choice,-1,2): return false
@@ -43,7 +82,14 @@ static func apply(params: Dictionary, state: Dictionary, action: Dictionary) -> 
 			if not Numbers.integer(action.get("value"),params.minimum,params.maximum): return {"accepted":false,"feedback":"终点在0至10之间。"}
 			if action.value in next.endpoints: next.endpoints.erase(action.value)
 			else: next.endpoints.append(int(action.value))
-		"try": next.tested = true
+		"try":
+			# 两条路走通只是第一步：8 和 9 都到不了，原因并不一样，这一步要自己判。
+			if state.get("proof",false):
+				if state.classifications != classifications_expected(params):
+					return {"accepted":false,"feedback":"先把 8、9、10 各自属于哪一种情况对上：能走到、奇偶拦住，还是五步凑不出。"}
+				if int(state.flip_loss) != flip_gap(params):
+					return {"accepted":false,"feedback":"先算一步：把一次 +2 换成 −2，终点会少多少？"}
+			next.tested = true
 		_: return {"accepted":false,"feedback":"未知石径操作。"}
 	if action.kind != "try": next.tested = false
 	var feedback = "轨迹已留下；比较奇偶和恰好五步这两条不同约束。"
@@ -71,4 +117,9 @@ static func complete(params: Dictionary, state: Dictionary) -> bool:
 	var replacements = 0
 	for step in state.repair:
 		if step in params.repair_moves: replacements += 1
-	return replacements == 1
+	if replacements != 1: return false
+	# 这一版起，还要给三个目标判因、说清改一次向的代价（见 fresh 的 proof 标记）。
+	if state.get("proof",false):
+		if state.classifications != classifications_expected(params): return false
+		if int(state.flip_loss) != flip_gap(params): return false
+	return true

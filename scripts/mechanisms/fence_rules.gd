@@ -1,10 +1,16 @@
 extends RefCounted
 const Numbers = preload("res://scripts/cargo/rules.gd")
 
+# 三边用料是 2×宽 + 长：宽每加 1，两条宽边各占去 1，可用的长就少 2。
+# 这个数是「借一道墙」这条规则本身带来的，不是调参调出来的。
+const WIDTH_STEP_LOSS = 2
+
 static func fresh(params: Dictionary) -> Dictionary:
 	# Start on the narrowest complete layout so the first option is visible immediately.
 	var units = int(params.fence_units)
-	return {"width":1,"length":units-2,"area_draft":units-2,"plans":[[1,units-2,units-2]],"chosen":-1,"length_loss":0,"tested":false,"sweep":true}
+	# guessed 标记：这一版起要先押一个「最大面积」的猜测，才允许动手调宽度。
+	# 旧存档没有这个键（sweep 与 guessed 都是这一版才有的），仍按原规则判定。
+	return {"width":1,"length":units-2,"area_draft":units-2,"plans":[[1,units-2,units-2]],"chosen":-1,"length_loss":0,"tested":false,"sweep":true,"guessed":false}
 
 static func width_count(params: Dictionary) -> int:
 	return (int(params.fence_units)-1)/2
@@ -12,6 +18,7 @@ static func width_count(params: Dictionary) -> int:
 static func valid(params: Dictionary, state: Variant) -> bool:
 	if not state is Dictionary or not state.has_all(["width","length","area_draft","plans","chosen","length_loss","tested"]): return false
 	if not state.get("sweep",false) is bool: return false
+	if not state.get("guessed",false) is bool: return false
 	if not Numbers.integer(state.area_draft,1,144): return false
 	if not Numbers.integer(state.width,1,params.fence_units) or not Numbers.integer(state.length,1,params.fence_units) or not state.plans is Array or not state.tested is bool or not Numbers.integer(state.chosen,-1,state.plans.size()-1) or not Numbers.integer(state.length_loss,0,params.fence_units): return false
 	var seen = []
@@ -35,14 +42,19 @@ static func apply(params: Dictionary, state: Dictionary, action: Dictionary) -> 
 	var next = state.duplicate(true); var feedback = "调整宽度看看效果；每种方案的面积都会记在下面。"
 	match action.get("kind"):
 		"resize":
+			if state.get("sweep",false) and not state.get("guessed",false):
+				return {"accepted":false,"feedback":"先押一注：五种宽度里，你猜最大能围出多少格？"}
 			if not Numbers.integer(action.get("width"),1,(int(params.fence_units)-1)/2): return {"accepted":false,"feedback":"宽度要取正整数；两条宽边至少各占1。"}
 			next.width = int(action.width); next.length = int(params.fence_units)-2*int(action.width)
 			note_plan(next,params)
 			return {"accepted":true,"state":next,"feedback":"宽%d、长%d：用料 %d 正好用完，面积 %d 格。"%[int(next.width),int(next.length),params.fence_units,int(next.width)*int(next.length)]}
 		"area":
 			if not Numbers.integer(action.get("value"),1,144): return {"accepted":false,"feedback":"用整数格记录花圃面积。"}
-			next.area_draft = int(action.value)
+			next.area_draft = int(action.value); next.guessed = true
+			return {"accepted":true,"state":next,"feedback":"押下了 %d 格。现在把每种宽度都调出来，比完再回头对一对。"%int(action.value)}
 		"dimension":
+			if state.get("sweep",false) and not state.get("guessed",false):
+				return {"accepted":false,"feedback":"先押一注：五种宽度里，你猜最大能围出多少格？"}
 			if action.get("side") not in ["width","length"] or not Numbers.integer(action.get("value"),1,params.fence_units): return {"accepted":false,"feedback":"边长必须是正整数。"}
 			next[action.side] = int(action.value); note_plan(next,params)
 		"store_plan":
@@ -58,7 +70,13 @@ static func apply(params: Dictionary, state: Dictionary, action: Dictionary) -> 
 		"loss":
 			if not Numbers.integer(action.get("value"),0,params.fence_units): return {"accepted":false,"feedback":"宽增加1，两条宽边都需要木料。"}
 			next.length_loss = int(action.value)
-		"try": next.tested = true
+			return {"accepted":true,"state":next,"feedback":"记下：宽多1格，长少%d格。"%int(action.value)}
+		"try":
+			if state.get("sweep",false):
+				if not state.get("guessed",false): return {"accepted":false,"feedback":"先押一注：五种宽度里，你猜最大能围出多少格？"}
+				# 光扫完五种宽度不算想明白「为什么」：宽多1与长少2是同一笔木料的两面。
+				if int(state.length_loss) != WIDTH_STEP_LOSS: return {"accepted":false,"feedback":"还差一句话：宽多1格，两条宽边都要木料——长会少几格？"}
+			next.tested = true
 		_: return {"accepted":false,"feedback":"未知花圃操作。"}
 	if action.kind != "try": next.tested = false
 	if action.kind == "try":
@@ -79,6 +97,9 @@ static func complete(params: Dictionary, state: Dictionary) -> bool:
 		for plan in state.plans: tried_max = maxi(tried_max,int(plan[2]))
 		return state.plans[int(state.chosen)][2] == tried_max
 	if state.plans.size() < width_count(params): return false
+	# 这一版起，还要先押过一个「最大面积」的猜测、说清宽多的代价（见 fresh 的 guessed 标记）。
+	if not state.get("guessed",false): return false
+	if int(state.length_loss) != WIDTH_STEP_LOSS: return false
 	var maximum = 0
 	for plan in state.plans:
 		if 2*plan[0]+plan[1] != params.fence_units or plan[2] != plan[0]*plan[1]: return false

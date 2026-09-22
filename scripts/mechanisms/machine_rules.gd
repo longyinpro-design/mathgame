@@ -4,7 +4,9 @@ const Numbers = preload("res://scripts/cargo/rules.gd")
 static func fresh(params: Dictionary) -> Dictionary:
 	if params.has("candidates"):
 		return {"probe_input":2,"predictions":{},"observation":[],"identified":"","secret_id":params.candidates.keys()[0]}
-	return {"order":[],"tested":false,"kept":[],"rejections":{},"prediction":0,"predicted_before_trial":false,"revealed":false,"equivalence":[],"final_order":[],"external_input":1,"external_tests":[],"observation_choice":"","observations":[]}
+	# proof 标记：从这一版起，启动之前必须先押一注（写下新输入的预测输出）。
+	# 旧存档没有这个键，仍按「装好并试过」判定，不会被判成无效。
+	return {"order":[],"tested":false,"kept":[],"rejections":{},"prediction":0,"predicted_before_trial":false,"revealed":false,"equivalence":[],"final_order":[],"external_input":1,"external_tests":[],"observation_choice":"","observations":[],"proof":true}
 
 static func evaluate(operations: Array, input_value: int) -> Array:
 	var result = [input_value]; var value = input_value
@@ -80,6 +82,7 @@ static func valid(params: Dictionary, state: Variant) -> bool:
 			if state.observation[1] != evaluate(params.candidates[state.secret_id],int(state.probe_input)).back(): return false
 		return true
 	if not state.has_all(["order","tested","kept","rejections","prediction","predicted_before_trial","revealed","equivalence","final_order","external_input","external_tests","observation_choice"]): return false
+	if not state.get("proof",false) is bool: return false
 	if not Numbers.integer(state.external_input,1,10) or not state.external_tests is Array or state.external_tests.size() > 10 or state.observation_choice not in ["","external","intermediate"]: return false
 	var observations = state.get("observations",[])
 	if not observations is Array or observations.size() > 3: return false
@@ -172,6 +175,9 @@ static func apply(params: Dictionary, state: Dictionary, action: Dictionary) -> 
 					if action.order not in candidates(params): return {"accepted":false,"feedback":"选择一套符合账簿的装法试开。"}
 					next.order = action.order.duplicate()
 				if not known_order(params,next.order): return {"accepted":false,"feedback":"先把所有位置装好。"}
+				# 没押注就不许启动：连按启动等于把「先想后验」换成「先看后猜」。
+				if state.get("proof",false) and params.has("predict_input") and not next.predicted_before_trial:
+					return {"accepted":false,"feedback":"先押一注：写下输入%d时你算出的输出，押完再启动机器。"%int(params.predict_input)}
 				next.tested = true; feedback = "这台能正常育苗，性能验证成功！另一种也能用；接下来用旧记录找回原机顺序。" if params.has("checkpoint") and next.order in candidates(params) else "两页账簿都要符合；留下所有可能的装法。"
 			"equivalence": next.equivalence = action.get("value",[]).duplicate(true)
 			"external_input":
@@ -238,6 +244,10 @@ static func external_certificate(params: Dictionary, state: Dictionary) -> bool:
 	# Player composes the equivalent first two operations, then the multiplier.
 	return state.equivalence == [["add",2],["mul",2]]
 
+# 押注要押的就是新输入在这台机器上的输出。
+static func predicted_output(params: Dictionary, state: Dictionary) -> int:
+	return evaluate(operations(params,state.order),int(params.predict_input)).back()
+
 static func complete(params: Dictionary, state: Dictionary) -> bool:
 	if params.has("candidates"):
 		# Saves written before predictions became mandatory carry an empty table and stay completable.
@@ -247,4 +257,8 @@ static func complete(params: Dictionary, state: Dictionary) -> bool:
 		if not state.revealed or state.final_order not in candidates(params): return false
 		var checkpoint: Dictionary = params.checkpoint
 		return evaluate(operations(params,state.final_order),int(checkpoint.input))[int(checkpoint.after_step)] == checkpoint.value
+	# 这一版起，启动前必须押过注，且押的数要和机器算出来的对上（见 fresh 的 proof 标记）。
+	# 改动押注会把 tested 打回 false，所以「已押且已验」这条记录不会自相矛盾。
+	if state.get("proof",false) and params.has("predict_input"):
+		if not state.predicted_before_trial or int(state.prediction) != predicted_output(params,state): return false
 	return state.tested and state.order in candidates(params)
