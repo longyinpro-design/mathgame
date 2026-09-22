@@ -28,6 +28,7 @@ static func draw(host: Control, definition: Dictionary, run: Dictionary) -> void
 	console.done = Rules.complete(definition.params,run.state)
 	console.target_value = float(tokens[0].n)/float(tokens[0].d) if tokens.size() == 1 else 0.0
 	host.text("数字卡："+"、".join(definition.params.cards.map(func(n): return str(n)))+"　每张恰好用一次，最后只留一张24。",Rect2(335,213,744,35),19,false)
+	host.twenty_view = {"tokens":tokens,"cards":[],"empty":[]}
 	var width = 152.0; var gap = 32.0
 	var start = 339.0
 	for i in tokens.size():
@@ -48,29 +49,50 @@ static func draw(host: Control, definition: Dictionary, run: Dictionary) -> void
 		card.add_theme_color_override("font_outline_color",Color("f6ecd2")); card.add_theme_constant_override("outline_size",0)
 		var tag = Panel.new(); tag.position = Vector2(x-2,y+62); tag.size = Vector2(width+4,40); tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tag.add_theme_stylebox_override("panel",tag_style()); host.ui.add_child(tag)
-		host.text(tokens[i].expression,Rect2(x+3,y+64,width-6,36),16,true)
-	var instruction = "依次点两张卡，再选 +、−、×、÷；减法和除法按①到②的顺序。"
-	if host.twenty_selection.size() == 2:
-		instruction = "将计算："+Rules.value_text(tokens[host.twenty_selection[0]])+"　□　"+Rules.value_text(tokens[host.twenty_selection[1]])+"　（结果会变成一张新卡）"
-	elif tokens.size() == 1:
-		instruction = "正好24，磨坊启动了！" if Rules.complete(definition.params,run.state) else "现在得到"+Rules.value_text(tokens[0])+"，还不是24。可以撤销，换一种组合。"
-	host.text(instruction,Rect2(335,359,742,45),18,false)
+		var expression = host.text(tokens[i].expression,Rect2(x+3,y+64,width-6,36),16,true)
+		host.twenty_view.cards.append({"button":card,"tag":tag,"expression":expression})
+	host.twenty_view.instruction = host.text("",Rect2(335,359,742,45),18,false)
 	var operators = ["+","-","*","/"]
 	for i in operators.size():
 		var op: String = operators[i]
 		host.button("operator_"+str(i),Rules.SYMBOLS[op],Rect2(402+i*120,508,100,38),calculate.bind(host,op),run.outcome == "active" and host.twenty_selection.size() == 2)
-	host.button("swap_operands","交换①②",Rect2(895,508,178,38),func(): host.twenty_selection.reverse(); host.refresh(),host.twenty_selection.size() == 2)
+	host.button("swap_operands","交换①②",Rect2(895,508,178,38),swap.bind(host),host.twenty_selection.size() == 2)
 	# The exact expression stays on each physical result tag. No automatic strategy hint.
-	if host.twenty_selection.is_empty() and tokens.size() > 1:
-		host.text("① 先放一枚符牌",Rect2(496,430,155,30),18,false)
-		host.text("② 再放一枚符牌",Rect2(740,430,155,30),18,false)
+	for i in range(2):
+		host.twenty_view.empty.append(host.text(["① 先放一枚符牌","② 再放一枚符牌"][i],Rect2(496+i*244,430,155,30),18,false))
+	update_selection(host)
+
+static func swap(host: Control) -> void:
+	host.twenty_selection.reverse()
+	update_selection(host)
+
+static func update_selection(host: Control) -> void:
+	var view: Dictionary = host.twenty_view
+	var tokens: Array = view.tokens
+	for i in tokens.size():
+		var slot: int = host.twenty_selection.find(i)
+		var point = Vector2(339+i*184,258) if slot < 0 else Vector2(489+slot*244,408)
+		var card: Dictionary = view.cards[i]
+		card.button.position = point
+		card.button.text = Rules.value_text(tokens[i])+("　①" if slot == 0 else ("　②" if slot == 1 else ""))
+		card.tag.position = point+Vector2(-2,62)
+		card.expression.position = point+Vector2(3,64)
+	var instruction = "依次点两张卡，再选 +、−、×、÷；减法和除法按①到②的顺序。"
+	if host.twenty_selection.size() == 2:
+		instruction = "将计算："+Rules.value_text(tokens[host.twenty_selection[0]])+"　□　"+Rules.value_text(tokens[host.twenty_selection[1]])+"　（结果会变成一张新卡）"
+	elif tokens.size() == 1:
+		instruction = "正好24，磨坊启动了！" if host.twenty_console.done else "现在得到"+Rules.value_text(tokens[0])+"，还不是24。可以撤销，换一种组合。"
+	view.instruction.text = instruction
+	for i in range(4): host.buttons["operator_"+str(i)].disabled = host.busy or host.session.profile.active_run.outcome != "active" or host.twenty_selection.size() != 2
+	host.buttons.swap_operands.disabled = host.busy or host.twenty_selection.size() != 2
+	for label in view.empty: label.visible = host.twenty_selection.is_empty() and tokens.size() > 1
 
 static func select(host: Control, index: int) -> void:
 	if index in host.twenty_selection: host.twenty_selection.erase(index)
 	else:
 		if host.twenty_selection.size() == 2: host.twenty_selection.clear()
 		host.twenty_selection.append(index)
-	host.sound.play_cue("pickup"); host.refresh()
+	host.sound.play_cue("pickup"); update_selection(host)
 
 static func calculate(host: Control, op: String) -> void:
 	if host.twenty_selection.size() != 2: return

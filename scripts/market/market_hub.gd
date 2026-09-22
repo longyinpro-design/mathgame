@@ -16,7 +16,14 @@ var world: Node2D
 var ui: Control
 var overlay: Control
 var buttons: Dictionary = {}
-var modal = false
+var modal = false:
+	set(value):
+		modal = value
+		sync_presentation()
+var focused = true:
+	set(value):
+		focused = value
+		sync_presentation()
 var window_theme: Theme
 
 func _ready() -> void:
@@ -37,9 +44,16 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if is_instance_valid(get_window()): get_window().theme = window_theme
 
+func sync_presentation() -> void:
+	if is_instance_valid(world): world.presentation_paused = modal or not focused
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: focused = false
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN: focused = true
+
 # The next lamp breathes, so the world layer redraws every frame instead of on commit.
 func _process(_delta: float) -> void:
-	if is_instance_valid(world): world.queue_redraw()
+	if is_instance_valid(world) and not modal and focused and is_visible_in_tree(): world.queue_redraw()
 
 func next_id() -> String:
 	var pending = Catalog.main_pending(progress.completed())
@@ -72,6 +86,8 @@ func station_head(id: String) -> String:
 	return "%s · %s" % [id, "支线" if Catalog.is_side(id) else "第%s幕" % ["零","一","二","三","四","五","六"][Catalog.act(id)]]
 
 func refresh() -> void:
+	sync_presentation()
+	world.queue_redraw()
 	for child in ui.get_children(): ui.remove_child(child); child.queue_free()
 	buttons = {}
 	var ids = Catalog.order()

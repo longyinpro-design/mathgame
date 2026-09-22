@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 ROOT = Path(__file__).resolve().parents[2]
 SAMPLES = {
@@ -132,7 +133,7 @@ SAMPLES = {
                        'All 18 stations now ship their own scene and save; the 尚未制作 branch stays only as a guard the chart can no longer reach.']},
 }
 SHARED = [ROOT/'project.godot', ROOT/'assets/runtime/cargo-props-v5.png', ROOT/'scripts/cargo/skin.gd',
-    ROOT/'scripts/persistence/save_repository.gd', ROOT/'tests/forest/window_focus.gd']
+    ROOT/'scripts/ui/presentation_layer.gd', ROOT/'scripts/persistence/save_repository.gd', ROOT/'tests/forest/window_focus.gd']
 
 def sources(sample):
     spec = SAMPLES[sample]
@@ -148,15 +149,36 @@ def sources(sample):
 def run(command, headless, output, name, label):
     # The native window must keep ticking while another application holds the foreground.
     env = dict(os.environ, NSAppSleepDisabled='YES')
-    process = subprocess.Popen(command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env)
-    try:
-        text, _ = process.communicate(timeout=180)
-    except subprocess.TimeoutExpired:
-        process.terminate()
-        try: text, _ = process.communicate(timeout=5)
+    foreground_pid = None
+    if not headless and sys.platform == 'darwin':
+        try:
+            foreground = subprocess.run(['osascript', '-e', 'tell application "System Events" to get unix id of (first application process whose frontmost is true)'], capture_output=True, text=True, timeout=10)
+            if foreground.returncode == 0 and foreground.stdout.strip().isdigit():
+                foreground_pid = foreground.stdout.strip()
         except subprocess.TimeoutExpired:
-            process.kill(); text, _ = process.communicate()
-        text += '\nERROR: bounded runner timed out and reaped child\n'
+            pass
+    with tempfile.TemporaryDirectory(prefix='pixel-market-window-') as temporary:
+        signal = Path(temporary)/'ready'
+        env['PIXEL_FOREST_WINDOW_READY'] = str(signal) if foreground_pid else ''
+        process = subprocess.Popen(command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env)
+        try:
+            # Match the forest runner: consume startup focus loss before fixtures
+            # restore logical focus for viewport-injected input.
+            if foreground_pid:
+                deadline = time.monotonic()+15
+                while not signal.exists() and process.poll() is None and time.monotonic() < deadline:
+                    time.sleep(0.05)
+                if signal.exists():
+                    script = 'tell application "System Events" to set frontmost of (first application process whose unix id is '+foreground_pid+') to true'
+                    restore = subprocess.run(['osascript', '-e', script], capture_output=True, text=True, timeout=10)
+                    if restore.returncode == 0: Path(str(signal)+'.restored').write_text('restored')
+            text, _ = process.communicate(timeout=180)
+        except subprocess.TimeoutExpired:
+            process.terminate()
+            try: text, _ = process.communicate(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill(); text, _ = process.communicate()
+            text += '\nERROR: bounded runner timed out and reaped child\n'
     (output/(Path(name).stem+'-stdout.log')).write_text(text)
     # Known offline headless macOS CA probe; all other engine errors fail.
     filtered = re.sub(r'ERROR: Condition "ret != noErr" is true\. Returning: ""\n\s+at: get_system_ca_certificates[^\n]*\n?', '', text) if headless else text
@@ -190,7 +212,9 @@ def main():
         output.mkdir(parents=True, exist_ok=True)
         before = sources(sample)
         results = []
-        for name, headless in [(spec['headless'],True), (spec['window'],False)]:
+        cases = [(spec['headless'],True), (spec['window'],False)]
+        if sample == 'hub': cases.append(('presentation_playtest.gd',False))
+        for name, headless in cases:
             command = [executable] + (['--headless'] if headless else []) + ['--path', str(ROOT), '--script', 'tests/market/'+name, '--log-file', str(output/(Path(name).stem+'.log'))]
             results.append(run(command, headless, output, name, spec['label']))
             print(f"{spec['label']} {name}: {results[-1]['passed']}/{results[-1]['total']} "+results[-1]['status'],flush=True)

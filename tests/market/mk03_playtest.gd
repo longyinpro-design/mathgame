@@ -38,6 +38,7 @@ func key(code: int) -> void:
 func hold(seconds: float) -> void:
 	game.paused = true; game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
+	game.world.queue_redraw() # explicit fixture pose while presentation is paused
 	await process_frame
 func fits(text: String, size_px: int, width: float) -> bool:
 	var widest := 0.0
@@ -176,6 +177,7 @@ func run() -> void:
 		game._notification(NOTIFICATION_APPLICATION_FOCUS_OUT)
 		paused_at = game.elapsed; await create_timer(0.1).timeout
 		check(game.paused and game.elapsed == paused_at,"focus loss freezes the reweigh")
+		game._notification(NOTIFICATION_APPLICATION_FOCUS_IN) # return to the window before input
 		await click("skip")
 		check(game.state.stage == "delivery","the reweigh hands over to 衡伯")
 		await hold(2.6); check(plaque_overflow() == 0,"the hand-over leaves no board wider than itself")

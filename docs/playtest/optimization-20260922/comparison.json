@@ -1,0 +1,321 @@
+{
+  "status": "PASS",
+  "base": "63b2488d6a89402245860fc5fb711538884143cf",
+  "order": "baseline, final",
+  "candidate_sha256": "89c6fd8fbf5f9361bfd96df2dca976e6e0d4072ab23b56d19d776142c7f42fe4",
+  "same_benchmark_scripts": true,
+  "rows": [
+    {
+      "case": "forest_story",
+      "frame_p50_ms": [
+        16.643,
+        16.656
+      ],
+      "frame_p95_ms": [
+        17.537,
+        24.118
+      ],
+      "draw_calls_p50": [
+        55.0,
+        55.0
+      ],
+      "canvas_redraws": [
+        1080,
+        1084
+      ],
+      "activity_clock_delta": [
+        2.9830553333333203,
+        3.05535288888888
+      ],
+      "pixel_diff_count": 0,
+      "pixel_diff_bbox": null
+    },
+    {
+      "case": "forest_story_paused",
+      "frame_p50_ms": [
+        16.663,
+        16.753
+      ],
+      "frame_p95_ms": [
+        17.478,
+        22.572
+      ],
+      "draw_calls_p50": [
+        55.0,
+        55.0
+      ],
+      "canvas_redraws": [
+        0,
+        0
+      ],
+      "activity_clock_delta": [
+        0.0,
+        0.0
+      ],
+      "pixel_diff_count": 0,
+      "pixel_diff_bbox": null
+    },
+    {
+      "case": "forest_cargo_idle",
+      "frame_p50_ms": [
+        16.652,
+        16.661
+      ],
+      "frame_p95_ms": [
+        23.156,
+        19.77
+      ],
+      "draw_calls_p50": [
+        106.0,
+        106.0
+      ],
+      "canvas_redraws": [
+        360,
+        180
+      ],
+      "activity_clock_delta": [
+        3.0178863333333297,
+        3.0000186666666497
+      ],
+      "pixel_diff_count": 0,
+      "pixel_diff_bbox": null
+    },
+    {
+      "case": "forest_cargo_moving",
+      "frame_p50_ms": [
+        16.659,
+        16.621
+      ],
+      "frame_p95_ms": [
+        21.565,
+        27.362
+      ],
+      "draw_calls_p50": [
+        106.0,
+        106.0
+      ],
+      "canvas_redraws": [
+        360,
+        180
+      ],
+      "activity_clock_delta": [
+        2.9999833333333195,
+        3.0082843333333105
+      ],
+      "pixel_diff_count": 0,
+      "pixel_diff_bbox": null
+    },
+    {
+      "case": "forest_transfer_idle",
+      "frame_p50_ms": [
+        16.703,
+        16.659
+      ],
+      "frame_p95_ms": [
+        28.364,
+        26.983
+      ],
+      "draw_calls_p50": [
+        230.0,
+        230.0
+      ],
+      "canvas_redraws": [
+        900,
+        540
+      ],
+      "activity_clock_delta": [
+        3.4462083333333298,
+        3.06654733333332
+      ],
+      "pixel_diff_count": 0,
+      "pixel_diff_bbox": null,
+      "transfer_layer_redraws": [
+        180,
+        0
+      ]
+    },
+    {
+      "case": "forest_transfer_selection",
+      "frame_p50_ms": [
+        19.091,
+        18.297
+      ],
+      "frame_p95_ms": [
+        25.722,
+        28.818
+      ],
+      "draw_calls_p50": [
+        230.0,
+        230.0
+      ],
+      "canvas_redraws": [
+        1440,
+        721
+      ],
+      "activity_clock_delta": [
+        3.3657833333333396,
+        3.2163956666666698
+      ],
+      "pixel_diff_count": 0,
+      "pixel_diff_bbox": null,
+      "selection_p50_us": [
+        4806.0,
+        11.0
+      ],
+      "selection_p95_us": [
+        5776.0,
+        18.0
+      ]
+    },
+    {
+      "case": "forest_transfer_moving",
+      "frame_p50_ms": [
+        16.666,
+        16.658
+      ],
+      "frame_p95_ms": [
+        23.672,
+        24.055
+      ],
+      "draw_calls_p50": [
+        231.0,
+        231.0
+      ],
+      "canvas_redraws": [
+        900,
+        720
+      ],
+      "activity_clock_delta": [
+        2.99999999999999,
+        3.03414066666666
+      ],
+      "pixel_diff_count": 0,
+      "pixel_diff_bbox": null
+    },
+    {
+      "case": "forest_console_idle",
+      "frame_p50_ms": [
+        16.651,
+        16.629
+      ],
+      "frame_p95_ms": [
+        23.208,
+        26.566
+      ],
+      "draw_calls_p50": [
+        242.0,
+        242.0
+      ],
+      "canvas_redraws": [
+        7200,
+        180
+      ],
+      "activity_clock_delta": [
+        3.03410599999999,
+        3.0303828888888797
+      ],
+      "pixel_diff_count": 0,
+      "pixel_diff_bbox": null
+    },
+    {
+      "case": "forest_battle_idle",
+      "frame_p50_ms": [
+        16.663,
+        16.665
+      ],
+      "frame_p95_ms": [
+        21.766,
+        22.898
+      ],
+      "draw_calls_p50": [
+        244.0,
+        245.0
+      ],
+      "canvas_redraws": [
+        1080,
+        1080
+      ],
+      "activity_clock_delta": [
+        3.06543799999999,
+        3.0801459999999796
+      ],
+      "pixel_diff_count": 0,
+      "pixel_diff_bbox": null
+    },
+    {
+      "case": "market_mk18_idle",
+      "frame_p50_ms": [
+        16.642,
+        16.661
+      ],
+      "frame_p95_ms": [
+        20.592,
+        17.424
+      ],
+      "draw_calls_p50": [
+        28.0,
+        28.0
+      ],
+      "canvas_redraws": [
+        180,
+        180
+      ],
+      "activity_clock_delta": [
+        2.9999999999999902,
+        2.99999999999999
+      ],
+      "pixel_diff_count": 0,
+      "pixel_diff_bbox": null
+    },
+    {
+      "case": "market_mk18_paused",
+      "frame_p50_ms": [
+        16.824,
+        16.663
+      ],
+      "frame_p95_ms": [
+        24.94,
+        17.535
+      ],
+      "draw_calls_p50": [
+        28.0,
+        28.0
+      ],
+      "canvas_redraws": [
+        180,
+        0
+      ],
+      "activity_clock_delta": [
+        3.14400411111111,
+        0.0
+      ],
+      "pixel_diff_count": 0,
+      "pixel_diff_bbox": null
+    },
+    {
+      "case": "market_mk18_resumed",
+      "frame_p50_ms": [
+        16.657,
+        16.661
+      ],
+      "frame_p95_ms": [
+        20.495,
+        21.337
+      ],
+      "draw_calls_p50": [
+        28.0,
+        28.0
+      ],
+      "canvas_redraws": [
+        180,
+        180
+      ],
+      "activity_clock_delta": [
+        3.0166459999999904,
+        3.01167499999999
+      ],
+      "pixel_diff_count": 0,
+      "pixel_diff_bbox": null
+    }
+  ]
+}

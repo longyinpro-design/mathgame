@@ -1,4 +1,4 @@
-extends Node2D
+extends "res://scripts/ui/presentation_layer.gd"
 # The mill's 24-point console: gears and an energy dial drawn as machine parts.
 # Rotation and needle carry the arithmetic: one turn per combined pair, needle
 # easing toward the current single-card value, 24 marked as the gold tooth.
@@ -9,11 +9,20 @@ const INK = Color("f1e5ca")
 const GOLD = Color("e4cd80")
 const BURST = preload("res://assets/runtime/forest/fx/burst.png")
 const UIStyle = preload("res://scripts/cargo/skin.gd")
-var story_mode = false
-var steps = 0
+var story_mode = false:
+	set(value):
+		story_mode = value
+		queue_redraw()
+var steps = 0:
+	set(value):
+		steps = value
+		queue_redraw()
 var target_value = 0.0
 var shown_value = 0.0
-var done = false
+var done = false:
+	set(value):
+		done = value
+		queue_redraw()
 var clock = 0.0
 const DIAL = Vector2(1146,297)
 const GEAR_A = Vector2(1143,410)
@@ -21,8 +30,9 @@ const GEAR_B = Vector2(1184,444)
 
 func _process(delta: float) -> void:
 	clock += delta
-	shown_value = lerpf(shown_value,target_value,minf(1.0,delta*6.0))
-	queue_redraw()
+	var previous = shown_value
+	shown_value = move_toward(shown_value,target_value,0.001) if absf(shown_value-target_value) < 0.001 else lerpf(shown_value,target_value,minf(1.0,delta*6.0))
+	if done or shown_value != previous: queue_redraw()
 
 func _draw() -> void:
 	# Close-up of the painted mill control, with no artificial support platform.

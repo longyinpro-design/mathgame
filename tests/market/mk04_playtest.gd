@@ -47,6 +47,7 @@ func drain() -> void:
 func hold(seconds: float) -> void:
 	game.paused = true; game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
+	game.world.queue_redraw() # explicit fixture pose while presentation is paused
 	await process_frame
 func label_with(needle: String) -> Label:
 	for child in game.ui.get_children():
@@ -372,6 +373,7 @@ func run() -> void:
 		check(game.paused and game.buttons.pause.text == "继续动画","leaving the window pauses the hand-over")
 		await create_timer(0.1).timeout
 		check(game.elapsed == paused_at,"focus loss freezes the hand-over")
+		game._notification(NOTIFICATION_APPLICATION_FOCUS_IN) # return to the window before input
 		await click("skip")
 		check(game.state.stage == "clarify" and game.state.beat == 0,"the hand-over hands the street back to 扣扣")
 		check(game.buttons.next.text == "继续听他们说","the clarification is advanced by the player")

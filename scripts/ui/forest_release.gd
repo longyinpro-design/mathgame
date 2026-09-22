@@ -1,19 +1,14 @@
 extends Control
+const Pages = preload("res://scripts/ui/forest_pages.gd")
 const Session = preload("res://scripts/core/game_session.gd")
 const UIStyle = preload("res://scripts/cargo/skin.gd")
-const CargoWorld = preload("res://scripts/cargo/world.gd")
-const ForestWorld = preload("res://scripts/ui/forest_world.gd")
-const Audio = preload("res://scripts/encounter/audio.gd")
 const CargoRules = preload("res://scripts/mechanisms/cargo_rules.gd")
 const BaseCargo = preload("res://scripts/cargo/rules.gd")
 const TwentyFourBoard = preload("res://scripts/ui/twenty_four_board.gd")
-const TwentyFourConsole = preload("res://scripts/ui/twenty_four_console.gd")
 const PuzzleBoards = preload("res://scripts/ui/puzzle_boards.gd")
 const RouteBoards = preload("res://scripts/ui/route_boards.gd")
 const SideBoards = preload("res://scripts/ui/side_boards.gd")
-const BattleWorld = preload("res://scripts/ui/battle_world.gd")
 const BattleBoards = preload("res://scripts/ui/battle_boards.gd")
-const StoryStage = preload("res://scripts/ui/story_stage.gd")
 const Story = preload("res://scripts/content/story_catalog.gd")
 const Discovery = preload("res://scripts/content/discovery_catalog.gd")
 const MarketSample = preload("res://scripts/market/mk01_scene.gd")
@@ -31,21 +26,22 @@ const REGIONS = {
 	"post":{"name":"林间邮路","levels":["FL08","FL09","FL10","FL14","FL16"],"line":"折羽绕着路口飞了一圈：还有信没有送到。"},
 	"heart":{"name":"古林心庭","levels":["FL02","FL11","FL12","FL17","FL18"],"line":"树根深处，石灵守着森林的回声。"}
 }
-var story_stage: Node2D
+@onready var story_stage: Node2D = $StoryStage
 var story_enabled = true
 var session = Session.new()
 var save_path = ""
-var world: Node2D
-var cargo_world: Node2D
-var sound: Node
-var ui: Control
-var overlay: Control
+@onready var world: Node2D = $ForestWorld
+@onready var cargo_world: Node2D = $CargoWorld
+@onready var sound: Node = $Audio
+@onready var ui: Control = $UI
+@onready var overlay: Control = $Overlay
 var page = "camp"
 var previous_page = "camp"
 var region = "treetop"
 var busy = false
 var modal = false
 var twenty_selection: Array = []
+var twenty_view: Dictionary = {}
 var twenty_board_key = ""
 var selected = -1
 var down_item = -1
@@ -64,8 +60,8 @@ var block_index = 0
 var coin_node = "root"
 var selected_coin = -1
 var fence_area = 1
-var battle_world: Node2D
-var twenty_console: Node2D
+@onready var battle_world: Node2D = $BattleWorld
+@onready var twenty_console: Node2D = $TwentyFourConsole
 var selected_card = -1
 var selected_core = -1
 var battle_presentation: Dictionary = {}
@@ -83,16 +79,8 @@ var tool_group_source = 0
 func _ready() -> void:
 	get_window().title = "数字群岛 · 森林岛"
 	mouse_filter = Control.MOUSE_FILTER_IGNORE; theme = UIStyle.make()
-	world = ForestWorld.new(); add_child(world)
-	cargo_world = CargoWorld.new(); add_child(cargo_world); cargo_world.visible = false
-	battle_world = BattleWorld.new(); add_child(battle_world); battle_world.visible = false
-	twenty_console = TwentyFourConsole.new(); twenty_console.z_index = 0; add_child(twenty_console); twenty_console.visible = false
-	story_stage = StoryStage.new(); add_child(story_stage); story_stage.visible = false
 	story_stage.finished.connect(func():
 		if page == "story": refresh())
-	sound = Audio.new(); add_child(sound)
-	ui = Control.new(); ui.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(ui)
-	overlay = Control.new(); overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE; overlay.z_index = 100; add_child(overlay)
 	session.open(save_path)
 	if MarketSample.entry == "return":
 		# Back from the market dock: the crossing was already watched, so open at the camp.
@@ -123,7 +111,7 @@ func refresh() -> void:
 	var focus = get_viewport().gui_get_focus_owner()
 	var focus_name = str(focus.name) if is_instance_valid(focus) else ""
 	for node in ui.find_children("*","ScrollContainer",true,false): scroll_positions[str(node.name)] = node.scroll_vertical
-	clear_children(ui); buttons.clear(); clear_children(overlay); modal = false; confirmation_open = false
+	clear_children(ui); buttons.clear(); twenty_view.clear(); clear_children(overlay); modal = false; confirmation_open = false
 	world.page = page; world.region = region
 	world.inspecting = page == "challenge" and session.profile.get("active_run") != null and session.profile.active_run.level_id in Layout.DETAIL_LEVELS and scene_detail
 	world.active_level = session.profile.active_run.level_id if session.profile.get("active_run") != null else ""
@@ -171,30 +159,7 @@ func navigation(title: String, subtitle: String = "") -> void:
 	button("settings","设置",Rect2(1170,30,75,38),open_page.bind("settings"))
 
 func draw_camp() -> void:
-	navigation("森林营地","林间来信 · 第一章")
-	text("Lv.%d   行旅经验 %d   木片 %d" % [Session.Catalog.rank(session.profile.progress.journey_exp),session.profile.progress.journey_exp,session.profile.inventory.camp_wood],Rect2(42,650,650,32),20)
-	button("party","同行伙伴",Rect2(1090,653,153,39),open_page.bind("party"))
-	if story_enabled: button("continue_story","继续故事",Rect2(465,252,350,52),resume_story,true,null,true)
-	if session.profile.story.node in ["end","voyage"]:
-		button("market","千灯集市 · "+("新的航路" if session.profile.story.node == "end" else "接货台"),Rect2(465,314,350,46),goto_market,true,null,true)
-	var i = 0
-	for id in REGIONS:
-		var x = [66,316,566,816,1066][i]
-		var unlocked = false
-		for level_id in REGIONS[id].levels:
-			if session.catalog.available(level_id,session.profile.progress.completed_levels): unlocked = true
-		button("region_"+id,REGIONS[id].name+(" · 回访" if story_enabled else ""),Rect2(x,166+i%2*45,160,44),show_region.bind(id),unlocked)
-		i += 1
-	var run = session.profile.active_run
-	if run != null and run.outcome == "active": button("resume","继续 · "+session.catalog.levels[run.level_id].title,Rect2(60,292,380,44),resume)
-	for entry in [["roof",Vector2(993,341)],["workbench",Vector2(167,516)],["garden",Vector2(862,559)]]:
-		var id: String = entry[0]; var building: Dictionary = Session.Catalog.BUILDINGS[id]
-		var built = id in session.profile.inventory.buildings
-		var available = building.requires in session.profile.progress.completed_levels
-		if available or built:
-			button("build_"+id,building.name+(" · 已建成" if built else " · %d木片"%building.cost),Rect2(entry[1],Vector2(233,39)),confirm_build.bind(id),not built)
-	if Session.Roster.can_grow(session.profile): button("grow","给阿橙系上同心叶结",Rect2(412,404,280,43),dispatch.bind({"kind":"grow"}))
-	button("chat","和伙伴聊聊",Rect2(454,556,190,36),camp_chat)
+	Pages.draw_camp(self)
 
 func camp_chat() -> void:
 	dispatch({"kind":"dialogue","id":Story.camp_dialogue(session.profile.progress.completed_levels)})
@@ -226,30 +191,7 @@ func show_region(id: String) -> void:
 	session.feedback = Story.region_line(id,session.profile.progress.completed_levels); refresh()
 
 func draw_region() -> void:
-	navigation(REGIONS[region].name,Story.region_line(region,session.profile.progress.completed_levels))
-	text("走近发光的物件，再按 E（或点它）互动。",Rect2(42,141,1063,35),20)
-	var ids: Array = REGIONS[region].levels
-	for i in ids.size():
-		var id: String = ids[i]; var definition: Dictionary = session.catalog.levels[id]
-		var complete = id in session.profile.progress.completed_levels
-		var available = session.catalog.available(id,session.profile.progress.completed_levels)
-		var point = Layout.point(region,i)
-		# The object itself is the trigger: a hotspot on the prop, with a walk-then-interact flow.
-		var hotspot = button("object_"+id,"",Rect2(point-Vector2(48,74),Vector2(96,90)),request_level.bind(id,false),available)
-		UIStyle.hotspot(hotspot,definition.title)
-	if region != "post" or "feather" not in session.profile.roster.owned:
-		var npc_point = Layout.npc_foot(region)-Vector2(0,70)
-		var npc_button = button("npc","",Rect2(npc_point-Vector2(92,26),Vector2(184,52)),interact_npc)
-		UIStyle.hotspot(npc_button,Story.NPC_NAMES[region])
-		if world.hero_position.distance_to(Layout.npc_foot(region)) < 150: text("按 E 和"+Story.NPC_NAMES[region]+"聊聊",Rect2(npc_point-Vector2(90,50),Vector2(240,30)),19)
-	# Pokeable corners of the scene: small answers, no progress attached.
-	world.flavor_spots = Story.FLAVOR.get(region,[])
-	for i in world.flavor_spots.size():
-		var spot: Array = world.flavor_spots[i]
-		var poke = button("poke_"+region+"_"+str(i),"",Rect2(Vector2(spot[0],spot[1])-Vector2(34,34),Vector2(68,68)),poke_flavor.bind(i))
-		UIStyle.hotspot(poke,spot[2])
-	# Quest interactions take priority where a painted prop also has ambient flavour.
-	for id in ids: ui.move_child(buttons["object_"+id],-1)
+	Pages.draw_region(self)
 
 func poke_flavor(index: int) -> void:
 	var spot: Array = world.flavor_spots[index]
@@ -550,80 +492,32 @@ func set_board_tab(value: String) -> void:
 	board_tab = value; selected = -1; refresh()
 
 func select_pile(index: int) -> void:
+	var was_preview = trace_preview >= 0
 	trace_preview = -1
 	if selected < 0:
 		selected = index
 		session.feedback = "已选"+["甲","乙","丙"][index]+"仓；再点接收粮袋的仓门。" if session.profile.active_run.level_id == "FL03" else "已选中；再点接收的一座台。"
-		refresh(); return
+		update_pile_selection(was_preview); return
 	var source = selected; selected = -1
-	if source == index: refresh(); return
+	if source == index: update_pile_selection(was_preview); return
 	rule({"kind":"shift","from":source,"to":index})
 
+# Selection changes neither the board nor its controls. Leaving a trace preview
+# rebuilds its labels once; ordinary select/deselect keeps focus and node identity.
+func update_pile_selection(was_preview: bool) -> void:
+	if was_preview:
+		refresh(); return
+	transfer_stage.selected = selected
+	message.text = session.feedback
+
 func draw_journal() -> void:
-	navigation("林间手记","记下走过的路、遇见的人和恢复的地方。")
-	UIStyle.panel(ui,Rect2(55,159,1170,430),true)
-	var scroll = ScrollContainer.new(); scroll.position = Vector2(79,181); scroll.size = Vector2(1115,384); ui.add_child(scroll)
-	var content = VBoxContainer.new(); content.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(content)
-	if story_enabled:
-		for id in session.profile.story.seen:
-			var beat = Story.scene(id)
-			var label = Label.new(); label.text = beat.title+" · "+beat.speaker+"："+beat.text; label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; label.custom_minimum_size = Vector2(1060,62); label.add_theme_color_override("font_color",UIStyle.DARK); content.add_child(label)
-		for id in session.catalog.levels:
-			if (id in Session.Flow.SIDES or id in session.profile.progress.completed_levels) and session.catalog.available(id,session.profile.progress.completed_levels):
-				var caption = "回忆 / 再玩 · " if id in session.profile.progress.completed_levels else "邻居的邀请 · "
-				var invite = Button.new(); invite.text = caption+session.catalog.levels[id].title; invite.custom_minimum_size.y = 42; invite.disabled = session.profile.story.return_node != ""; invite.pressed.connect(story_excursion.bind(id)); invite.name = "invite_"+id; buttons["invite_"+id] = invite; content.add_child(invite)
-	var lines = []
-	if not session.profile.get("legacy_fl07_runs",{}).is_empty() or session.profile.story.results.get("FL07",{}).has("final_order"):
-		lines.append("第七关已更新为24点；旧版中间记录与奖励保留，旧版完成不记作24点解答。")
-	for id in session.profile.progress.completed_levels:
-		lines.append("✓ "+session.catalog.levels[id].title)
-		lines.append(level_reaction(id))
-	for dialogue in session.profile.world.dialogues: lines.append(Story.DIALOGUES[dialogue].text)
-	for dialogue in session.profile.world.region_dialogues: lines.append("林间对话："+Story.region_dialogue(dialogue).text)
-	for id in session.profile.progress.completed_levels:
-		if Story.ITEMS.has(id): lines.append("收藏 · "+Story.ITEMS[id].name+"："+Story.ITEMS[id].story)
-	if lines.is_empty(): lines.append("第一袋种子还在树梢站。和阿橙出发吧。")
-	if session.profile.active_run != null:
-		var run: Dictionary = session.profile.active_run
-		lines.append("当前现场："+session.catalog.levels[run.level_id].title+"；回到入口可以接着上次的摆法继续。")
-		for entry in run.hint_log: lines.append("伙伴的想法："+entry.text)
-		for i in run.tools.snapshots.size(): lines.append("前后手记第%d张："%(i+1)+snapshot_text(run.tools.snapshots[i]))
-		for path in run.tools.route_tags: lines.append("我的路签："+path+" → %d层"%run.tools.route_tags[path])
-	for id in session.profile.suspended_runs:
-		var saved: Dictionary = session.profile.suspended_runs[id]
-		lines.append("暂存现场："+session.catalog.levels[id].title+"，可从地区入口继续。")
-		for entry in saved.hint_log: lines.append("暂存提示："+entry.text)
-		for path in saved.tools.route_tags: lines.append("暂存路签："+path+" → %d层"%saved.tools.route_tags[path])
-	for line in lines:
-		var label = Label.new(); label.text = line; label.add_theme_color_override("font_color",UIStyle.DARK); label.add_theme_font_size_override("font_size",20); label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; label.custom_minimum_size = Vector2(1070,42); content.add_child(label)
-	button("back","合上手记",Rect2(1044,659,200,39),back)
+	Pages.draw_journal(self)
 
 func draw_party() -> void:
-	navigation("同行伙伴","两位伙伴出行，所有已加入伙伴共享行旅等级；主线工具始终可用。")
-	UIStyle.panel(ui,Rect2(55,160,1170,427),true)
-	var index = 0
-	for id in session.profile.roster.owned:
-		var partner: Dictionary = Session.Catalog.PARTNERS[id]; var x = 86+index*376
-		text(partner.name+"  Lv.%d"%Session.Catalog.rank(session.profile.progress.journey_exp),Rect2(x,200,310,45),28,true)
-		var portrait = Actor.new(); portrait.identity = id; portrait.position = Vector2(x+239,299); portrait.pixel_scale = 0.35; portrait.grown = session.profile.roster.grown; ui.add_child(portrait)
-		text("共同经历：%d"%session.profile.roster.bonds[id].size(),Rect2(x,277,309,41),20,true)
-		for skill_index in partner.skills.size():
-			var skill: String = partner.skills[skill_index]
-			var gate = {"compare":"FL06","bands":"FL11","shadow":"FL10"}.get(skill,"")
-			var available = gate == "" or gate in session.profile.progress.completed_levels
-			button("equip_"+skill,("✓ " if skill in session.profile.roster.loadouts[id] else "")+SKILL_NAMES[skill],Rect2(x,339+skill_index*58,284,42),dispatch.bind({"kind":"equip","partner":id,"skill":skill}),available)
-		button("party_"+id,"留在营地" if id in session.profile.roster.party else "一起出发",Rect2(x,481,264,43),toggle_party.bind(id))
-		index += 1
-	button("back","回到营地",Rect2(1044,659,200,39),go_camp)
+	Pages.draw_party(self)
 
 func draw_visit() -> void:
-	navigation(session.catalog.levels[visit_id].title+" · 回访",Story.region_line(region,session.profile.progress.completed_levels))
-	world.page = "region"
-	UIStyle.panel(ui,Rect2(65,182,702,204),true)
-	text(level_reaction(visit_id),Rect2(93,209,646,134),24,true)
-	text("这里已经恢复；可以看看伙伴，也可以再玩一次。",Rect2(81,424,991,92),22)
-	button("practice","再玩一次",Rect2(82,538,274,45),request_level.bind(visit_id,true))
-	button("back","回到林间",Rect2(1000,659,243,40),show_region.bind(region))
+	Pages.draw_visit(self)
 
 func draw_tools() -> void:
 	if session.profile.active_run == null: page = "camp"; draw_camp(); return
@@ -680,7 +574,8 @@ func play_route_shadow() -> void:
 	for b in buttons.values(): b.disabled = true
 	for i in range(full_path.length()+1):
 		canvas.path = full_path.left(i); canvas.queue_redraw()
-		await get_tree().create_timer(effect_duration(0.18)).timeout
+		var beat = create_tween(); beat.tween_interval(effect_duration(0.18))
+		await beat.finished
 	busy = false; refresh()
 
 func toggle_party(id: String) -> void:
@@ -692,18 +587,7 @@ func toggle_party(id: String) -> void:
 	dispatch({"kind":"party","members":members})
 
 func draw_settings() -> void:
-	navigation("设置","声音可关闭；重要提示同时显示在场景中。")
-	UIStyle.panel(ui,Rect2(191,165,896,417),true)
-	text("环境与音乐音量",Rect2(235,215,340,45),24,true)
-	var slider = HSlider.new(); slider.name = "volume"; slider.position = Vector2(590,219); slider.size = Vector2(419,35); slider.min_value = 0; slider.max_value = 1; slider.step = 0.05; slider.value = session.profile.settings.volume; ui.add_child(slider)
-	slider.value_changed.connect(func(value: float):
-		if busy or modal or not session.pending.is_empty(): return
-		session.command({"kind":"settings","values":{"volume":value}},int(session.profile.revision)); apply_audio()
-		if not session.pending.is_empty(): refresh())
-	button("mute","打开声音" if session.profile.settings.muted else "关闭声音",Rect2(590,291,419,44),dispatch.bind({"kind":"settings","values":{"muted":not session.profile.settings.muted}}))
-	button("short_effects","重复演出：短" if session.profile.settings.short_effects else "重复演出：完整",Rect2(590,367,419,44),dispatch.bind({"kind":"settings","values":{"short_effects":not session.profile.settings.short_effects}}))
-	text("鼠标点选或拖动；Tab切换控件，Enter确认。\n货运：数字键选物件，方向键放置，Space松闸。\nH请求提示，Z撤销，Esc取消或返回。",Rect2(235,440,780,116),20,true)
-	button("back","返回",Rect2(1044,659,200,39),back)
+	Pages.draw_settings(self)
 
 func snapshot_text(state: Dictionary) -> String:
 	if state.has("steps"):
@@ -813,14 +697,11 @@ func animate_walk_pair(pair: Dictionary) -> void:
 	if not ui.has_node("route_canvas"): busy = false; refresh(); return
 	var canvas = ui.get_node("route_canvas")
 	canvas.walk_pair = [pair.a,pair.b]
-	var steps = maxf(1.0,maxf(float(pair.a.length()),float(pair.b.length())))
-	var duration = effect_duration(1.1)
-	var elapsed = 0.0
-	while elapsed < duration:
-		await get_tree().process_frame
-		elapsed += get_process_delta_time()
-		canvas.walk_t = clampf(elapsed/duration,0.0,1.2)
-		canvas.queue_redraw()
+	var tween = create_tween()
+	tween.tween_method(func(progress: float):
+		canvas.walk_t = progress
+		canvas.queue_redraw(),0.0,1.0,effect_duration(1.1))
+	await tween.finished
 	canvas.walk_t = -1.0
 	busy = false; refresh()
 
@@ -942,6 +823,8 @@ func show_save_error() -> void:
 		create.name = "new_profile"
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: process_mode = Node.PROCESS_MODE_DISABLED
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN: process_mode = Node.PROCESS_MODE_INHERIT
 	if is_instance_valid(story_stage):
 		if what == NOTIFICATION_APPLICATION_FOCUS_OUT: story_stage.focused = false
 		elif what == NOTIFICATION_APPLICATION_FOCUS_IN: story_stage.focused = true
@@ -1039,37 +922,7 @@ func story_continue(expected: String) -> void:
 		if Story.scene(session.profile.story.node).kind == "puzzle": resume_story()
 
 func draw_story() -> void:
-	var node: String = session.profile.story.node
-	var beat = Story.scene(node)
-	if node == "post_FL07" and session.profile.story.excursion == "" and session.profile.story.results.get("FL07",{}).has("final_order"):
-		beat = beat.duplicate(true); beat.title = "磨坊的旧记录"; beat.text = "旧版关卡的修复已经完成，奖励和进度保留。新的24点挑战可以从手记中再玩。"
-	if beat.kind == "puzzle": page = "challenge"; draw_challenge(); return
-	world.visible = false; story_stage.visible = true
-	if story_stage.node_id != node:
-		sound.play_cue({"delivery":"place","letter":"pickup","gates_lit":"unlock","join":"reward","bridge":"unlock","finale":"reward"}.get(beat.effect,"footstep"))
-	story_stage.setup(node,session.profile,time_scale)
-	region = beat.region if beat.region != "camp" else "treetop"
-	navigation(beat.title,"林间来信 · "+("旧事与新的约定" if session.profile.story.seen.is_empty() and not session.profile.progress.completed_levels.is_empty() else "故事进行中"))
-	var grain_scene = beat.region in ["village","mill","heart"] and not story_stage.cargo_scene and beat.effect != "bridge"
-	var upper_dialogue = beat.region in ["treetop","camp"] and not story_stage.cargo_scene
-	UIStyle.panel(ui,Rect2(60,155,1160,132) if upper_dialogue else (Rect2(60,557,1160,96) if grain_scene else Rect2(60,493,1160,158)),true)
-	text(beat.speaker,Rect2(106,168,1070,26) if upper_dialogue else (Rect2(106,562,1070,26) if grain_scene else Rect2(106,507,1070,29)),19 if grain_scene else 21,true)
-	text(beat.text,Rect2(106,203,1070,72) if upper_dialogue else (Rect2(106,590,1070,60) if grain_scene else Rect2(106,545,1070,100)),20 if grain_scene or upper_dialogue else 23,true)
-	button("story_skip","跳过本段动作",Rect2(1020,110,200,36),func(): story_stage.skip(); refresh(),not story_stage.done)
-	button("story_pause","继续播放" if story_stage.paused else "暂停",Rect2(885,110,125,36),func(): story_stage.paused = not story_stage.paused; refresh())
-	var ready: bool = story_stage.done and not story_stage.paused
-	if node == "post_branch":
-		for i in range(2):
-			var id: String = ["FL09","FL10"][i]
-			if id not in session.profile.progress.completed_levels: button("choose_"+id,"先去落石路口" if i == 0 else "先安排两封信",Rect2(590+i*320,665,300,39),dispatch.bind({"kind":"story_choose","level_id":id},"story"),ready,null,true)
-	else: button("story_continue",beat.action,Rect2(780,665,440,39),story_continue.bind(node),ready,null,true)
-	if session.profile.story.return_node != "": button("story_return","稍后再来 · 返回故事",Rect2(60,665,330,39),func():
-		if dispatch({"kind":"story_return"},"story"): resume_story())
-	elif node in ["joined","rest_village","rest_post","rest_growth","end","voyage"]: button("story_rest","在营地歇脚",Rect2(60,665,230,39),go_camp)
-	if node == "rest_growth" and Session.Roster.can_grow(session.profile): button("story_grow","系上同心叶结",Rect2(320,665,260,39),dispatch.bind({"kind":"grow"}),ready)
-	if node.begins_with("post_") and beat.level != "":
-		var reward: Dictionary = session.catalog.levels[beat.level].reward
-		text(("收藏 · "+Story.ITEMS[beat.level].name) if Story.ITEMS.has(beat.level) else "林间手记 · "+session.catalog.levels[beat.level].title,Rect2(60,615,1120,35) if upper_dialogue else Rect2(60,153,1120,35),19)
+	Pages.draw_story(self)
 
 func level_reaction(id: String) -> String:
 	if id == "FL07":

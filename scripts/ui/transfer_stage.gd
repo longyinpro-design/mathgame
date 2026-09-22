@@ -1,4 +1,4 @@
-extends Node2D
+extends "res://scripts/ui/presentation_layer.gd"
 const UIStyle = preload("res://scripts/cargo/skin.gd")
 const OBJECTS = preload("res://assets/runtime/v3/objects.png")
 const CRYSTAL = preload("res://assets/runtime/forest/fx/crystal-idle.png")
@@ -8,18 +8,43 @@ const DOORS = [Rect2(73,343,103,104),Rect2(570,383,83,89),Rect2(1007,412,78,73)]
 const LABELS = [Vector2(60,350),Vector2(550,390),Vector2(984,397)]
 const ROAD_X = [126.0,612.0,1048.0]
 const VILLAGE_FEET = {"hero":Vector2(365,537),"acheng":Vector2(438,539),"mossling":Vector2(812,537),"feather":Vector2(898,538)}
-var values: Array = [8,8,8]
-var selected = -1
-var warehouse = false
-var flight = -1.0
-var from_index = 0
-var to_index = 1
-var quantity = 1
-var band_size = 0
-var marks: Array = []
+var values: Array = [8,8,8]:
+	set(value):
+		values = value
+		queue_redraw()
+var selected = -1:
+	set(value):
+		selected = value
+		queue_redraw()
+var warehouse = false:
+	set(value):
+		warehouse = value
+		queue_redraw()
+var flight = -1.0:
+	set(value):
+		flight = value
+		queue_redraw()
+var from_index = 0:
+	set(value):
+		from_index = value
+		queue_redraw()
+var to_index = 1:
+	set(value):
+		to_index = value
+		queue_redraw()
+var quantity = 1:
+	set(value):
+		quantity = value
+		queue_redraw()
+var band_size = 0:
+	set(value):
+		band_size = value
+		queue_redraw()
+var marks: Array = []:
+	set(value):
+		marks = value
+		queue_redraw()
 const CENTERS = [Vector2(266,408),Vector2(631,408),Vector2(996,408)]
-
-func _process(_delta: float) -> void: queue_redraw()
 
 func _draw() -> void:
 	if warehouse:

@@ -58,6 +58,7 @@ func key(code: int) -> void:
 func hold(seconds: float) -> void:
 	game.paused = true; game.elapsed = seconds
 	game.world.progress = minf(1.0, seconds / game.duration())
+	game.world.queue_redraw() # explicit fixture pose while presentation is paused
 	await process_frame
 
 func fits(text: String, size_px: int, width: float) -> bool:
@@ -130,6 +131,8 @@ func patch_lumen(image: Image, rect: Rect2) -> float:
 	return total * 255.0 / seen if seen > 0 else 0.0
 
 func paper_audit(label: String) -> void:
+	# Some branches skip shot(); sample this committed frame, not the prior screen.
+	await process_frame; await process_frame; RenderingServer.force_draw(false)
 	var sprite = Image.load_from_file(ProjectSettings.globalize_path(PAPER_ART))
 	check(sprite != null, "%s: the letter paper art can be read back" % label)
 	if sprite == null: return
@@ -215,7 +218,7 @@ func run() -> void:
 				and "键盘 1 加一包" in game.buttons.pack_0_0.tooltip_text,
 				"%s: 每一行封包的说明里写着自己那两颗键" % prefix)
 			await shot(prefix, "03-order", branch, small)
-			if not small: paper_audit(prefix)
+			if not small: await paper_audit(prefix)
 			await click("pack_0_2")
 			check(game.state.order == [3, 0, 0],
 				"%s: one click dials three packs of a kind at once" % prefix)

@@ -1,4 +1,4 @@
-extends Node2D
+extends "res://scripts/ui/presentation_layer.gd"
 static var metadata: Dictionary = {}
 static var texture: Texture2D
 var region = "treetop"

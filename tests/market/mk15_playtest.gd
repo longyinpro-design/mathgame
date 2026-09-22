@@ -37,6 +37,7 @@ func key(code: int) -> void:
 func hold(seconds: float) -> void:
 	game.paused = true; game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
+	game.world.queue_redraw() # explicit fixture pose while presentation is paused
 	await process_frame
 func fits(text: String, size_px: int, width: float) -> bool:
 	var widest := 0.0
@@ -133,6 +134,7 @@ func run() -> void:
 		game._notification(NOTIFICATION_APPLICATION_FOCUS_OUT)
 		paused_at = game.elapsed; await create_timer(0.1).timeout
 		check(game.paused and game.elapsed == paused_at,"focus loss freezes the ringing")
+		game._notification(NOTIFICATION_APPLICATION_FOCUS_IN) # return to the window before input
 		await click("skip")
 		check(game.state.stage == "delivery","the ring hands over to taking the sign down")
 		await hold(1.2); await capture(prefix+"09-sign-falls")

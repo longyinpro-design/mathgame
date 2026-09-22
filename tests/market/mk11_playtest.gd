@@ -56,6 +56,7 @@ func key(code: int) -> void:
 func pose(seconds: float) -> void:
 	game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
+	game.world.queue_redraw() # explicit fixture pose while presentation is paused
 	# 镜头是 world.progress 的派生值，宿主在自己的 _process 里才换算：先叫它按新进度算一次，
 	# 否则个别帧序下读到的是上一帧的旧镜头（整表 pass 里 MK09／MK11 各撞见过一次）。
 	game.update_camera()
@@ -537,6 +538,7 @@ func run() -> void:
 		await create_timer(0.12).timeout
 		check(game.paused and game.elapsed == paused_at,"focus loss freezes the jar mid-flight")
 		check(game.buttons.pause.text == "继续动画","the frozen delivery offers to resume")
+		game._notification(NOTIFICATION_APPLICATION_FOCUS_IN) # return to the window before input
 		await click("skip")
 		check(game.state.stage == "complete" and at_camera(1.0, Vector2.ZERO),
 			"the courtyard pulls back to the whole scene when the jar is handed over")

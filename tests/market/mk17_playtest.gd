@@ -96,6 +96,7 @@ func drained() -> void:
 func hold(seconds: float) -> void:
 	game.paused = true; game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
+	game.world.queue_redraw() # explicit fixture pose while presentation is paused
 	await process_frame
 
 func fits(text: String, size_px: int, width: float) -> bool:

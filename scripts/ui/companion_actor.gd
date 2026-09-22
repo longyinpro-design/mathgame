@@ -1,4 +1,4 @@
-extends Node2D
+extends "res://scripts/ui/presentation_layer.gd"
 const FOX = preload("res://assets/runtime/fox-v2.png")
 const HERO = preload("res://assets/source/explorer-sprites-v2.png")
 const ACTIONS = {"idle":[0,1,2],"walk":[3,4,5],"interact":[6,7,8],"skill":[9,10,11],"affected":[12,13,14],"success":[15,16,17],"rest":[18,19,20],"talk":[21,22,23]}

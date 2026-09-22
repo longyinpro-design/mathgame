@@ -170,6 +170,7 @@ func run() -> void:
 		game._notification(NOTIFICATION_APPLICATION_FOCUS_OUT)
 		paused_at = game.elapsed; await create_timer(0.1).timeout
 		check(game.paused and game.elapsed == paused_at,"focus loss freezes measurement")
+		game._notification(NOTIFICATION_APPLICATION_FOCUS_IN) # return to the window before input
 		await click("skip"); await click("next")
 		check(game.state.stage == "deduction" and game.state.guesses == [0,0],"two receipts do not automatically solve capacity")
 		check("容量签" in label_at(Vector2(456,28)) and "先复核" not in label_at(Vector2(456,28)),

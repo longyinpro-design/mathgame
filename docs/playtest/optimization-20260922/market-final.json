@@ -1,0 +1,237 @@
+{
+  "status": "PASS",
+  "samples": 19,
+  "suites": 39,
+  "passed": 8857,
+  "total": 8857,
+  "candidate_sha256": "89c6fd8fbf5f9361bfd96df2dca976e6e0d4072ab23b56d19d776142c7f42fe4",
+  "reuse_note": "Full market run passed 18 entrypoints; final MK18 rerun passed after its own test-only readback synchronization fix. Other receipts include all market test files in a broad manifest: their sole drift is mk18_playtest.gd, which those entrypoints do not execute. Product and actual executed fixtures are unchanged.",
+  "results": [
+    {
+      "sample": "mk01",
+      "receipt": "docs/playtest/market-mk01-reasoning/verification.json",
+      "receipt_sha256": "79db6031cc0a3db8440c952959b223cb2fbea5126b582f45a3e977b77949e222",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 849,
+      "total": 849,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk02",
+      "receipt": "docs/playtest/market-mk02-exchange/verification.json",
+      "receipt_sha256": "bcaee576bc5eda365d00edf370320ebd17c5e1d29e876c463d0843cec349568f",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 181,
+      "total": 181,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk03",
+      "receipt": "docs/playtest/market-mk03-weight/verification.json",
+      "receipt_sha256": "f9c7991d3b84c8d20dfe1ecdaa494bd2390ac74a35544444107480ba79dd0479",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 292,
+      "total": 292,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk04",
+      "receipt": "docs/playtest/market-mk04-receipt/verification.json",
+      "receipt_sha256": "548481460684f19df0e7167cf13190d38ee96214d5e782a99cd242ea1c6395ef",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 568,
+      "total": 568,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk05",
+      "receipt": "docs/playtest/market-mk05-labels/verification.json",
+      "receipt_sha256": "3c0841c09211fb2640cb9e7c7759e0ba124cd921e3e607428f1dc72ff615f1f3",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 279,
+      "total": 279,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk06",
+      "receipt": "docs/playtest/market-mk06-packs/verification.json",
+      "receipt_sha256": "f89b2f23ece449e548fd8e987cbea1370602afeb85d00a0dd1de1fb60e8ea3a0",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 302,
+      "total": 302,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk07",
+      "receipt": "docs/playtest/market-mk07-goods/verification.json",
+      "receipt_sha256": "5c55df8afbfc0c74b6e8750b95c2d22a09736bd1d73b25b08392f37bd2ac5cfc",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 323,
+      "total": 323,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk08",
+      "receipt": "docs/playtest/market-mk08-oil/verification.json",
+      "receipt_sha256": "a71a0fba10f2bfb709d78592e5f29407f09c5958f22b271b64eff78f0dba98ff",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 399,
+      "total": 399,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk09",
+      "receipt": "docs/playtest/market-mk09-cyclic-exchange/verification.json",
+      "receipt_sha256": "bc39e0d7d46203ce2f8a4ce51541bd4a2abcbfff715a59ad210101c641b1b192",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 820,
+      "total": 820,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk10",
+      "receipt": "docs/playtest/market-mk10-fare/verification.json",
+      "receipt_sha256": "a7a4dcb05fad0942de91c6cdd41db8fd081a8802218a36ccdcc393677fff3fcb",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 592,
+      "total": 592,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk12",
+      "receipt": "docs/playtest/market-mk12-oil/verification.json",
+      "receipt_sha256": "cc85af25942840e96f72187276193e5f29cbb9e82811dd0edb7d0bde4ac02695",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 379,
+      "total": 379,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk14",
+      "receipt": "docs/playtest/market-mk14-scale/verification.json",
+      "receipt_sha256": "b7fa69dff3b1e5083168f6179b830f8dae6345b72a2bb877f0fb21f95dccff6f",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 590,
+      "total": 590,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk13",
+      "receipt": "docs/playtest/market-mk13-scarf/verification.json",
+      "receipt_sha256": "4c16fe2393a5069672fb878112a04b5c8fcc12bd73e4b1a0b74917399870572b",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 485,
+      "total": 485,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk15",
+      "receipt": "docs/playtest/market-mk15-copper-nut/verification.json",
+      "receipt_sha256": "d446d1221c3bdb40d55c2f8f38a3042a0011a1a51dcc8982ccc4b69d8186d574",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 357,
+      "total": 357,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk16",
+      "receipt": "docs/playtest/market-mk16-gift/verification.json",
+      "receipt_sha256": "045ec15f3d783d3c6a53a59a1cbb61e3d43362889732c832e1e7849051b868f3",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 453,
+      "total": 453,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk11",
+      "receipt": "docs/playtest/market-mk11-scale/verification.json",
+      "receipt_sha256": "3d536470628080ce12751d894b4bb37e04eb30beaa32040475e43866e94c4c9b",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 527,
+      "total": 527,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk17",
+      "receipt": "docs/playtest/market-mk17-inspection/verification.json",
+      "receipt_sha256": "7a5e03445f23eec6daded72e1fe542d96d1faee591acb32cceca9767d94ee992",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 526,
+      "total": 526,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    },
+    {
+      "sample": "mk18",
+      "receipt": "docs/playtest/market-mk18-lantern/verification.json",
+      "receipt_sha256": "11e0d99f6bc5b86316f106091fcb722f46a7b2f5efc66f68af055d64f2ae61a7",
+      "status": "PASS",
+      "suites": 2,
+      "passed": 796,
+      "total": 796,
+      "manifest_drift": []
+    },
+    {
+      "sample": "hub",
+      "receipt": "docs/playtest/market-chapter-hub/verification.json",
+      "receipt_sha256": "f9908fe02628da6f317b18c506b7ec23d5688b47c64e249093b148cd6cf0eb95",
+      "status": "PASS",
+      "suites": 3,
+      "passed": 139,
+      "total": 139,
+      "manifest_drift": [
+        "tests/market/mk18_playtest.gd"
+      ]
+    }
+  ]
+}

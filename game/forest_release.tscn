@@ -1,5 +1,11 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=8 format=3]
 [ext_resource type="Script" path="res://scripts/ui/forest_release.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/forest_world.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/cargo/world.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/ui/battle_world.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/ui/twenty_four_console.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/ui/story_stage.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/encounter/audio.gd" id="7"]
 [node name="ForestRelease" type="Control"]
 layout_mode=3
 anchors_preset=15
@@ -7,3 +13,32 @@ anchor_right=1.0
 anchor_bottom=1.0
 mouse_filter=2
 script=ExtResource("1")
+
+[node name="ForestWorld" type="Node2D" parent="."]
+script=ExtResource("2")
+
+[node name="CargoWorld" type="Node2D" parent="."]
+script=ExtResource("3")
+visible=false
+
+[node name="BattleWorld" type="Node2D" parent="."]
+script=ExtResource("4")
+visible=false
+
+[node name="TwentyFourConsole" type="Node2D" parent="."]
+script=ExtResource("5")
+visible=false
+
+[node name="StoryStage" type="Node2D" parent="."]
+script=ExtResource("6")
+visible=false
+
+[node name="Audio" type="Node" parent="."]
+script=ExtResource("7")
+
+[node name="UI" type="Control" parent="."]
+mouse_filter=2
+
+[node name="Overlay" type="Control" parent="."]
+mouse_filter=2
+z_index=100

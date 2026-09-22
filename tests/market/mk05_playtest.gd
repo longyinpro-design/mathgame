@@ -54,6 +54,7 @@ func key(code: int) -> void:
 func hold(seconds: float) -> void:
 	game.paused = true; game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
+	game.world.queue_redraw() # explicit fixture pose while presentation is paused
 	await process_frame; game.refresh()
 func landed(what: String) -> bool: return lock_left > 0.0 and land_seen == what
 func text_w(value: String, px: int) -> float:
@@ -321,6 +322,7 @@ func run() -> void:
 		game._notification(NOTIFICATION_APPLICATION_FOCUS_OUT)
 		frozen_at = game.elapsed; await create_timer(0.1).timeout
 		check(game.paused and game.elapsed == frozen_at, "focus loss freezes the hand-over mid-flight")
+		game._notification(NOTIFICATION_APPLICATION_FOCUS_IN) # return before either input branch
 		if small:
 			await click("skip")
 		else:

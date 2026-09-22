@@ -1,0 +1,136 @@
+========================================================================
+静态体检报告 · 只读分析
+========================================================================
+
+脚本文件            130
+总行数              23,079
+函数总数            1,508   有返回类型 100.0%
+参数缺类型          0
+信号                5  其中参数缺类型 0
+
+var 显式注解        801
+var 类型推断        193
+var 无注解          2,235
+→ 注解覆盖率        30.8%  (994/3,229)
+
+get_node/get_parent 2
+preload 调用        343
+运行期 load 调用    16
+
+重写 _process 等    22 个文件
+其中含 queue_redraw 15 处
+
+------------------------------------------------------------------------
+重绘热点（可能逐帧刷屏）
+------------------------------------------------------------------------
+  cargo/world.gd:35   func _process(delta: float) -> void:
+  encounter/visuals.gd:144   func _process(delta: float) -> void:
+  forest_world.gd:17   func _process(delta: float) -> void:
+  journey/camp.gd:17   func _process(delta: float) -> void:
+  market/level_host.gd:116   func _process(delta: float) -> void:
+  market/market_hub.gd:56   func _process(_delta: float) -> void:
+  market/mk01_scene.gd:89   func _process(delta: float) -> void:
+  ui/battle_world.gd:43   func _process(delta: float) -> void:
+  ui/cargo_annotations.gd:14   func _process(_delta: float) -> void:
+  ui/companion_actor.gd:53   func _process(delta: float) -> void:
+  ui/forest_world.gd:100   func _process(delta: float) -> void:
+  ui/npc_actor.gd:18   func _process(delta: float) -> void:
+  ui/scene_ground.gd:18   func _process(delta: float) -> void:
+  ui/story_stage.gd:128   func _process(delta: float) -> void:
+  ui/twenty_four_console.gd:35   func _process(delta: float) -> void:
+
+------------------------------------------------------------------------
+超长脚本（>250 行）
+------------------------------------------------------------------------
+    933 行   ui/forest_release.gd
+    701 行   market/mk14_rules.gd
+    560 行   core/game_session.gd
+    512 行   market/mk18_rules.gd
+    459 行   market/mk17_rules.gd
+    451 行   market/mk14_world.gd
+    430 行   ui/story_stage.gd
+    402 行   cargo/journey.gd
+    389 行   market/mk10_world.gd
+    387 行   chapter.gd
+    384 行   mechanisms/current_hint.gd
+    379 行   mechanisms/route_rules.gd
+    368 行   market/mk18_world.gd
+    361 行   encounter/encounter.gd
+    360 行   market/mk01_scene.gd
+    354 行   market/level_host.gd
+    332 行   market/mk17_world.gd
+    329 行   market/mk16_world.gd
+    297 行   market/mk03_world.gd
+    292 行   market/mk11_rules.gd
+    291 行   market/mk09_world.gd
+    288 行   journey/journey.gd
+    279 行   market/mk08_world.gd
+    269 行   main.gd
+    268 行   market/mk11_world.gd
+    266 行   market/mk15_rules.gd
+    264 行   mechanisms/machine_rules.gd
+    263 行   market/mk15_world.gd
+    260 行   market/mk08_rules.gd
+    258 行   market/mk01_world.gd
+    258 行   market/mk09_rules.gd
+    251 行   market/mk06_world.gd
+
+------------------------------------------------------------------------
+类型注解覆盖率最低（var > 20 行）
+------------------------------------------------------------------------
+    0.0%     0/22   persistence/save_repository.gd
+    3.4%     1/29   market/mk18_world.gd
+    3.7%     1/27   mechanisms/coin_rules.gd
+    5.8%     3/52   market/mk01_world.gd
+    6.7%     2/30   ui/route_canvas.gd
+   11.1%     3/27   market/mk09_rules.gd
+   13.2%     5/38   market/mk17_world.gd
+   14.3%     7/49   market/mk16_world.gd
+   14.3%     6/42   market/mk17_rules.gd
+   17.4%     4/23   ui/companion_actor.gd
+   18.2%     4/22   cargo/rules.gd
+   18.5%     5/27   market/market_hub.gd
+   18.9%     7/37   mechanisms/machine_rules.gd
+   20.0%     9/45   cargo/world.gd
+   20.0%    10/50   market/mk01_scene.gd
+   20.0%     5/25   ui/transfer_stage.gd
+   20.4%    10/49   market/mk18_rules.gd
+   20.5%    15/73   encounter/visuals.gd
+   21.6%     8/37   main.gd
+   21.9%     7/32   market/mk06_world.gd
+
+------------------------------------------------------------------------
+场景空壳检查
+------------------------------------------------------------------------
+     9 行  1 节点  game/chapter.tscn
+     9 行  1 节点  game/encounter.tscn
+    44 行  9 节点  game/forest_release.tscn
+     9 行  1 节点  game/journey.tscn
+     8 行  1 节点  game/main.tscn
+    11 行  1 节点  game/market_island.tscn
+     9 行  1 节点  game/market_mk01.tscn
+     9 行  1 节点  game/market_mk02.tscn
+     9 行  1 节点  game/market_mk03.tscn
+     9 行  1 节点  game/market_mk04.tscn
+     9 行  1 节点  game/market_mk05.tscn
+     9 行  1 节点  game/market_mk06.tscn
+     9 行  1 节点  game/market_mk07.tscn
+     9 行  1 节点  game/market_mk08.tscn
+     9 行  1 节点  game/market_mk09.tscn
+     9 行  1 节点  game/market_mk10.tscn
+     9 行  1 节点  game/market_mk11.tscn
+     9 行  1 节点  game/market_mk12.tscn
+     9 行  1 节点  game/market_mk13.tscn
+     9 行  1 节点  game/market_mk14.tscn
+     9 行  1 节点  game/market_mk15.tscn
+     9 行  1 节点  game/market_mk16.tscn
+     9 行  1 节点  game/market_mk17.tscn
+     9 行  1 节点  game/market_mk18.tscn
+     9 行  1 节点  game/treetop.tscn
+
+------------------------------------------------------------------------
+可达性（从 game/*.tscn 出发，含 class_name 引用）
+------------------------------------------------------------------------
+  根场景   55
+  脚本总量 130
+  不可达   0  ← 候选死代码，需人工确认（动态 load 会误报）

@@ -48,6 +48,7 @@ func key(code: int) -> void:
 func pose(seconds: float) -> void:
 	game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
+	game.world.queue_redraw() # explicit fixture pose while presentation is paused
 	# 镜头是 world.progress 的派生值，宿主在自己的 _process 里才换算：先叫它按新进度算一次，
 	# 否则个别帧序下读到的是上一帧的旧镜头（整表 pass 里 MK09／MK11 各撞见过一次）。
 	game.update_camera()
@@ -463,11 +464,13 @@ func run() -> void:
 			"the shopfront still names the good hanging at it while three of five are in the air")
 		var keep_progress: float = game.world.progress
 		game.world.progress = 0.95
+		game.world.queue_redraw() # explicit fixture pose while presentation is paused
 		var landed_at = game.world.goods_held()[0]
 		check(board_with("%s摊 · 有%s" % [Rules.ACTORS[0], Rules.GOODS[landed_at]]) != ""
 			and board_with("%s摊 · 有%s" % [Rules.ACTORS[0], Rules.GOODS[0]]) == "",
 			"the shopfronts change wording once the last good has landed in its tray")
 		game.world.progress = keep_progress
+		game.world.queue_redraw() # explicit fixture pose while presentation is paused
 		var legible = 0
 		for lifted in mid:
 			if lifted["phase"] <= 0.1 or lifted["phase"] >= 0.9: continue
@@ -494,6 +497,7 @@ func run() -> void:
 		await create_timer(0.12).timeout
 		check(game.paused and game.elapsed == paused_at,"losing focus freezes the batch mid-air")
 		check(game.buttons.pause.text == "继续动画","the frozen exchange offers to resume")
+		game._notification(NOTIFICATION_APPLICATION_FOCUS_IN) # return to the window before input
 		await click("skip")
 		check(game.state.stage == "delivery" and game.state.booked == Rules.SOLUTION,
 			"the booked batch lands as one record")

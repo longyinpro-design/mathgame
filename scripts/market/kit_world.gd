@@ -1,4 +1,4 @@
-extends Node2D
+extends "res://scripts/ui/presentation_layer.gd"
 # kit-v1 拆件包的统一世界层：底景、锚点换算、站位读取、货签文字与落地动画只在这里实现一次。
 # 关卡子类只需设置 scene_id/backdrop 并实现 draw_level()。
 const UIStyle = preload("res://scripts/cargo/skin.gd")

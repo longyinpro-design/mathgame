@@ -63,6 +63,7 @@ func key(code: int) -> void:
 func pose(seconds: float) -> void:
 	game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
+	game.world.queue_redraw() # explicit fixture pose while presentation is paused
 	game.update_camera()
 	await process_frame
 func hold(seconds: float) -> void:
@@ -385,6 +386,7 @@ func run() -> void:
 		check(game.paused and game.elapsed == paused_at and game.buttons.pause.text == "继续动画",
 			"失焦把交付冻在当下这一帧，并提供继续")
 		await capture(prefix+"07-handover")
+		game._notification(NOTIFICATION_APPLICATION_FOCUS_IN) # return to the window before input
 		await click("skip")
 		check(game.state.stage == "puzzle" and Rules.delivered(game.state) == 1
 			and game.state.order == Rules.NONE and game.state.built_far[THIRTEEN] == THIRTEEN_FAR,

@@ -27,10 +27,20 @@ var buttons: Dictionary = {}
 var selected = -1
 var elapsed = 0.0
 var time_scale = 1.0
-var paused = false
+var paused = false:
+	set(value):
+		paused = value
+		sync_presentation()
 var message = ""
-var modal = false
+var modal = false:
+	set(value):
+		modal = value
+		sync_presentation()
 var transient = 0.0
+var focused = true:
+	set(value):
+		focused = value
+		sync_presentation()
 var window_theme: Theme
 
 func _ready() -> void:
@@ -54,22 +64,27 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if is_instance_valid(get_window()): get_window().theme = window_theme
 
+func sync_presentation() -> void:
+	if is_instance_valid(world): world.presentation_paused = modal or paused or not focused
+
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: focused = false
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN: focused = true
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and is_instance_valid(world) and state.stage in Rules.ANIMATIONS:
 		paused = true
 		if buttons.has("pause"): buttons.pause.text = "继续动画"
 
 func _process(delta: float) -> void:
-	if not is_instance_valid(world): return
-	if not modal and not paused:
-		if transient > 0:
-			transient = maxf(0,transient-delta/maxf(0.01,time_scale))
-			world.move_progress = 1-transient/0.3
-			if transient == 0: refresh()
-		if state.stage in Rules.ANIMATIONS:
-			elapsed += delta/maxf(0.01,time_scale)
-			world.progress = minf(1,elapsed/DURATIONS[state.stage])
-			if world.progress >= 1: commit(Rules.advance(state),history)
+	if not is_instance_valid(world) or not is_visible_in_tree(): return
+	if modal or paused or not focused: return
+	if transient > 0:
+		transient = maxf(0,transient-delta/maxf(0.01,time_scale))
+		world.move_progress = 1-transient/0.3
+		if transient == 0: refresh()
+	if state.stage in Rules.ANIMATIONS:
+		elapsed += delta/maxf(0.01,time_scale)
+		world.progress = minf(1,elapsed/DURATIONS[state.stage])
+		if world.progress >= 1: commit(Rules.advance(state),history)
 	update_camera()
 	world.queue_redraw()
 
@@ -127,6 +142,8 @@ func sign_text(text: String, rect: Rect2, size_px: int = 20) -> void:
 	UIStyle.text(ui,text,Rect2(rect.position+Vector2(14,8),rect.size-Vector2(28,12)),size_px)
 
 func refresh() -> void:
+	sync_presentation()
+	world.queue_redraw()
 	clear_children(ui)
 	for child in world.get_children(): world.remove_child(child); child.queue_free()
 	buttons = {}; world.state = state; world.selected = selected

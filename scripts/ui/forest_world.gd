@@ -1,4 +1,4 @@
-extends Node2D
+extends "res://scripts/ui/presentation_layer.gd"
 const UIStyle = preload("res://scripts/cargo/skin.gd")
 const BACKGROUND = preload("res://assets/runtime/treetop-v5.png")
 const RAVINE = preload("res://assets/runtime/forest-ravine-v2.png")

@@ -68,11 +68,13 @@ func run() -> void:
 	var locked = true
 	for control in game.buttons.values(): locked = locked and control.disabled
 	check(locked,"focus loss keeps background controls disabled")
+	game.notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	await key(KEY_ESCAPE); check(not game.modal,"Escape cancels reset without a background action")
 	game.session.repository.fail_at = "replace"
 	await key(KEY_1); await key(KEY_LEFT)
 	check(game.modal and not game.session.pending.is_empty() and game.session.profile.active_run.state.places[0] == 0,"failed actual move keeps old board behind save modal")
 	game.notification(NOTIFICATION_APPLICATION_FOCUS_OUT)
+	game.notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	await click(Vector2(1027,49)); check(game.page == "challenge","save modal blocks background camp")
 	game.session.repository.fail_at = ""; await overlay_click("retry")
 	check(not game.modal and game.session.profile.active_run.state.places[0] == 1,"actual retry installs preserved candidate")

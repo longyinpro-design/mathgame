@@ -31,4 +31,9 @@ static func ready(window: Window) -> bool:
 	if DisplayServer.get_name() == "headless" or not window.get_flag(Window.FLAG_NO_FOCUS) or window.mode != Window.MODE_MINIMIZED:
 		push_error("Window test requires a native minimized non-focus-stealing window")
 		return false
+	# Viewport-injected input stands in for returning to the game window. Native
+	# minimization sends FOCUS_OUT, but cannot send the matching FOCUS_IN while
+	# these fixtures deliberately remain minimized. Frozen-state assertions run
+	# before ready(); restore logical focus only when the next interaction starts.
+	for child in window.get_children(): child.propagate_notification(MainLoop.NOTIFICATION_APPLICATION_FOCUS_IN)
 	return true

@@ -58,6 +58,7 @@ func key(code: int) -> void:
 func pose(seconds: float) -> void:
 	game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
+	game.world.queue_redraw() # explicit fixture pose while presentation is paused
 	# 镜头是 world.progress 的派生值，宿主在自己的 _process 里才换算：先叫它按新进度算一次，
 	# 否则个别帧序下读到的是上一帧的旧镜头（整表 pass 里 MK09／MK11 各撞见过一次）。
 	game.update_camera()
@@ -531,6 +532,7 @@ func run() -> void:
 		check(changed_pixels(flight_pose, prefix+"12b-ticket-crossing",
 			flight_over(flying, landed, Callable(self,"ticket_board"))) > 0,
 			"筹票飞过船底那两排收费牌时画在木头前面：两帧在牌面上确实留下了变化")
+		game._notification(NOTIFICATION_APPLICATION_FOCUS_IN) # return to the window before input
 		await click("skip")
 		check(game.state.stage == "clarify" and game.state.written == PAPER and game.state.paid == paid_now,
 			"跳过把演出收尾，纸面与结清都留在承诺过的那份上")

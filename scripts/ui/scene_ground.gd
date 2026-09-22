@@ -1,4 +1,4 @@
-extends Node2D
+extends "res://scripts/ui/presentation_layer.gd"
 # Original painted terrain owns the ground. This layer carries only local outcomes.
 var region = "treetop"
 var story = false
@@ -8,9 +8,14 @@ var bridge = 1.0
 var time = 0.0
 var light_progress = 1.0
 var bridge_gap = false
+var drawn_state: Array = []
 const LAMPS = [Vector2(332,294),Vector2(823,395),Vector2(1178,311)]
 func _process(delta: float) -> void:
-	time += delta; queue_redraw()
+	time += delta
+	var current = [region,"FL04" in completed,"FL07" in completed,light_progress]
+	if current != drawn_state or (region == "village" and "FL04" in completed):
+		drawn_state = current
+		queue_redraw()
 func _draw() -> void:
 	if region == "village" and "FL04" in completed:
 		for i in range(3):

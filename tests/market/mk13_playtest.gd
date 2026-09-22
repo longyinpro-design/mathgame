@@ -53,6 +53,7 @@ func key(code: int) -> void:
 func pose(seconds: float) -> void:
 	game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
+	game.world.queue_redraw() # explicit fixture pose while presentation is paused
 	game.update_camera()
 	await process_frame
 func hold(seconds: float) -> void:
@@ -275,6 +276,7 @@ func run() -> void:
 		await create_timer(0.1).timeout
 		check(game.paused and game.elapsed == paused_at and game.buttons.pause.text == "继续动画",
 			"focus loss freezes the sewing and says so on the button")
+		game._notification(NOTIFICATION_APPLICATION_FOCUS_IN) # return to the window before input
 		await click("skip")
 		check(game.state.stage == "story" and game.state.beat == 0,"the sewing hands over to her own story")
 		check(game.world.sewn() == Rules.NEED,"the whole edge is on her scarf by the time she talks")

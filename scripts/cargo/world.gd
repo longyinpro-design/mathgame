@@ -1,4 +1,4 @@
-extends Node2D
+extends "res://scripts/ui/presentation_layer.gd"
 const Rules = preload("res://scripts/cargo/rules.gd")
 const UIStyle = preload("res://scripts/cargo/skin.gd")
 const FOX = preload("res://assets/runtime/fox-v2.png")

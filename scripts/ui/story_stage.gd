@@ -1,4 +1,4 @@
-extends Node2D
+extends "res://scripts/ui/presentation_layer.gd"
 signal finished
 const Actor = preload("res://scripts/ui/companion_actor.gd")
 const NPC = preload("res://scripts/ui/npc_actor.gd")
@@ -14,8 +14,14 @@ var result: Dictionary = {}
 var elapsed = 0.0
 var duration = 3.0
 var speed = 1.0
-var paused = false
-var focused = true
+var paused = false:
+	set(value):
+		paused = value
+		presentation_paused = paused or not focused
+var focused = true:
+	set(value):
+		focused = value
+		presentation_paused = paused or not focused
 var done = false
 var backdrop: Node2D
 var cast: Dictionary = {}
@@ -114,11 +120,7 @@ func skip() -> void:
 
 func _process(delta: float) -> void:
 	if not visible or scene.is_empty(): return
-	var running = not paused and focused
-	for actor in cast.values(): actor.set_process(running)
-	npc.set_process(running); backdrop.set_process(running); cargo.set_process(running); mill.set_process(running)
-	backdrop.ground.set_process(running)
-	if not running: return
+	if paused or not focused: return
 	if not done:
 		elapsed = minf(duration,elapsed+delta*speed)
 		_update_pose()
@@ -215,6 +217,7 @@ func _update_pose() -> void:
 	if done or t >= 1.0:
 		for actor in cast.values(): actor.action = "idle"
 
+	redraw_pose()
 
 func _draw() -> void:
 	if scene.is_empty(): return

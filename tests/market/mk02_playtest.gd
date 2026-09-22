@@ -39,6 +39,7 @@ func hold(seconds: float) -> void:
 	game.paused = true
 	game.elapsed = seconds
 	game.world.progress = minf(1, seconds / game.duration())
+	game.world.queue_redraw() # explicit fixture pose while presentation is paused
 	await process_frame
 # 抬头那两块板与回执板都由 UIStyle.text 画：Label 的框按板子内框写死，汉字又从不折行，
 # 一句超长的话会直接爬出板子外面。这里按真实字号量每一句，超框就算缺陷。
@@ -108,6 +109,7 @@ func run() -> void:
 		await click("batch_0")
 		check(game.state.exchange == [0,3],"the batch button spends the remaining fruit pairs")
 		game.elapsed = 0.5; game.world.progress = 0.5 / game.duration(); await process_frame
+		game.world.queue_redraw() # explicit fixture pose while presentation is paused
 		check(game.world.progress > 0.2 and game.world.progress < 0.5,"the batch animation holds a mid-flight frame")
 		check(game.world.in_flight_homes().size() == Rules.GROUP * 3,"the batch carries every fruit of the group at once")
 		var closest := 9999.0
@@ -123,6 +125,7 @@ func run() -> void:
 		game._notification(NOTIFICATION_APPLICATION_FOCUS_OUT)
 		paused_at = game.elapsed; await create_timer(0.1).timeout
 		check(game.paused and game.elapsed == paused_at,"focus loss freezes the exchange mid-flight")
+		game._notification(NOTIFICATION_APPLICATION_FOCUS_IN) # return to the window before input
 		await click("skip")
 		check(game.state.a == 4 and Rules.spools_loose(game.state) == 12,"the basket is spent and twelve spools are on the table")
 		await capture(prefix+"04-full-table")
