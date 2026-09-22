@@ -1,0 +1,667 @@
+{
+  "scope": "Design-model evidence only; no Godot or child difficulty acceptance",
+  "inputs": {
+    "tests/design/workshop_olympiad.py": "d3502669abfe2910f143dddc4c50b862b127a0a58a236cb472d100c4caaac3fb",
+    "docs/production/workshop_chapter_olympiad.md": "674f46616bf68583d1d68a22d54a22197fbb273fd43c5db0b6b83c938e42d825"
+  },
+  "levels": {
+    "GW02": {
+      "solution_count": 28,
+      "examples": [
+        [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          7,
+          7
+        ],
+        [
+          4,
+          4,
+          4,
+          4,
+          4,
+          7,
+          4,
+          7
+        ],
+        [
+          4,
+          4,
+          4,
+          4,
+          4,
+          7,
+          7,
+          4
+        ],
+        [
+          4,
+          4,
+          4,
+          4,
+          7,
+          4,
+          4,
+          7
+        ],
+        [
+          4,
+          4,
+          4,
+          4,
+          7,
+          4,
+          7,
+          4
+        ],
+        [
+          4,
+          4,
+          4,
+          4,
+          7,
+          7,
+          4,
+          4
+        ]
+      ],
+      "quantities": {
+        "small": 6,
+        "large": 2
+      },
+      "produced": 38,
+      "reserved": 11
+    },
+    "GW03": {
+      "solution_count": 1,
+      "examples": [
+        23
+      ],
+      "two_machine_meetings": [
+        11,
+        23,
+        35
+      ],
+      "horizon": 40
+    },
+    "GW04": {
+      "solution_count": 1,
+      "examples": [
+        {
+          "delay": 2,
+          "transfers": [
+            4,
+            16
+          ]
+        }
+      ],
+      "all_delays": {
+        "0": [
+          8
+        ],
+        "1": [],
+        "2": [
+          4,
+          16
+        ]
+      }
+    },
+    "GW05": {
+      "solution_count": 1,
+      "examples": [
+        {
+          "drill": {
+            "C": 0,
+            "B": 1,
+            "A": 3
+          },
+          "polish": {
+            "C": 1,
+            "B": 3,
+            "A": 6
+          }
+        }
+      ],
+      "lower_bound": 7,
+      "rationale": "earliest polish 1 plus six polish beats"
+    },
+    "GW06": {
+      "solution_count": 2,
+      "examples": [
+        [
+          3,
+          3,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        [
+          5,
+          5,
+          5,
+          5,
+          5,
+          3,
+          3
+        ]
+      ],
+      "quantity_combinations": [
+        [
+          2,
+          5
+        ],
+        [
+          7,
+          2
+        ]
+      ],
+      "deadline": 8
+    },
+    "GW07": {
+      "solution_count": 79,
+      "examples": [
+        {
+          "press": {
+            "A": 0,
+            "B": 1,
+            "C": 4,
+            "D": 6
+          },
+          "cool": {
+            "A": 1,
+            "B": 5,
+            "C": 7,
+            "D": 9
+          }
+        },
+        {
+          "press": {
+            "A": 0,
+            "B": 1,
+            "C": 4,
+            "D": 6
+          },
+          "cool": {
+            "A": 2,
+            "B": 5,
+            "C": 7,
+            "D": 9
+          }
+        },
+        {
+          "press": {
+            "A": 0,
+            "B": 1,
+            "C": 4,
+            "D": 7
+          },
+          "cool": {
+            "A": 1,
+            "B": 5,
+            "C": 7,
+            "D": 9
+          }
+        },
+        {
+          "press": {
+            "A": 0,
+            "B": 1,
+            "C": 4,
+            "D": 7
+          },
+          "cool": {
+            "A": 2,
+            "B": 5,
+            "C": 7,
+            "D": 9
+          }
+        },
+        {
+          "press": {
+            "A": 0,
+            "B": 1,
+            "C": 4,
+            "D": 8
+          },
+          "cool": {
+            "A": 1,
+            "B": 5,
+            "C": 7,
+            "D": 9
+          }
+        },
+        {
+          "press": {
+            "A": 0,
+            "B": 1,
+            "C": 4,
+            "D": 8
+          },
+          "cool": {
+            "A": 2,
+            "B": 5,
+            "C": 7,
+            "D": 9
+          }
+        }
+      ],
+      "minimum_finish": 11,
+      "maintenance": [
+        4,
+        5
+      ],
+      "buffer_capacity": 1
+    },
+    "GW08": {
+      "solution_count": 1,
+      "examples": [
+        8
+      ],
+      "first_record_candidates": [
+        8,
+        16
+      ],
+      "second_record_candidates": [
+        8,
+        10
+      ]
+    },
+    "GW09": {
+      "solution_count": 1,
+      "examples": [
+        7
+      ],
+      "tracks": {
+        "2": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          0
+        ],
+        "3": [
+          0,
+          3,
+          6,
+          9,
+          0
+        ],
+        "4": [
+          0,
+          4,
+          8,
+          0
+        ],
+        "5": [
+          0,
+          5,
+          10,
+          3,
+          8,
+          1,
+          6,
+          11,
+          4,
+          9,
+          2,
+          7,
+          0
+        ],
+        "6": [
+          0,
+          6,
+          0
+        ],
+        "7": [
+          0,
+          7,
+          2,
+          9,
+          4,
+          11,
+          6,
+          1,
+          8,
+          3,
+          10,
+          5,
+          0
+        ],
+        "8": [
+          0,
+          8,
+          4,
+          0
+        ]
+      },
+      "coverage_only": [
+        5,
+        7
+      ]
+    },
+    "GW10": {
+      "solution_count": 2,
+      "examples": [
+        {
+          "A": 0,
+          "C": 2,
+          "D": 3,
+          "B": 5
+        },
+        {
+          "D": 0,
+          "C": 2,
+          "A": 3,
+          "B": 5
+        }
+      ],
+      "total_work": 8
+    },
+    "GW11": {
+      "solution_count": 1,
+      "examples": [
+        {
+          "A_assembly": 7,
+          "A_cool": 9,
+          "A_load": 12,
+          "B_assembly": 9,
+          "B_cool": 12,
+          "B_load": 14
+        }
+      ],
+      "material_arrival": 6,
+      "rejected_shared_table_conflicts": [
+        {
+          "A_assembly": 7,
+          "A_cool": 9,
+          "A_load": 12,
+          "B_assembly": 8,
+          "B_cool": 11,
+          "B_load": 13
+        }
+      ]
+    },
+    "GW12": {
+      "solution_count": 1,
+      "examples": [
+        {
+          "capacity": 5,
+          "first": 4,
+          "carry": 3,
+          "second": 5,
+          "last": 2
+        }
+      ]
+    },
+    "GW13": {
+      "solution_count": 1,
+      "examples": [
+        {
+          "heard": 9,
+          "solo": 6
+        }
+      ],
+      "first_bird": [
+        0,
+        4,
+        8,
+        12,
+        16,
+        20,
+        24
+      ],
+      "second_bird": [
+        0,
+        6,
+        12,
+        18,
+        24
+      ],
+      "together": [
+        0,
+        12,
+        24
+      ]
+    },
+    "GW14": {
+      "solution_count": 1,
+      "examples": [
+        47
+      ],
+      "two_record_candidates": [
+        23,
+        35,
+        47,
+        59,
+        71
+      ]
+    },
+    "GW15": {
+      "solution_count": 1,
+      "examples": [
+        9
+      ],
+      "all_distinguishing_times": [
+        9,
+        12
+      ],
+      "observation_signatures": {
+        "1": [
+          0,
+          0,
+          0
+        ],
+        "2": [
+          0,
+          0,
+          0
+        ],
+        "3": [
+          1,
+          0,
+          0
+        ],
+        "4": [
+          1,
+          1,
+          0
+        ],
+        "5": [
+          1,
+          1,
+          1
+        ],
+        "6": [
+          2,
+          1,
+          1
+        ],
+        "7": [
+          2,
+          1,
+          1
+        ],
+        "8": [
+          2,
+          2,
+          1
+        ],
+        "9": [
+          3,
+          2,
+          1
+        ],
+        "10": [
+          3,
+          2,
+          2
+        ],
+        "11": [
+          3,
+          2,
+          2
+        ],
+        "12": [
+          4,
+          3,
+          2
+        ]
+      }
+    },
+    "GW16": {
+      "solution_count": 4,
+      "examples": [
+        [
+          2,
+          3,
+          4,
+          3
+        ],
+        [
+          3,
+          2,
+          3,
+          4
+        ],
+        [
+          3,
+          4,
+          3,
+          2
+        ],
+        [
+          4,
+          3,
+          2,
+          3
+        ]
+      ],
+      "rotations_count_as_different": true
+    },
+    "GW17": {
+      "solution_count": 1,
+      "examples": [
+        {
+          "B": 1,
+          "C": 3,
+          "A": 4,
+          "D": 7
+        }
+      ]
+    },
+    "GW18": {
+      "solution_count": 19,
+      "examples": [
+        {
+          "press": {
+            "F": 0,
+            "V": 1,
+            "M": 3
+          },
+          "cool": {
+            "F": 1,
+            "V": 3,
+            "M": 6
+          }
+        },
+        {
+          "press": {
+            "F": 0,
+            "V": 1,
+            "M": 3
+          },
+          "cool": {
+            "F": 1,
+            "V": 3,
+            "M": 7
+          }
+        },
+        {
+          "press": {
+            "F": 0,
+            "V": 1,
+            "M": 3
+          },
+          "cool": {
+            "F": 1,
+            "V": 4,
+            "M": 6
+          }
+        },
+        {
+          "press": {
+            "F": 0,
+            "V": 1,
+            "M": 3
+          },
+          "cool": {
+            "F": 1,
+            "V": 4,
+            "M": 7
+          }
+        },
+        {
+          "press": {
+            "F": 0,
+            "V": 1,
+            "M": 4
+          },
+          "cool": {
+            "F": 1,
+            "V": 3,
+            "M": 6
+          }
+        },
+        {
+          "press": {
+            "F": 0,
+            "V": 1,
+            "M": 4
+          },
+          "cool": {
+            "F": 1,
+            "V": 3,
+            "M": 7
+          }
+        }
+      ],
+      "branch_solution_counts": {
+        "6": 21,
+        "8": 38
+      },
+      "sample": {
+        "press": {
+          "F": 0,
+          "V": 1,
+          "M": 3
+        },
+        "cool": {
+          "F": 1,
+          "V": 3,
+          "M": 6
+        }
+      },
+      "rejected_late_example": {
+        "press": {
+          "F": 0,
+          "V": 1,
+          "M": 3
+        },
+        "cool": {
+          "F": 1,
+          "V": 3,
+          "M": 5
+        }
+      }
+    }
+  },
+  "passed": true
+}
