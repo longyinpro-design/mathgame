@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "source_mode": "AtlasTexture regions; source pixels unchanged",
+  "sprites": [
+    {
+      "id": "tray",
+      "source": "assets/source/workshop/harbor-props-source-v1.png",
+      "region": [
+        64,
+        195,
+        584,
+        251
+      ],
+      "anchor_px": [
+        292.0,
+        251
+      ],
+      "atlas": "assets/runtime/workshop/gw01/tray.tres"
+    },
+    {
+      "id": "spindle",
+      "source": "assets/source/workshop/harbor-props-source-v1.png",
+      "region": [
+        769,
+        122,
+        125,
+        311
+      ],
+      "anchor_px": [
+        62.5,
+        311
+      ],
+      "atlas": "assets/runtime/workshop/gw01/spindle.tres"
+    },
+    {
+      "id": "box",
+      "source": "assets/source/workshop/harbor-props-source-v1.png",
+      "region": [
+        1097,
+        98,
+        366,
+        352
+      ],
+      "anchor_px": [
+        183.0,
+        352
+      ],
+      "atlas": "assets/runtime/workshop/gw01/box.tres"
+    },
+    {
+      "id": "lift",
+      "source": "assets/source/workshop/harbor-props-source-v1.png",
+      "region": [
+        59,
+        567,
+        492,
+        360
+      ],
+      "anchor_px": [
+        246.0,
+        360
+      ],
+      "atlas": "assets/runtime/workshop/gw01/lift.tres"
+    },
+    {
+      "id": "cart",
+      "source": "assets/source/workshop/harbor-props-source-v1.png",
+      "region": [
+        605,
+        715,
+        508,
+        217
+      ],
+      "anchor_px": [
+        254.0,
+        217
+      ],
+      "atlas": "assets/runtime/workshop/gw01/cart.tres"
+    },
+    {
+      "id": "bell",
+      "source": "assets/source/workshop/harbor-props-source-v1.png",
+      "region": [
+        1168,
+        549,
+        281,
+        374
+      ],
+      "anchor_px": [
+        140.5,
+        374
+      ],
+      "atlas": "assets/runtime/workshop/gw01/bell.tres"
+    },
+    {
+      "id": "dada_idle",
+      "source": "assets/source/workshop/dada-poses-source-v1.png",
+      "region": [
+        68,
+        78,
+        416,
+        534
+      ],
+      "anchor_px": [
+        262,
+        534
+      ],
+      "atlas": "assets/runtime/workshop/gw01/dada_idle.tres"
+    }
+  ]
+}
