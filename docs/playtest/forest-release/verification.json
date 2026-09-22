@@ -28,12 +28,8 @@
     "assets/audio/v3/unbalanced.wav.import": "1ae241433367905b8b8b9c702127220a6f3394f4eb9eb4e56e52afd5168ae942",
     "assets/audio/v3/unlock.wav": "81bc08dc3fc6b0d1f243d54605116f86269faad3b8e30899ac20c379c37cf64c",
     "assets/audio/v3/unlock.wav.import": "fb4147ea827c8b5483e2427ffd9ebb332fb575b644991a01aaefebe84c60c6f5",
-    "assets/fonts/NotoSansSC-Semibold.ttf": "7c941d13e1f99a7c78fc89ef734b9322404804573a936085f7a910b47b8bb984",
-    "assets/fonts/NotoSansSC-Semibold.ttf.import": "1059da9f4ba50a4ae683a64f654456813855ada9537dcce54614f8a9c714d0ab",
     "assets/fonts/NotoSansSC.ttf": "450625c8d46ab3df97b7904ded955ec2746d17ec76740cb1e91d1ba63a0f89af",
     "assets/fonts/NotoSansSC.ttf.import": "419d712774b32aa582a17e02cb86f5b70a44b72a794bb42a9783b36da41d26f2",
-    "assets/fonts/NotoSerifSC-Medium.ttf": "5e792d889dd5c4c853cd5cee57e839ff97088287280a0efc88dab7b335be0fa9",
-    "assets/fonts/NotoSerifSC-Medium.ttf.import": "df9d21fd22805216fa32b5ba7e135d6fe09210bcaaf907f2e4857843b16c0e4f",
     "assets/fonts/OFL-NotoSerifSC.txt": "5690d88535c85c447b8f02b0c67d02fe0c8ff61169d8b7dc3cd982f211768612",
     "assets/fonts/OFL-ZCOOLKuaiLe.txt": "ee0caff41a4dea011af35ed70c5f3b8225b9acea7e5786cccbd11400b9b8ada5",
     "assets/fonts/OFL.txt": "c9ccdf2be41f83f609c149ccc4594f793d29a6a1905418c8c43f1c8810d2aa70",
@@ -97,7 +93,7 @@
     "assets/runtime/forest/village-v1.png": "91d2ce389ca42664c54b49efa3a53e7474ba022edd33cd1040ffc8ebaa2acc83",
     "assets/runtime/forest/village-v1.png.import": "a58ec5abcbe53bbf6af9ed82b9e9e0c133952e173fbc82d244d2d248f4a1a093",
     "assets/source/terrain-textures-v1.png": "4aaf484f1893b06f67e9b0cf02fd23005ff2d6a967573470c7472121d91c5687",
-    "docs/production/forest_levels.json": "b9125ea48a29da1928c7c5f7e07d3ed5f6ad4d925b1e25d29ee87cc807aa918e",
+    "docs/production/forest_levels.json": "c573bb1b0c735b9f77cf02f61b99f00af752399e6377ed7a66b3bdaadad81450",
     "docs/production/legacy_fl07.json": "8585d7be2ae4de7076d7067b2da4702ff90605d50a3065208aca8420095cff67",
     "game/forest_release.tscn": "2adb17e9480933d5c36e0530906586ea86c9a0306e1fcbdde5773722ff553319",
     "project.godot": "233fc26672e3334d75735cbc3139151d23985aac1aec223c5cec17e4b8e4406e",
@@ -105,7 +101,7 @@
     "scripts/cargo/journey.gd.uid": "28afd7b8835f6bbeaae12244249259eac2fb9fa8d9a7b9f41aeab7e5941a15bd",
     "scripts/cargo/rules.gd": "acc65838a24e17f0424a9cff17d86005afc0f7e685df0368e05012c5758a2fea",
     "scripts/cargo/rules.gd.uid": "ad0396cf95495d76646ae72cf8c9dffb43eca0adc8a2492c8c56c37f73a6d50c",
-    "scripts/cargo/skin.gd": "ca48f7a97a1665775a4b2702bb68973f1202fd405bf148217533eeb46a4bc6f2",
+    "scripts/cargo/skin.gd": "9de78d9d68059064d9605755e5dd12a755c11fbcd7d36eca6f3f2a655dd0ec3b",
     "scripts/cargo/skin.gd.uid": "1f349d76182afe5bd201834039679fa20aec3c1bad7fd08933d8c11817fb6df5",
     "scripts/cargo/store.gd": "9426246edec66d652c5ab852ab1e72972a31b2a531a7c5a2f261729b5dedf167",
     "scripts/cargo/store.gd.uid": "1a9a24cc3ffa041314ad25093782d906045fbe9e18856d8fbedfa36cf4af76ba",
@@ -113,9 +109,11 @@
     "scripts/cargo/world.gd.uid": "c99de622ccb512e2235fbc89719154461eaa4aa8cecfec739c5259e319ac1e72",
     "scripts/content/content_catalog.gd": "c41a45cf557251b386d492389e9d3910b5530ed524a12c5f60eb49069dfe9013",
     "scripts/content/content_catalog.gd.uid": "3b9bd7aeb4099f48555576c9a381ed1e48840a485b4e5e7044f86b0bb59df6f7",
+    "scripts/content/discovery_catalog.gd": "52b1c28eb6bf29afd1d7e4051e536ff3acb1b0dae23df7277b47541ca7a288b9",
+    "scripts/content/discovery_catalog.gd.uid": "5b7f4e856e5f9d3547025ad465643010b76adbdd27e75835e91f5db268867bf0",
     "scripts/content/story_catalog.gd": "367e60cc220b8802b73a971dbf97ff62cfae3c4a6b1cbd5799d1529a31657624",
     "scripts/content/story_catalog.gd.uid": "e5ac6e6ab8f79978cfba9c74b1efdae92f6d5066f0eccbe8f1239ea4e470bae3",
-    "scripts/core/game_session.gd": "b72e809754a1c96aa048e8a830563b8b70326afc3d194e983e377c17b467fd80",
+    "scripts/core/game_session.gd": "ff04fcaca050a2760d94e37d83626d8da90b00c0c55f2b83bbd24404fab86f76",
     "scripts/core/game_session.gd.uid": "77c0dce7536ef234dcfd2047dc030ff5efb2f62f0c984e9a5a24f11d969e591f",
     "scripts/encounter/audio.gd": "3f49dff0782fa3642dd268ddafb8e244c05edd0f201b089968f6c3fd29de5730",
     "scripts/encounter/audio.gd.uid": "3132a9839574cfe39ce58559bcd54f89c63bad29a931bc29aa33a44078145750",
@@ -134,19 +132,19 @@
     "scripts/learning/learning_record.gd.uid": "a453f59ba68a68dfff63acfef1d68a450c7272f7d7abec7be0a6ae98597b6efd",
     "scripts/mechanisms/cargo_rules.gd": "7402e892f39e06b4ec905148019b643b842f9eff2dcbb4829193d0959bd76379",
     "scripts/mechanisms/cargo_rules.gd.uid": "5c80213885944591f787af78b2df6dc0edbb0ff4de5e9bc2027679de179b3bcb",
-    "scripts/mechanisms/coin_rules.gd": "625067ddbfc96a67ad85656384195bbfc2bc8b76182640b30bb8250cd5063377",
+    "scripts/mechanisms/coin_rules.gd": "059c4c6f46e21dcf512407b3bf8caa3e0055a55b0e74aa420661dcf2dde005e6",
     "scripts/mechanisms/coin_rules.gd.uid": "06145a18180cb2b6f925a30ed5238837b263166ed0d9020bd05521b34684c5af",
-    "scripts/mechanisms/current_hint.gd": "afecd2342357a35688811d322aaa041bd599dc269108edd1b8c09382f90c714b",
+    "scripts/mechanisms/current_hint.gd": "38e328eebf4c2f38ab5dbaa00882a8c5b4f4395888c3a1d51f7fb379e6778953",
     "scripts/mechanisms/current_hint.gd.uid": "d2da7b04bf3dd25e1f5a535cc90e75ec9b813ad5cff3179cbcda7f8316a22e0f",
-    "scripts/mechanisms/fence_rules.gd": "4ebf8d118c2c05278ab1df39050f56ab64e43b2ae10ceb1dfae2a80c9fbfeab9",
+    "scripts/mechanisms/fence_rules.gd": "41bc0e1bffb6383a438af22cde401d21ac8ca7cb303dc80b48b5cfcfa8f8bd4d",
     "scripts/mechanisms/fence_rules.gd.uid": "053af4d37a876f32c9d4d7ddff3e0d826de947e4a560515ec2a08ff49cddd9de",
-    "scripts/mechanisms/machine_rules.gd": "d4001ea1e58e9795c62e0c74193a115639236a925b6aa3666cd3ad1c1fc7d2b2",
+    "scripts/mechanisms/machine_rules.gd": "f5c3719ed936fdf28645bb68d77fb95e239cdfe5d94885b4facb0b966848a11f",
     "scripts/mechanisms/machine_rules.gd.uid": "0ced5d803a68410ab41ec69c9da323e503953b7d56aab8943405fef978868780",
-    "scripts/mechanisms/mechanism_rules.gd": "4ef12f0fe8b6e5efc7949e08b6325b6d23dc769a8ef561eb85776d06d54da14d",
+    "scripts/mechanisms/mechanism_rules.gd": "0a9f4d2f287a269a342679eaae073096bb1f9f601ff675a435c7a42f7cd51dc7",
     "scripts/mechanisms/mechanism_rules.gd.uid": "3641427d4d299f49e930ffd4a5d57ba32d863f1d3a5ba600599216677b8544af",
-    "scripts/mechanisms/pair_rules.gd": "515e3dcab883f33a809430c0b8b64a6f34dc08ee7550abcab9423d0f1f53b73c",
+    "scripts/mechanisms/pair_rules.gd": "00417e1dec36c2a699cc4692d5d43a7f67e76c1bce4d7f17fe86438707ef4d6e",
     "scripts/mechanisms/pair_rules.gd.uid": "047e83828a57b2aa524bb6f628a5245cbc3a86a16e7dffe4e037c6961f7a989d",
-    "scripts/mechanisms/parity_rules.gd": "69b8085d51a904e89e7fe3c31ce44527fe3f13b3c7c9a41295d0e35256ff938e",
+    "scripts/mechanisms/parity_rules.gd": "6977b1e33433280a5469c11e86c2b89dd8f3493db6b81619ceb5a3a5c144069a",
     "scripts/mechanisms/parity_rules.gd.uid": "157d70c93b295db357f54e40392b8edbdb28697c3e345cb145d77775e91e92bb",
     "scripts/mechanisms/policy_rules.gd": "96cdfe57dd14cbdc39a8b3b48a0d195f395839b40d4a15c5a99818f9c99979df",
     "scripts/mechanisms/policy_rules.gd.uid": "c85cba7b3e377e57c595a1dec271fc76d008a3a5a0dfd32783a77c95de8f0de8",
@@ -176,13 +174,13 @@
     "scripts/ui/cargo_annotations.gd.uid": "3f3b672bec5e99c15e01479ce705b96ece0bcd05340641e4809f123faec8969e",
     "scripts/ui/companion_actor.gd": "545ab55d264a106e3ec958fa6b082b2e2a83d07d2bfa4dbf70a61a630c7cad4e",
     "scripts/ui/companion_actor.gd.uid": "19bcb33729a7b0b30a85c6403ba2cff7c61d2243fe53280e22e9c8c78d1a7886",
-    "scripts/ui/forest_release.gd": "217a62a58184aab8b5039d1e59656155234a39c51e333d73c1fd77c349b99f75",
+    "scripts/ui/forest_release.gd": "3113840e662fcebaeb533d3dd4fd5a240dbcb9ed0290d818ad74822d3406089a",
     "scripts/ui/forest_release.gd.uid": "7049f8a9e73ee11aa75f65fd666fced4cee8ac3c68e00cdfc14374198bce94cd",
     "scripts/ui/forest_world.gd": "624fa5275770da6799607be7fec9b3d802686b6ed6d07edc05a2fdebef9671d2",
     "scripts/ui/forest_world.gd.uid": "7133e1f5d111774e64d1cabfe0046188002ae900f93bcb6a3a29f4c1a709e0b3",
     "scripts/ui/npc_actor.gd": "c08da745d03f165ce0b914780b452c6c3cdf2fa7621e0d10582ed8c4976958f3",
     "scripts/ui/npc_actor.gd.uid": "e72b5cd78f271e3851a644365999961af4550e47d7e7866e5280df01bf608c1f",
-    "scripts/ui/puzzle_boards.gd": "954f172e0c636d37c9685be01a14f8b64a3e00a18f829b70753bb86547e5eeda",
+    "scripts/ui/puzzle_boards.gd": "93ab134121e3ecdc0eeed2d7380f39cb32affd4b50e19c22f860270b1cee94e7",
     "scripts/ui/puzzle_boards.gd.uid": "608b4e71236da3b3a61d762e54d86cde319ac40e5c0410b57dc9275662b17205",
     "scripts/ui/route_boards.gd": "52389cca0e15ec45f4bc18716bfac4a1168d06ea93b81583970b22f659e4b0df",
     "scripts/ui/route_boards.gd.uid": "7eedef43fbe3e2f0d0873ecd024433e770a6c96e1c2435fdb3eca15705be29e7",
@@ -194,7 +192,7 @@
     "scripts/ui/scene_layout.gd.uid": "19874d39f31a9c7a0bea60e7137d2d9badf661ec0cd8a8d595a59aa1d87dec95",
     "scripts/ui/scene_materials.gd": "98c221df07d51cda71efda2663c0cc855b94c2d4311cd546c667671d8856784d",
     "scripts/ui/scene_materials.gd.uid": "aa89ebb1c53d1e71dbb49a453322af37f6272aee43980cc77fdb4770e5002773",
-    "scripts/ui/side_boards.gd": "80368e77731327e48a3bb77c8f6b0833ee26e50b89827779d37394e788d93d02",
+    "scripts/ui/side_boards.gd": "47b9ffde14a27e32d38054610a4e1113dff7a391863b314e28a706e3a2abbf48",
     "scripts/ui/side_boards.gd.uid": "1b45a3ea5ee7405b50fe8eaf2adc6ec50a7cbb6b742ca1687244574813f9ea99",
     "scripts/ui/story_stage.gd": "4f454275b551b7892746309b4da95ffdaaeaa9ff0fdd35ef23e028fde18e6c97",
     "scripts/ui/story_stage.gd.uid": "9fb85a9c084483ff83499dcd4601ab190d1f6d950f2733388ebdfd2c093f3a08",
@@ -208,12 +206,14 @@
     "scripts/ui/workbench.gd.uid": "a99980e57635b6ffd71e01c57500ceb9114332d7ec8c79462b7b4e570b99bfb3",
     "tests/forest/actors_playtest.gd": "af78773eacbd93e3bb12cec5b75faeb242cb3e334ae19177be4488d7ecadcc16",
     "tests/forest/actors_playtest.gd.uid": "640e1d836ba36a8ff54f7f3a061ad0c541bd12cd935bc8661e4fe8b377ba3a56",
-    "tests/forest/assets_test.gd": "0b105ec4d412b4d04e4f4853bae6e7b7f938e8ceba40ebfe619024801b1fcfb3",
+    "tests/forest/assets_test.gd": "d55fc496810e2518a0ae2cf380cb2c6a199f723402fd925626bb83d59ae6207a",
     "tests/forest/assets_test.gd.uid": "75b09254d851ba0267fc22a7a7343700e6f67fb0cd0e52fa73e5e158b6879c4d",
     "tests/forest/battle_playtest.gd": "731fe70819368fffc98464ec48c2e729ac0856fad513dc3cb92c7c0573942fe4",
     "tests/forest/battle_playtest.gd.uid": "d33876d2b9503b39bb247399cc25fe619044fdc058cae95564681a426c1041be",
     "tests/forest/boundary_test.gd": "9ba8bc2535331f2d2ee4e01108422f75c5681f3afe1ec69b4c7fb53d5435a75c",
     "tests/forest/boundary_test.gd.uid": "e61fd916423fc3ca40c759b4687b3b5ab69d4916e009f602bbf7dee4d0d669be",
+    "tests/forest/discovery_test.gd": "3fc9d189bb4a536e70b106d472e997b30372e7cd8a4f6048d9495a7535a9d59d",
+    "tests/forest/discovery_test.gd.uid": "a6911ea80089e8731226548009dcbac68be7569f7a83fd4c4369dade3a4fc8d8",
     "tests/forest/empty_profile_migration_playtest.gd": "11666d531f9cb725ea08bd29682797d73dc26568d100ad1b4b4130c3c7140043",
     "tests/forest/empty_profile_migration_playtest.gd.uid": "38686a1cfcbdaac2cbdeb112cfbcfb0559292c33df6dbd3f98dbc5ae941e44a8",
     "tests/forest/empty_profile_migration_test.gd": "79877e74c62c796e92bde51db910f410c4aa02e408a6e96a9f7e507fb12b76d7",
@@ -222,13 +222,14 @@
     "tests/forest/fl07_playtest.gd.uid": "59597299e3c0a795caeee8e201a6179ba1b2c72bcb2bf972baaec7848b28dc51",
     "tests/forest/ground_occlusion_playtest.gd": "752e57975a070cf0f73e16b06bbb3a04bb31e1b748e15415a666f881046ac2ea",
     "tests/forest/ground_occlusion_playtest.gd.uid": "cb71d55342c3e36a31d34029f4e7e852b1198dad72e7dcbe8e6be0051ac65579",
+    "tests/forest/hint_layers_test.gd": "f5fbfb21e2225a19a4ca846211131a43bcc536b89888b52339f196d124c3324b",
     "tests/forest/island_original_playtest.gd": "985f97be06d7709812f52992da30849d1ffe0451eafdad058bafc5da7f8430f8",
     "tests/forest/island_original_playtest.gd.uid": "cbb0a2922ee81cf09493195c148fdaf256644503956d04a5843f921a7d0defd6",
-    "tests/forest/layout_fixes_playtest.gd": "39d078b76dc357759e540b6794a35e1b8c7925c7b48821ce75622a60df6bbb2e",
+    "tests/forest/layout_fixes_playtest.gd": "47713f02b6e1b232cc3a3a21f7c415e81f98ad45a1d132202bd67fa3a7cbe3c8",
     "tests/forest/layout_fixes_playtest.gd.uid": "5622ad4117b1008c1fb69f622903732d20499446d6f78080cc9a30b2a699bace",
     "tests/forest/p2_playtest.gd": "1165fb4071ced28b9156fb4d6eea7a3d253d58f36431bf111c0c1e304f8c3e84",
     "tests/forest/p2_playtest.gd.uid": "4777cca9cf97cc087f94273820b27eab1932a3a53d958bcf315302f7fe295443",
-    "tests/forest/p3_playtest.gd": "d0504feb86b0d56831f063cea034fc59920ff43c44b7d257d7dfaf62e92c3d30",
+    "tests/forest/p3_playtest.gd": "a74176f0ffd9e3835bb5a86e733b32875d7dec3118bfeae67406a488cbec0beb",
     "tests/forest/p3_playtest.gd.uid": "e0710c94a0337e02662b7acead252a0fe334b0d789ecb1d1f1b3353d14e71859",
     "tests/forest/p3_test.gd": "bdedfae59f7c22fadbd9cfc0c56425595e3c112ae6a4d433681e3bc40c084325",
     "tests/forest/p3_test.gd.uid": "9c77d8c4705d09eded4ac5b0826b35ca531007357deb7a7775dba9b8f5167e7f",
@@ -238,20 +239,21 @@
     "tests/forest/p4_p5_test.gd.uid": "45386beeacbebfc4801b916cac223988108a723189461ab661192dc65b74b820",
     "tests/forest/p6_p7_test.gd": "addbb716edc99d9f57efa931e1c70af92a002337f8986b62c955190e75bb124c",
     "tests/forest/p6_p7_test.gd.uid": "405a8ad3bd44a76767d722ef71399afd0370de9dcdbaefd78e4863d1180aab63",
-    "tests/forest/p6_playtest.gd": "c9ed45aabab2bcd1d2fe501afda496077e04b7005b23afdec063fb5ee662649d",
+    "tests/forest/p6_playtest.gd": "8fac71c5393b3e11349e60d8c828f9b144e1368f7ee74752c234b99954667886",
     "tests/forest/p6_playtest.gd.uid": "b50202604094712f2ccd8028e0be5d5cd6e40155d634eeb79e8c7afcecc7bf96",
     "tests/forest/p8_playtest.gd": "e4525fb5b5c443b5836b5c64acf82d3639491e5ab5d272ddcad4f00779dcc01d",
     "tests/forest/p8_playtest.gd.uid": "5db8a44f3a1d614300e29884544889ea463f7d0d995ce38dbf2aef2de100d362",
     "tests/forest/p8_test.gd": "d95c8d8aa62e0a36eddd1a7ceebf38925808eac286a413420ea6ddd366f716ac",
     "tests/forest/p8_test.gd.uid": "ce63369fb62cfff972b882eafbf86f13926aa71211fd4a4ab341ce63cafe1f59",
-    "tests/forest/review_repairs_playtest.gd": "3811d69b2ca77771a99f5f38fa11b74a8b4295298d2bad67cb799dad6aa4eecc",
+    "tests/forest/proof_steps_test.gd": "5e00939e36152a8fed5516f611c4427d22f452174ee36585107d21dce275ca4d",
+    "tests/forest/review_repairs_playtest.gd": "4093f3c3ffed792a68720472c8121830d1a9ee501382f61c4ba8c9ffc6efbb2a",
     "tests/forest/review_repairs_playtest.gd.uid": "469fe539af3a881645fa0bcf27123a3abd9e7c700f8178b6816926e96b1cb238",
-    "tests/forest/review_repairs_test.gd": "02d7d08d83e486ee9cac0916fea1b19fbd9f4dcec56180313fc2c336cb0a84ad",
+    "tests/forest/review_repairs_test.gd": "346e62ae0770755754aa60c1b61f22cd8d2ecb18bbdce4ee2b128b1af5b88ed4",
     "tests/forest/review_repairs_test.gd.uid": "3dc5634580bff327e0485a7c60b7eecac17fa050813b09bbf4f261b474451277",
     "tests/forest/route_redesign_test.gd": "8f2ae215513a2d03f146a17b29f078df5c5d6ff9a32b654d5bff5e569e0c0059",
     "tests/forest/route_redesign_test.gd.uid": "cc63728788562d61e0c6651411b4cc23aec4ad7371d67eaded99bbc2327658bb",
-    "tests/forest/run_checks.py": "c9b1229b26ca1a35cbb50633d378d3fad8af29e3a703ee8357ea6a1a5acf6977",
-    "tests/forest/scenarios.gd": "7af785705632ca0b1983fc76feaf0b3f71a60c73c6aaba1fd9bea6e3a7ba2b43",
+    "tests/forest/run_checks.py": "8ede5529ab935aa88e54d61be2ffd491ed81ddc741836655727abb6c14171fcc",
+    "tests/forest/scenarios.gd": "1f2d1771d91538f14d9f166ef0106835dc246644768f94f7086a4b6494dcd6fd",
     "tests/forest/scenarios.gd.uid": "f04c1638a04b757369db095f1fb720d6a02addfd583bf454eb0435f45d53d44a",
     "tests/forest/scene_integration_playtest.gd": "796bd1ee491226a3e9a7d2e0568c96061a53a3a8fc4dc7f32ac337625e3e39a9",
     "tests/forest/scene_integration_playtest.gd.uid": "9a4c96e86c6c3aa00fccf318cd3d82c734678cb7b94e49d074c8420813f9dee7",
@@ -273,7 +275,7 @@
     "tests/forest/v07_screens.gd.uid": "de3c8f71bd1f210bdd03a5c91da52f19ba8b8cc9120559c0d73c36c17313beb1",
     "tests/forest/village_scene_playtest.gd": "2049fa327fd6de0258758adf3ae7e100c0c1fac97c6a410cc53156ae83c3fba9",
     "tests/forest/village_scene_playtest.gd.uid": "eff43d482b1f49d3533a4ed4e4c731fc9d5c6f0debffca5a37396c9d9d0f1257",
-    "tests/forest/window_focus.gd": "898407e9be9d7b52d53d3695904cd1bc6b96396e6c01d39eaa92068cefa257d4",
+    "tests/forest/window_focus.gd": "365a984123b5b266fc76118d83463451baceb1f99e34248c67463659f82fdcf8",
     "tests/forest/window_focus.gd.uid": "8650c37a016a56ea65ee0c2f3fb2bdfa89e905eac84d527e419dca36f0fc8cbd",
     "启动全岛原图试玩.command": "8339049db6905970c3878ee2435520ba1e2c0ebc1ee6a286ecd1e64125c23e4b"
   },
@@ -290,11 +292,11 @@
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/twenty_four_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/twenty_four_test.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/twenty_four_test.log"
       ]
     },
     {
@@ -309,11 +311,11 @@
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/route_redesign_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/route_redesign_test.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/route_redesign_test.log"
       ]
     },
     {
@@ -328,49 +330,49 @@
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/story_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/story_test.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/story_test.log"
       ]
     },
     {
       "test": "assets_test.gd",
       "mode": "headless",
       "status": "PASS",
-      "passed": 952,
-      "total": 952,
+      "passed": 1037,
+      "total": 1037,
       "exit_code": 0,
       "errors": [],
       "command": [
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/assets_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/assets_test.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/assets_test.log"
       ]
     },
     {
       "test": "boundary_test.gd",
       "mode": "headless",
       "status": "PASS",
-      "passed": 709,
-      "total": 709,
+      "passed": 726,
+      "total": 726,
       "exit_code": 0,
       "errors": [],
       "command": [
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/boundary_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/boundary_test.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/boundary_test.log"
       ]
     },
     {
@@ -385,11 +387,11 @@
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/session_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/session_test.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/session_test.log"
       ]
     },
     {
@@ -404,11 +406,11 @@
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/p3_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/p3_test.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/p3_test.log"
       ]
     },
     {
@@ -423,11 +425,11 @@
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/p4_p5_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/p4_p5_test.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/p4_p5_test.log"
       ]
     },
     {
@@ -442,11 +444,11 @@
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/p6_p7_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/p6_p7_test.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/p6_p7_test.log"
       ]
     },
     {
@@ -461,30 +463,30 @@
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/p8_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/p8_test.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/p8_test.log"
       ]
     },
     {
       "test": "review_repairs_test.gd",
       "mode": "headless",
       "status": "PASS",
-      "passed": 44,
-      "total": 44,
+      "passed": 45,
+      "total": 45,
       "exit_code": 0,
       "errors": [],
       "command": [
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/review_repairs_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/review_repairs_test.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/review_repairs_test.log"
       ]
     },
     {
@@ -499,11 +501,68 @@
         "/opt/homebrew/bin/godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/empty_profile_migration_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/empty_profile_migration_test.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/empty_profile_migration_test.log"
+      ]
+    },
+    {
+      "test": "discovery_test.gd",
+      "mode": "headless",
+      "status": "PASS",
+      "passed": 108,
+      "total": 108,
+      "exit_code": 0,
+      "errors": [],
+      "command": [
+        "/opt/homebrew/bin/godot",
+        "--headless",
+        "--path",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
+        "--script",
+        "tests/forest/discovery_test.gd",
+        "--log-file",
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/discovery_test.log"
+      ]
+    },
+    {
+      "test": "hint_layers_test.gd",
+      "mode": "headless",
+      "status": "PASS",
+      "passed": 110,
+      "total": 110,
+      "exit_code": 0,
+      "errors": [],
+      "command": [
+        "/opt/homebrew/bin/godot",
+        "--headless",
+        "--path",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
+        "--script",
+        "tests/forest/hint_layers_test.gd",
+        "--log-file",
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/hint_layers_test.log"
+      ]
+    },
+    {
+      "test": "proof_steps_test.gd",
+      "mode": "headless",
+      "status": "PASS",
+      "passed": 76,
+      "total": 76,
+      "exit_code": 0,
+      "errors": [],
+      "command": [
+        "/opt/homebrew/bin/godot",
+        "--headless",
+        "--path",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
+        "--script",
+        "tests/forest/proof_steps_test.gd",
+        "--log-file",
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/proof_steps_test.log"
       ]
     },
     {
@@ -517,11 +576,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/fl07_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/fl07_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/fl07_playtest.log"
       ]
     },
     {
@@ -535,11 +594,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/story_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/story_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/story_playtest.log"
       ]
     },
     {
@@ -553,11 +612,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/story_chapter_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/story_chapter_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/story_chapter_playtest.log"
       ]
     },
     {
@@ -571,11 +630,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/actors_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/actors_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/actors_playtest.log"
       ]
     },
     {
@@ -589,11 +648,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/p2_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/p2_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/p2_playtest.log"
       ]
     },
     {
@@ -607,11 +666,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/p3_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/p3_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/p3_playtest.log"
       ]
     },
     {
@@ -625,11 +684,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/p4_p5_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/p4_p5_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/p4_p5_playtest.log"
       ]
     },
     {
@@ -643,11 +702,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/p6_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/p6_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/p6_playtest.log"
       ]
     },
     {
@@ -661,11 +720,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/battle_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/battle_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/battle_playtest.log"
       ]
     },
     {
@@ -679,11 +738,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/p8_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/p8_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/p8_playtest.log"
       ]
     },
     {
@@ -697,11 +756,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/review_repairs_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/review_repairs_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/review_repairs_playtest.log"
       ]
     },
     {
@@ -715,11 +774,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/layout_fixes_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/layout_fixes_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/layout_fixes_playtest.log"
       ]
     },
     {
@@ -733,11 +792,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/empty_profile_migration_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/empty_profile_migration_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/empty_profile_migration_playtest.log"
       ]
     },
     {
@@ -751,11 +810,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/scene_integration_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/scene_integration_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/scene_integration_playtest.log"
       ]
     },
     {
@@ -769,11 +828,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/ground_occlusion_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/ground_occlusion_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/ground_occlusion_playtest.log"
       ]
     },
     {
@@ -787,11 +846,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/village_scene_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/village_scene_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/village_scene_playtest.log"
       ]
     },
     {
@@ -805,11 +864,11 @@
       "command": [
         "/opt/homebrew/bin/godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-cfbffb60",
         "--script",
         "tests/forest/island_original_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-9sea4_9_/island_original_playtest.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/pixel-forest-verification-_ydsvnii/island_original_playtest.log"
       ]
     }
   ],
