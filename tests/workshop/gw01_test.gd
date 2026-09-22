@@ -15,64 +15,63 @@ func run() -> void:
 	var s = puzzle()
 	check(R.validate(s),"fresh progression reaches legal puzzle")
 	check(R.move(R.fresh(),0,1).is_empty(),"no moving during dialogue")
-	check(R.move(s,5,24).is_empty(),"cannot invent a 24th spindle")
-	check(R.move(s,6,1).is_empty(),"no sixth tray")
-	check(R.move(s,0,5).is_empty(),"cannot overfill a tray")
+	check(R.move(s,0,25).is_empty(),"cannot invent goods")
+	check(R.move(s,3,1).is_empty(),"no fourth tray")
 	check(R.move(s,0,-1).is_empty(),"cannot remove from empty")
-	check(R.advance(s).is_empty(),"cannot complete empty board")
-	var solutions = 0
-	# Independent enumeration of all 32 insert layouts and every allocation.
-	for mask in range(32):
-		var caps = []
-		var combinations = 1
-		for i in range(5):
-			caps.append(5 if mask & (1 << i) else 3)
-			combinations *= caps[i]+1
-		for encoded in range(combinations):
-			var digits = encoded; var sum = 0; var trays = []
-			for cap in caps:
-				var n = digits%(cap+1); digits = int(digits/(cap+1)); trays.append(n); sum += n
-			for box in range(3):
-				var c = s.duplicate(true); c.capacities = caps.duplicate(); c.trays = trays.duplicate(); c.box = box
-				check(R.validate(c) == (sum+box <= 23),"allocation conservation boundary")
-				var expected = trays == caps and sum == 21 and box == 2
-				check(R.solved(c) == expected,"only three large and two small full trays with reserve")
-				if R.solved(c): solutions += 1
-	check(solutions == 10,"all ten permutations accepted")
-	for i in [4,2,0]: s = R.resize(s,i)
-	for i in [4,2,0,3,1]: s = R.move(s,i,s.capacities[i])
-	s = R.move(s,5,2)
-	check(R.solved(s) and R.stock(s) == 0,"batch actions conserve 23")
-	check(R.resize(s,0).is_empty(),"occupied insert cannot change")
-	check(R.resize(R.fresh(),0).is_empty(),"no insert changes during dialogue")
-	check(R.resize(puzzle(),5).is_empty(),"repair box has no insert")
-	var no_reserve = puzzle(); no_reserve.capacities = [5,5,5,5,3]; no_reserve.trays = [5,5,5,5,3]
-	check(R.validate(no_reserve) and not R.solved(no_reserve),"four large trays leave no repair reserve and cannot pass")
-	for bad_caps in [[3,3,3,3], [4,3,3,3,3], [true,3,3,3,3], [3.0,3,3,3,3]]:
-		var c = puzzle(); c.capacities = bad_caps
-		check(not R.validate(c),"malformed insert configuration rejected")
-	var legacy = puzzle(); legacy.sample = "workshop-gw01-1"; legacy.erase("capacities")
-	check(not R.validate(legacy),"legacy schema is not interpreted as new game")
-	var delivery = R.advance(s)
-	check(delivery.stage == "delivery" and R.validate(delivery),"verified board saved before animation")
-	check(R.move(delivery,0,-1).is_empty(),"cannot remove goods after acceptance")
+	check(R.advance(s).is_empty(),"cannot start with loose goods")
+	var solutions = []
+	# All 325 complete partitions, using a separate scalar oracle for each round.
+	for a in range(25):
+		for b in range(25-a):
+			var c = 24-a-b
+			var candidate = puzzle(); candidate.trays = [a,b,c]
+			var expected = a >= b+c
+			var x = a-b-c; var y = b*2; var z = c*2
+			expected = expected and y >= x+z
+			var u = x*2; var v = y-x-z; var w = z*2
+			expected = expected and w >= u+v and u*2 == 8 and v*2 == 8 and w-u-v == 8
+			check(R.validate(candidate),"legal partition")
+			check(R.solved(candidate) == expected,"exhaustive independent forward oracle")
+			var trial = R.advance(candidate)
+			check(R.validate(trial) and trial.stage == "trial","full wrong boards may be explored")
+			for step in range(4):
+				if trial.stage != "trial": break
+				trial = R.advance(trial)
+				check(R.validate(trial),"every simulated prefix validates")
+			check((trial.stage == "delivery") == expected,"only verified result enters delivery")
+			if expected: solutions.append([a,b,c])
+	check(solutions == [[13,7,4]],"unique recovered manifest")
+	s.trays = [13,7,4]
+	check(R.after_rounds(s.trays,1) == [2,14,8],"golden first round")
+	check(R.after_rounds(s.trays,2) == [4,4,16],"golden second round")
+	check(R.after_rounds(s.trays,3) == [8,8,8],"golden third round")
+	var trial = R.advance(s)
+	for i in range(3): trial = R.advance(trial)
+	check(trial.stage == "trial" and trial.round == 3,"result requires manual confirmation")
+	var delivery = R.advance(trial)
+	check(delivery.stage == "delivery" and R.validate(delivery),"confirmed result saved before delivery")
+	check(R.move(delivery,0,-1).is_empty(),"no editing result")
 	var aftermath = R.advance(delivery)
-	check(aftermath.stage == "aftermath" and aftermath.beat == 0,"animation ends at player-controlled story stop")
 	for i in range(3): aftermath = R.advance(aftermath)
-	check(aftermath.stage == "complete" and R.validate(aftermath),"completion after discovery dialogue")
-	for stage in ["delivery","aftermath","complete"]:
-		var forged = puzzle(); forged.stage = stage; forged.attempts = 1
-		check(not R.validate(forged),"forged completion rejected")
-	for bad in [-1,5,2.5,"4",true]:
+	check(aftermath.stage == "complete" and R.validate(aftermath),"manual discovery completes")
+	for stage in ["trial","delivery","aftermath","complete"]:
+		var forged = puzzle(); forged.stage = stage; forged.attempts = 1; forged.round = 3
+		check(not R.validate(forged),"forged trial or completion rejected")
+	for bad in [-1,25,2.5,"4",true]:
 		var c = puzzle(); c.trays[0] = bad
-		check(not R.validate(c),"invalid tray JSON rejected")
-	var bad = s.duplicate(true); bad.box = 4
-	check(not R.validate(bad),"overallocated save rejected")
+		check(not R.validate(c),"invalid count rejected")
+	for bad_round in [-1,4,2.0,true]:
+		var c = trial.duplicate(true); c.round = bad_round
+		check(not R.validate(c),"invalid round rejected")
+	var bad = trial.duplicate(true); bad.trays = [8,8,8]
+	check(not R.validate(bad),"impossible saved replay prefix rejected")
 	bad = s.duplicate(true); bad.extra = true
-	check(not R.validate(bad),"unknown schema field rejected")
+	check(not R.validate(bad),"closed schema")
+	bad = s.duplicate(true); bad.sample = "workshop-gw01-2"
+	check(not R.validate(bad),"old version not interpreted as new progress")
 	var helped = s.duplicate(true); helped.hint = 4; helped.attempts = 2
-	var restored = R.restore(helped,{"trays":[0,0,0,0,0],"capacities":[3,3,3,3,3],"box":0})
-	check(restored.hint == 4 and restored.attempts == 2,"undo retains assistance and attempts")
+	var restored = R.restore(helped,{"trays":[0,0,0]})
+	check(restored.hint == 4 and restored.attempts == 2,"undo retains help and attempts")
 	var repo = Repo.new(); repo.path = "/tmp/gw01-rules-%d/save.json"%OS.get_process_id()
 	check(repo.write_profile(delivery,R.validate),"save accepted board")
 	var hash = FileAccess.get_sha256(repo.path)

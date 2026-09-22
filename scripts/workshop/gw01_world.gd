@@ -6,7 +6,6 @@ const HERO = preload("res://assets/source/explorer-sprites-v2.png")
 const FOX = preload("res://assets/runtime/fox-v2.png")
 const TRAY = preload("res://assets/runtime/workshop/gw01/tray.tres")
 const SPINDLE = preload("res://assets/runtime/workshop/gw01/spindle.tres")
-const BOX = preload("res://assets/runtime/workshop/gw01/box.tres")
 const LIFT = preload("res://assets/runtime/workshop/gw01/lift.tres")
 const CART = preload("res://assets/runtime/workshop/gw01/cart.tres")
 const BELL = preload("res://assets/runtime/workshop/gw01/bell.tres")
@@ -29,8 +28,8 @@ func _ready() -> void:
 func tray_foot(i: int) -> Vector2:
 	if i == 0 and state.stage in ["delivery","aftermath","complete"]:
 		var p = progress if state.stage == "delivery" else 1.0
-		return Vector2(270,448).lerp(lift_foot()-Vector2(0,25),smoothstep(0,0.45,p))
-	return Vector2(270+i*156,448)
+		return Vector2(360,448).lerp(lift_foot()-Vector2(0,25),smoothstep(0,0.45,p))
+	return Vector2(360+i*240,448)
 
 func lift_foot() -> Vector2:
 	var rise = 0.0
@@ -45,32 +44,28 @@ func cart_foot() -> Vector2:
 	return Vector2(x,357)
 
 func tray_rect(i: int) -> Rect2:
-	return Rect2(Vector2(194+i*156,377),Vector2(152,104))
-func box_rect() -> Rect2: return Rect2(1004,364,155,132)
+	return Rect2(Vector2(248+i*240,345),Vector2(224,141))
 func source_foot(index: int) -> Vector2:
 	return Vector2(50+(index%6)*20,373+floori(index/6.0)*22)
 func target_foot(target: int, index: int) -> Vector2:
-	if target == 5: return Vector2(1027+(index%6)*18,400-floori(index/6.0)*16)
-	return tray_foot(target)+Vector2(-48+index*24,-17)
+	if target == -1: return source_foot(index)
+	return tray_foot(target)+Vector2(-74+(index%8)*21,-20-floori(index/8.0)*22)
 
 func begin_land(previous: Dictionary) -> void:
 	land_place = ""; moving = []
-	if previous.stage != "puzzle" or state.stage != "puzzle": return
-	# Each changed spindle has exactly one visible owner while its saved location is animated.
-	var old_stock = Rules.stock(previous)
-	var stock_cursor = old_stock
-	for target in range(6):
-		var before: int = previous.box if target == 5 else previous.trays[target]
-		var after: int = state.box if target == 5 else state.trays[target]
-		if before == after: continue
-		land_place = "goods"; land_slot = target
-		for k in range(absi(after-before)):
-			if after > before:
-				stock_cursor -= 1
-				moving.append({"target":target,"index":before+k,"from":source_foot(stock_cursor),"to":target_foot(target,before+k)})
-			else:
-				moving.append({"target":-1,"index":stock_cursor,"from":target_foot(target,before-1-k),"to":source_foot(stock_cursor)})
-				stock_cursor += 1
+	if previous.stage not in ["puzzle","trial"] or state.stage not in ["puzzle","trial"]: return
+	var before = Rules.displayed(previous); before.append(Rules.stock(previous))
+	var after = Rules.displayed(state); after.append(Rules.stock(state))
+	var origins = []; var destinations = []
+	for slot in range(4):
+		var target = -1 if slot == 3 else slot
+		for index in range(after[slot],before[slot]): origins.append(target_foot(target,index))
+		for index in range(before[slot],after[slot]): destinations.append({"target":target,"index":index})
+	assert(origins.size() == destinations.size())
+	for i in range(origins.size()):
+		var dest = destinations[i]
+		moving.append({"target":dest.target,"index":dest.index,"from":origins[i],"to":target_foot(dest.target,dest.index)})
+	if not moving.is_empty(): land_place = "goods"
 
 func hidden(target: int, index: int) -> bool:
 	if land_progress >= 1: return false
@@ -108,24 +103,26 @@ func _draw() -> void:
 		var hook = tray-Vector2(0,76)
 		draw_line(Vector2(661,83),hook,Color("bca375"),3)
 		for dx in [-62,62]: draw_line(hook,tray+Vector2(dx,-15),Color("bca375"),3)
-	# All 23 authoritative items remain either loose, in one tray, or inside the repair box.
+	# Counts and movements are derived from the saved initial manifest and verified round.
 	for n in range(Rules.stock(state)):
 		if not hidden(-1,n): spindle(source_foot(n))
-	if state.stage not in ["arrival","approach"]: plaque("待整理 %d 根"%Rules.stock(state),Rect2(25,450,158,38))
-	for i in range(5):
+	if state.stage not in ["arrival","approach"]: plaque("待摆 %d 根"%Rules.stock(state),Rect2(25,450,158,38))
+	var counts = Rules.displayed(state)
+	for i in range(3):
 		var foot = tray_foot(i)
-		contact(foot,69); prop(TRAY,foot,145)
-		for slot in range(state.capacities[i]):
-			var at = foot+Vector2(-48+slot*24,-17)
-			draw_rect(Rect2(at-Vector2(10,31),Vector2(20,33)),Color("25485a",0.65),false,2)
-			if slot < state.trays[i] and not hidden(i,slot): spindle(at)
-		if state.stage not in ["arrival","approach"] and not (i == 0 and state.stage == "delivery"): plaque("%d托 · %d / %d"%[i+1,state.trays[i],state.capacities[i]],Rect2(foot+Vector2(-74,5),Vector2(148,35)),18)
+		contact(foot,96); prop(TRAY,foot,210)
+		for slot in range(counts[i]):
+			if not hidden(i,slot): spindle(target_foot(i,slot),9)
+		if state.stage not in ["arrival","approach"] and not (i == 0 and state.stage == "delivery"):
+			plaque("%s托 · %d 根"%[Rules.NAMES[i],counts[i]],Rect2(foot+Vector2(-100,5),Vector2(200,35)),20)
 		if selected == i and state.stage == "puzzle": draw_rect(tray_rect(i),Color("ffe19c"),false,3)
-	contact(Vector2(1082,461),57); prop(BOX,Vector2(1082,461),140)
-	for n in range(state.box):
-		if not hidden(5,n): spindle(target_foot(5,n),10)
-	if state.stage not in ["arrival","approach"]: plaque("维修盒 · %d 根"%state.box,Rect2(1003,469,165,38),18)
-	if selected == 5 and state.stage == "puzzle": draw_rect(box_rect(),Color("ffe19c"),false,3)
+	if state.stage not in ["arrival","approach"]:
+		plaque("记录终点：各 8 根",Rect2(25,193,217,37),18)
+		if state.stage == "trial":
+			plaque("试运行 · 甲 / 乙 / 丙",Rect2(25,235,217,37),18)
+			for r in range(state.round+1):
+				var row = Rules.after_rounds(state.trays,r)
+				plaque(("起始" if r == 0 else "%d轮后"%r)+"  %d / %d / %d"%row,Rect2(25,274+r*36,217,34),17)
 	if land_progress < 1:
 		for item in moving:
 			var p: Vector2 = item.from.lerp(item.to,smoothstep(0,1,land_progress))
