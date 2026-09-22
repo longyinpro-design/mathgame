@@ -31,7 +31,9 @@ func _initialize() -> void:
 			var r: Array = frame.region
 			check(r[0] >= 0 and r[1] >= 0 and r[0]+r[2] <= npcs.size[0] and r[1]+r[3] <= npcs.size[1],"NPC measured atlas bounds "+region)
 	var font = UIStyle.face(); var characters = {}
-	for path in ["res://scripts/ui/forest_release.gd","res://scripts/ui/puzzle_boards.gd","res://scripts/ui/route_boards.gd","res://scripts/ui/side_boards.gd","res://scripts/ui/battle_boards.gd","res://scripts/content/story_catalog.gd"]:
+	# discovery_catalog.gd 里的名字与解释是直接画在通关横幅上的，和这些脚本一样过字体；
+	# 它漏在名单外时，缺字形的卡片会在实机上显示成方块而测试毫无察觉。
+	for path in ["res://scripts/ui/forest_release.gd","res://scripts/ui/puzzle_boards.gd","res://scripts/ui/route_boards.gd","res://scripts/ui/side_boards.gd","res://scripts/ui/battle_boards.gd","res://scripts/content/story_catalog.gd","res://scripts/content/discovery_catalog.gd"]:
 		var source = FileAccess.get_file_as_string(path)
 		for i in source.length():
 			var code = source.unicode_at(i)

@@ -87,7 +87,7 @@ func run() -> void:
 	for i in range(3): await button("hint")
 	var first_hint = game.session.feedback
 	await button("pile_1"); await button("pile_0"); await button("hint")
-	check(game.session.feedback != first_hint,"R2 real repeated hint follows changed board")
+	check(game.session.feedback != first_hint and game.session.profile.active_run.highest_hint == 4,"R2 real fourth request escalates to the step-by-step tier and follows the changed board")
 	for i in range(2): await button("pile_2"); await button("pile_0")
 	await button("hint"); var settled_hint: String = game.session.feedback
 	check(settled_hint.contains("门环"),"R2 hint recognizes the board is ready to ring")

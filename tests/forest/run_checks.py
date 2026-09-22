@@ -14,7 +14,7 @@ import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
-HEADLESS = ['twenty_four_test.gd', 'route_redesign_test.gd', 'story_test.gd', 'assets_test.gd', 'boundary_test.gd', 'session_test.gd', 'p3_test.gd', 'p4_p5_test.gd', 'p6_p7_test.gd', 'p8_test.gd', 'review_repairs_test.gd', 'empty_profile_migration_test.gd']
+HEADLESS = ['twenty_four_test.gd', 'route_redesign_test.gd', 'story_test.gd', 'assets_test.gd', 'boundary_test.gd', 'session_test.gd', 'p3_test.gd', 'p4_p5_test.gd', 'p6_p7_test.gd', 'p8_test.gd', 'review_repairs_test.gd', 'empty_profile_migration_test.gd', 'discovery_test.gd', 'hint_layers_test.gd', 'proof_steps_test.gd']
 WINDOWS = ['fl07_playtest.gd', 'story_playtest.gd', 'story_chapter_playtest.gd', 'actors_playtest.gd', 'p2_playtest.gd', 'p3_playtest.gd', 'p4_p5_playtest.gd', 'p6_playtest.gd', 'battle_playtest.gd', 'p8_playtest.gd', 'review_repairs_playtest.gd', 'layout_fixes_playtest.gd', 'empty_profile_migration_playtest.gd', 'scene_integration_playtest.gd', 'ground_occlusion_playtest.gd', 'village_scene_playtest.gd', 'island_original_playtest.gd']
 
 def sources() -> dict[str, str]:

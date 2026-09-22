@@ -25,8 +25,9 @@ func _initialize() -> void:
 	Scenarios.send(s,{"kind":"start","level_id":"FL02"})
 	for i in range(3): Scenarios.send(s,{"kind":"hint"})
 	var hint = s.feedback
+	check(s.profile.active_run.highest_hint == 3 and not hint.contains("先把一枚从"),"R2 third hint stays in the guiding tier and still withholds the move")
 	Scenarios.rule(s,{"kind":"shift","from":1,"to":0}); Scenarios.send(s,{"kind":"hint"})
-	check(s.feedback != hint and s.profile.active_run.highest_hint == 3,"R2 repeated third-tier hint follows changed initial board")
+	check(s.feedback != hint and s.profile.active_run.highest_hint == 4,"R2 fourth request escalates to the step-by-step tier and follows the changed board")
 	for i in range(2): Scenarios.rule(s,{"kind":"shift","from":2,"to":0})
 	Scenarios.send(s,{"kind":"hint"}); var last_hint = s.feedback
 	check(Scenarios.rule(s,{"kind":"try"}) and s.profile.active_run.outcome == "complete","R2 matched trace settles FL02 directly")
@@ -56,7 +57,9 @@ func _initialize() -> void:
 			route = Session.Rules.apply(p,route,{"kind":"audit_move","index":index}).state
 	var after_fix = Session.Rules.hint(p,route,3)
 	check(after_fix != audit_hint and (after_fix.contains("条数") or after_fix.contains("缺")),"R2 postal hint then asks for the per-bag counts")
-	p = trained.catalog.levels.FL15; var coin = Session.Rules.fresh(p); var first_hint = Session.Rules.hint(p,coin,3)
+	# 第 3 档现在先盯「至少要称几次」那一栏；先把它答对，才轮到提示跟着秤盘走。
+	p = trained.catalog.levels.FL15; var coin = Session.Rules.apply(p,Session.Rules.fresh(p),{"kind":"min_weighings","value":2}).state
+	var first_hint = Session.Rules.hint(p,coin,3)
 	coin = Session.Rules.apply(p,coin,{"kind":"assign","node":"root","coin":0,"pan":"left"}).state
 	check(first_hint != Session.Rules.hint(p,coin,3),"R2 weighing hint preserves current assignments")
 	for id in trained.catalog.levels:

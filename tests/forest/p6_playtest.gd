@@ -66,10 +66,15 @@ func run() -> void:
 	await enter("FL14","post")
 	for i in range(5): await button("parity_0_2")
 	for value in [2,2,2,2,1]: await button("parity_1_"+str(value))
+	# 上路之前要给 8/9/10 各判一个原因，再说清改一次向的代价（4）。
+	for classify in ["classify_0_2","classify_1_1","classify_2_0"]: await button(classify)
+	await number("flip_loss",4)
 	await button("try"); check(game.session.profile.active_run.outcome == "complete","FL14 actual trajectories to 10 and 9")
 	await capture("fl14-complete")
 	if game.session.profile.active_run.outcome != "complete": quit(1); return
 	await enter("FL15","mill")
+	# 先说清至少要称几次（由 3^k 追上九颗推出），再摆方案。
+	await number("min_weighings",2)
 	for coin in range(6): await button("coin_"+str(coin)); await button("pan_"+("left" if coin < 3 else "right"))
 	for i in range(3):
 		var node: String = ["left","right","equal"][i]
@@ -80,7 +85,10 @@ func run() -> void:
 	await capture("fl15-complete")
 	if game.session.profile.active_run.outcome != "complete": quit(1); return
 	await enter("FL16","post")
+	# 先押一注（最大 18 格）才允许调宽度，再扫完五种宽度、说清宽多的代价（2），最后围定 3×6。
+	await number("area_guess",18)
 	for step in range(4): await button("fence_w_more")
+	await number("fence_loss",2)
 	await button("fence_choose_2"); await button("try")
 	check(game.session.profile.active_run.outcome == "complete","FL16 actual integer plans and maximum area")
 	await capture("fl16-complete")

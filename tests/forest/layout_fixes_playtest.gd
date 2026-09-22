@@ -57,8 +57,12 @@ func run() -> void:
     await enter("FL05","mill")
     check(labels_text().contains("输入6 →"),"FL05 bet labels the hidden input it asks about")
     await button("module_triple"); await button("module_plus2")
+    # 押注是必填而且要押对：从这台机器在隐藏输入上的输出推出来，不写死一个数。
+    var machine = preload("res://scripts/mechanisms/machine_rules.gd")
+    var machine_params: Dictionary = game.session.catalog.levels.FL05.params
+    var answer: int = machine.evaluate(machine.operations(machine_params,["triple","plus2"]),int(machine_params.predict_input)).back()
     var bet = game.ui.get_node("prediction")
-    bet.text = "8"; bet.text_submitted.emit("8"); await process_frame
+    bet.text = str(answer); bet.text_submitted.emit(str(answer)); await process_frame
     await button("try")
     check(game.session.profile.active_run.outcome == "complete","FL05 still settles with a bet placed")
 
@@ -93,11 +97,18 @@ func run() -> void:
     check(labels_text().contains("从 4 再走 3 步，只能走到：2、6、10"),"FL14 reachable line lists only legal endings (from 4)")
     for i in range(3): await button("parity_0_2")
     for value in [2,2,2,2,1]: await button("parity_1_"+str(value))
+    # 上路之前还要判 8/9/10 的原因、并说清改一次向的代价。
+    for classify in ["classify_0_2","classify_1_1","classify_2_0"]: await button(classify)
+    var loss: LineEdit = game.ui.get_node("flip_loss")
+    loss.text = "4"; loss.text_submitted.emit("4"); await process_frame
     await button("try")
     check(game.session.profile.active_run.outcome == "complete","FL14 still settles after the reachability fix")
 
     # FL16: the width controls and the commit button must not overlap.
     await enter("FL16","post")
+    # 调宽度之前必须先押一注（见 fence_rules.fresh 的 guessed 标记）。
+    var area: LineEdit = game.ui.get_node("area_guess")
+    area.text = "18"; area.text_submitted.emit("18"); await process_frame
     var more = game.buttons.fence_w_more.get_global_rect()
     var less = game.buttons.fence_w_less.get_global_rect()
     var commit = game.buttons.try.get_global_rect()
@@ -121,6 +132,9 @@ func run() -> void:
     for i in game.session.profile.active_run.state.plans.size():
         if game.session.profile.active_run.state.plans[i][0] == 3: chosen = i
     await button("fence_choose_"+str(chosen))
+    # 围定之前要说清宽多 1 格、长少 2 格。
+    var price: LineEdit = game.ui.get_node("fence_loss")
+    price.text = "2"; price.text_submitted.emit("2"); await process_frame
     await button("try")
     check(game.session.profile.active_run.outcome == "complete","FL16 still settles at the maximum area")
 

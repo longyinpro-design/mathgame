@@ -1,13 +1,19 @@
 extends RefCounted
 
-# Render a real native window without taking the user's foreground application.
-# Viewport input still reaches real Controls; focus-loss notifications are exercised separately.
+# Render a real native window without taking the user's foreground application,
+# and minimize it immediately: these checks never need to be looked at, and a
+# minimized window neither steals focus nor covers whatever the user is doing.
+# Input is pushed straight into the viewport (root.push_input), so visibility
+# is irrelevant to the checks themselves.
 static func configure(window: Window) -> void:
 	window.set_flag(Window.FLAG_NO_FOCUS,true)
+	window.mode = Window.MODE_MINIMIZED
 
 static func ready(window: Window) -> bool:
 	# The root window reapplies project flags during startup, after SceneTree._initialize.
 	if not window.get_flag(Window.FLAG_NO_FOCUS): configure(window)
+	# A later refresh may have restored the mode; minimize again before input starts.
+	if window.mode != Window.MODE_MINIMIZED: window.mode = Window.MODE_MINIMIZED
 	if not window.has_meta("test_background_ready"):
 		var signal_path = OS.get_environment("PIXEL_FOREST_WINDOW_READY")
 		if not signal_path.is_empty():
@@ -22,7 +28,7 @@ static func ready(window: Window) -> bool:
 		await window.get_tree().process_frame
 		window.set_meta("test_background_ready",true)
 	await window.get_tree().process_frame
-	if DisplayServer.get_name() == "headless" or not window.visible or not window.get_flag(Window.FLAG_NO_FOCUS):
-		push_error("Window test requires a visible native non-focus-stealing window")
+	if DisplayServer.get_name() == "headless" or not window.get_flag(Window.FLAG_NO_FOCUS) or window.mode != Window.MODE_MINIMIZED:
+		push_error("Window test requires a native minimized non-focus-stealing window")
 		return false
 	return true

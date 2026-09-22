@@ -59,6 +59,8 @@ func run() -> void:
 	await enter("FL04","village")
 	for pair in ["ab","bc","ac"]: await button("weigh_"+pair)
 	for i in range(3): await number("weight_"+str(i),[12,17,18][i])
+	# 点亮之前要先把三次合称加起来（94），再折出一套灯架的重（47）。
+	await number("sum",94); await number("total",47)
 	await button("try")
 	check(game.session.profile.active_run.outcome == "complete","FL04 actual weights settle")
 	if game.session.profile.active_run.outcome != "complete": print(game.session.profile.active_run.state); quit(1); return
@@ -68,6 +70,8 @@ func run() -> void:
 	await click(Vector2(772,435)); check("roof" in game.session.profile.inventory.buildings,"real construction spends wood once")
 	await enter("FL05","mill")
 	await button("module_triple"); await button("module_plus2")
+	# 押注是必填：先算出输入6的输出（6×3+2=20），再启动。
+	await number("prediction",20)
 	await button("try")
 	check(game.session.profile.active_run.outcome == "complete","FL05 assembled machine settles")
 	await capture("fl05-complete")

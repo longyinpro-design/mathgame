@@ -22,8 +22,19 @@ static func play(session: RefCounted, id: String) -> bool:
 		"FL04":
 			for pair in [[0,1],[1,2],[0,2]]: actions.append({"kind":"weigh","first":pair[0],"second":pair[1]})
 			for i in range(3): actions.append({"kind":"weight","index":i,"value":[12,17,18][i]})
+			# 三次合重之和正好是两套灯架：先算总量，再折出一套，最后点亮。
+			var pair_rules = preload("res://scripts/mechanisms/pair_rules.gd")
+			var pair_params: Dictionary = session.catalog.levels.FL04.params
+			actions.append({"kind":"sum","value":pair_rules.sum_expected(pair_params)})
+			actions.append({"kind":"total","value":pair_rules.total_expected(pair_params)})
 			actions.append({"kind":"try"})
-		"FL05": actions = [{"kind":"order","value":["triple","plus2"]},{"kind":"try"}]
+		"FL05":
+			# 押注是必填：先算出这台机器在输入6上的输出，再启动对答案。
+			var machine = preload("res://scripts/mechanisms/machine_rules.gd")
+			var machine_params: Dictionary = session.catalog.levels.FL05.params
+			var order := ["triple","plus2"]
+			var bet: int = machine.evaluate(machine.operations(machine_params,order),int(machine_params.predict_input)).back()
+			actions = [{"kind":"order","value":order},{"kind":"predict","value":bet},{"kind":"try"}]
 		"FL06":
 			actions = [{"kind":"probe_input","value":6},{"kind":"predict","id":"A","value":16},{"kind":"predict","id":"B","value":20},{"kind":"predict","id":"C","value":18},{"kind":"probe"}]
 			for action in actions:
@@ -73,14 +84,22 @@ static func play(session: RefCounted, id: String) -> bool:
 		"FL14":
 			for i in range(5): actions.append({"kind":"step","value":2,"repair":false})
 			for value in [2,2,2,2,1]: actions.append({"kind":"step","value":value,"repair":true})
-			actions.append({"kind":"try"})
+			# 三个目标的判因各不一样（10 能走到 / 9 被奇偶拦住 / 8 五步凑不出），
+			# 改一次向让终点少4。
+			actions.append_array([{"kind":"classify","index":0,"reason":2},{"kind":"classify","index":1,"reason":1},{"kind":"classify","index":2,"reason":0},
+				{"kind":"loss","value":4},{"kind":"try"}])
 		"FL15":
+			# 先答「至少要称几次」（由 3^k 追上九颗推出），再摆三分支方案。
+			var coin_rules = preload("res://scripts/mechanisms/coin_rules.gd")
+			actions.append({"kind":"min_weighings","value":coin_rules.minimal_weighings(session.catalog.levels.FL15.params)})
 			for coin in range(6): actions.append({"kind":"assign","node":"root","coin":coin,"pan":"left" if coin < 3 else "right"})
 			for i in range(3):
 				var node: String = ["left","right","equal"][i]
 				actions.append_array([{"kind":"assign","node":node,"coin":i*3,"pan":"left"},{"kind":"assign","node":node,"coin":i*3+1,"pan":"right"}])
 			actions.append({"kind":"try"})
 		"FL16":
+			# 先押一注才允许调宽度，再扫完五种宽度、说清宽多的代价，最后围定 3×6。
+			actions.append_array([{"kind":"area","value":18},{"kind":"loss","value":2}])
 			for width in range(1,6): actions.append({"kind":"resize","width":width})
 			actions.append_array([{"kind":"choose","index":2},{"kind":"try"}])
 		"FL17":
