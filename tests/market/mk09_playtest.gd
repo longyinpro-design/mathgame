@@ -28,6 +28,7 @@ func capture(name: String) -> void:
 	root.get_texture().get_image().save_png(CAPTURE+"/"+name+".png")
 # 一次真实的按下-抬起：不等帧，所以能看见宿主 0.28 秒的落纸锁。
 func tap(id: String) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	if not game.buttons.has(id) or game.buttons[id].disabled:
 		check(false,"button unavailable "+id); return
 	var b: Control = game.buttons[id]
@@ -36,6 +37,7 @@ func tap(id: String) -> void:
 	for down in [true,false]:
 		var event = InputEventMouseButton.new(); event.position = point; event.button_index = MOUSE_BUTTON_LEFT; event.pressed = down; root.push_input(event)
 func send(code: int) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	for down in [true,false]:
 		var event = InputEventKey.new(); event.keycode = code; event.pressed = down; root.push_input(event)
 func settle() -> void:

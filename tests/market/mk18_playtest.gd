@@ -37,6 +37,7 @@ func shot(prefix: String, name: String, branch: int, small: bool) -> void:
 	if keep(name, branch, small): await capture(prefix + "-" + name)
 
 func click(id: String) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	if not game.buttons.has(id) or game.buttons[id].disabled:
 		check(false, "button unavailable " + id); return
 	var b: Control = game.buttons[id]
@@ -49,6 +50,7 @@ func click(id: String) -> void:
 	while game.transient > 0: await process_frame
 
 func key(code: int) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	for down in [true, false]:
 		var event = InputEventKey.new(); event.keycode = code; event.pressed = down
 		root.push_input(event)

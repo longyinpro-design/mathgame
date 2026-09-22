@@ -89,7 +89,7 @@ func run() -> void:
 	await capture("13-bridge-growing")
 	await story("bridge",0.8); await capture("14-bridge-crossing")
 	for id in ["story_skip","story_pause"]:
-		check(game.ui.get_node(id).position.y < 160,"bridge control stays above the crossing: "+id)
+		check(not game.ui.get_node(id).get_global_rect().intersects(Rect2(600,265,640,130)),"bridge control stays clear of actors and crossing: "+id)
 	await story("bridge",1.0)
 	check(game.story_stage.cast.hero.position.x > 1030,"party reaches the far bank after bridge growth")
 	await dispose_game()

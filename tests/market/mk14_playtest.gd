@@ -44,6 +44,7 @@ func capture(name: String) -> void:
 	root.get_texture().get_image().save_png(CAPTURE+"/"+name+".png")
 # 一次真实的按下-抬起：不等帧，所以看得见 0.24 秒的砝码下落与 0.6 秒的挑单搬运。
 func tap(id: String) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	if not game.buttons.has(id) or game.buttons[id].disabled:
 		check(false,"button unavailable "+id); return
 	var b: Control = game.buttons[id]
@@ -56,6 +57,7 @@ func settle() -> void:
 func click(id: String) -> void:
 	tap(id); await process_frame; await settle()
 func key(code: int) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	for down in [true,false]:
 		var event = InputEventKey.new(); event.keycode = code; event.pressed = down; root.push_input(event)
 	await process_frame; await settle()
@@ -501,7 +503,7 @@ func run() -> void:
 			and paper.text.contains("4 → 13：只挪 9（架上→对面）")
 			and paper.text.contains("13 → 7：只挪 3（对面→货盘）"),
 			"回执逐单说清起手那一式与每一步挪了哪一枚、从哪儿到哪儿")
-		check(paper != null and paper.text.contains("4 与 7 只差 3 单位，却要动两枚砝码")
+		check(paper != null and paper.text.contains("4与7差3单位，需动两枚砝码")
 			and paper.text.contains("1 至 13 每单只一解"),"最后两行是三单之间的算术事实，不是作者的夸奖")
 		check(paper != null and widest(paper.text, 18) <= PAPER_ROOM,"回执六行都贴得进自己那张纸的内框")
 		var stacked := 0.0

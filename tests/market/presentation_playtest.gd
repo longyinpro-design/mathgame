@@ -25,6 +25,8 @@ func run() -> void:
 		var saved = FileAccess.get_file_as_bytes(game.save_path) if FileAccess.file_exists(game.save_path) else PackedByteArray()
 		game.world.draw.connect(func(): redraws += 1)
 		for reason in ["paused","modal","focused","hidden"]:
+			# Establish focus before testing each independent freeze condition.
+			root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 			match reason:
 				"paused": game.paused = true
 				"modal": game.modal = true

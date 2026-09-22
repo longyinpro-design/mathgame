@@ -122,7 +122,7 @@ func draw_tag(good: int) -> void:
 	if held: socket(foot - Vector2(0, TAG_LIFT), Vector2(34, 32), 0.5 + 0.4 * pulse())
 
 # 牌面上的字集中在这里拼：实窗按同一份字符串量宽度，不靠把文案再抄一遍。
-func board_head_plate() -> String: return "订单板 · 三句留下的话"
+func board_head_plate() -> String: return "订单板 · 三句线索"
 # 柜台牌跟着摊着的签数一起少：四张全按上订单板的那一刻，柜台上空无一物，
 # 牌面就退回光一个「柜台」，不许写着一张也不摊着的「0 张货签」。
 func counter_plate() -> String:

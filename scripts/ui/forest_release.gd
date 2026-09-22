@@ -142,7 +142,7 @@ func refresh() -> void:
 		"visit": draw_visit()
 		"tools": draw_tools()
 	var foreground_party = page == "challenge" and (world.visible or battle_world.visible)
-	message = text("" if page == "story" else session.feedback,Rect2(420,598,810,30 if world.original_village else 55) if foreground_party else Rect2(40,598,930,55),18 if foreground_party else 20)
+	message = text("" if page in ["story","journal","settings","party"] else session.feedback,Rect2(420,598,810,30 if world.original_village else 55) if foreground_party else (Rect2(40,601,1200,36) if page == "camp" else Rect2(40,598,930,55)),18 if foreground_party else 20)
 	if world.original_village and busy: message.text = "正在搬粮 · 看看送出仓和接收仓的变化。"
 	message.add_theme_color_override("font_color",UIStyle.GOLD)
 	if busy:
@@ -305,11 +305,11 @@ func draw_challenge() -> void:
 	else: PuzzleBoards.draw(self,definition,run)
 	if run.level_id in Layout.DETAIL_LEVELS:
 		button("scene_view","回到现场" if scene_detail else Layout.detail_title(run.level_id),Rect2(958,110,278,36),func(): scene_detail = not scene_detail; refresh())
-	button("hint","问伙伴 · H",Rect2(40,659,130,38),hint,run.outcome == "active")
-	button("undo","撤销 · Z",Rect2(183,659,118,38),dispatch.bind({"kind":"undo"}),run.outcome == "active" and not session.history.is_empty())
-	button("reset","重新摆放",Rect2(314,659,125,38),confirm_reset,run.outcome == "active")
-	button("tools","伙伴工具",Rect2(453,659,126,38),open_page.bind("tools"),run.outcome == "active")
-	button("leave","离开机关 · Esc",Rect2(728,659,180,38),return_to_region)
+	button("hint","问伙伴 · H",Rect2(40,659,130,44),hint,run.outcome == "active")
+	button("undo","撤销 · Z",Rect2(183,659,118,44),dispatch.bind({"kind":"undo"}),run.outcome == "active" and not session.history.is_empty())
+	button("reset","重新摆放",Rect2(314,659,125,44),confirm_reset,run.outcome == "active")
+	button("tools","伙伴工具",Rect2(453,659,126,44),open_page.bind("tools"),run.outcome == "active")
+	button("leave","离开机关 · Esc",Rect2(600,659,180,44),return_to_region)
 	if run.outcome == "complete" and not busy and not (story_enabled and session.profile.story.node == "post_"+run.level_id): draw_completion(definition,run)
 
 func draw_field_level(definition: Dictionary, run: Dictionary) -> void:
@@ -415,7 +415,7 @@ func draw_cargo(definition: Dictionary, run: Dictionary) -> void:
 	if definition.family != "cargo":
 		text("载重差决定谁下降；到站旅客会下篮、配重留在篮里。已经升降 %d 趟（要用正好%d趟）。"%[run.state.trips,3 if p.get("lock_delivered",false) else 2],Rect2(41,120,930,30),19)
 	var annotations = CargoAnnotations.new(); annotations.world = cargo_world; annotations.marks = run.tools.marks; ui.add_child(annotations)
-	action_button = button("travel","松闸 · Space",Rect2(1080,611,164,41),rule.bind({"kind":"travel"}),run.outcome == "active" and not run.state.complete)
+	action_button = button("travel","松闸 · Space",Rect2(1040,650,204,52),rule.bind({"kind":"travel"}),run.outcome == "active" and not run.state.complete,null,true)
 
 func draw_transfer(definition: Dictionary, run: Dictionary) -> void:
 	var state: Dictionary = run.state

@@ -16,6 +16,7 @@ func capture(name: String) -> void:
 	await process_frame; await process_frame; RenderingServer.force_draw(false)
 	root.get_texture().get_image().save_png(OUT+name+".png")
 func click(id: String) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	var b = game.buttons[id]
 	var point = b.get_global_rect().get_center()*Vector2(root.size)/Vector2(1280,720)
 	for down in [true,false]:

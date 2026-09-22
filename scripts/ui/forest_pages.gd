@@ -3,21 +3,21 @@ extends RefCounted
 
 static func draw_camp(host: Control) -> void:
 	host.navigation("森林营地","林间来信 · 第一章")
-	host.text("Lv.%d   行旅经验 %d   木片 %d" % [host.Session.Catalog.rank(host.session.profile.progress.journey_exp),host.session.profile.progress.journey_exp,host.session.profile.inventory.camp_wood],Rect2(42,650,650,32),20)
-	host.button("party","同行伙伴",Rect2(1090,653,153,39),host.open_page.bind("party"))
-	if host.story_enabled: host.button("continue_story","继续故事",Rect2(465,252,350,52),host.resume_story,true,null,true)
+	host.text("Lv.%d   行旅经验 %d   木片 %d" % [host.Session.Catalog.rank(host.session.profile.progress.journey_exp),host.session.profile.progress.journey_exp,host.session.profile.inventory.camp_wood],Rect2(42,650,390,40),20)
+	host.button("party","同行伙伴",Rect2(676,646,208,46),host.open_page.bind("party"))
+	if host.story_enabled: host.button("continue_story","继续故事",Rect2(900,646,344,50),host.resume_story,true,null,true)
 	if host.session.profile.story.node in ["end","voyage"]:
-		host.button("market","千灯集市 · "+("新的航路" if host.session.profile.story.node == "end" else "接货台"),Rect2(465,314,350,46),host.goto_market,true,null,true)
+		host.button("market","千灯集市 · "+("新的航路" if host.session.profile.story.node == "end" else "接货台"),Rect2(900,598,344,42),host.goto_market,true,null,true)
 	var i = 0
 	for id in host.REGIONS:
-		var x = [66,316,566,816,1066][i]
+		var x = 64+i*233
 		var unlocked = false
 		for level_id in host.REGIONS[id].levels:
 			if host.session.catalog.available(level_id,host.session.profile.progress.completed_levels): unlocked = true
-		host.button("region_"+id,host.REGIONS[id].name+(" · 回访" if host.story_enabled else ""),Rect2(x,166+i%2*45,160,44),host.show_region.bind(id),unlocked)
+		host.button("region_"+id,host.REGIONS[id].name+(" · 回访" if host.story_enabled else ""),Rect2(x,154,220,44),host.show_region.bind(id),unlocked)
 		i += 1
 	var run = host.session.profile.active_run
-	if run != null and run.outcome == "active": host.button("resume","继续 · "+host.session.catalog.levels[run.level_id].title,Rect2(60,292,380,44),host.resume)
+	if run != null and run.outcome == "active": host.button("resume","继续 · "+host.session.catalog.levels[run.level_id].title,Rect2(64,210,450,44),host.resume)
 	for entry in [["roof",Vector2(993,341)],["workbench",Vector2(167,516)],["garden",Vector2(862,559)]]:
 		var id: String = entry[0]; var building: Dictionary = host.Session.Catalog.BUILDINGS[id]
 		var built = id in host.session.profile.inventory.buildings
@@ -25,18 +25,18 @@ static func draw_camp(host: Control) -> void:
 		if available or built:
 			host.button("build_"+id,building.name+(" · 已建成" if built else " · %d木片"%building.cost),Rect2(entry[1],Vector2(233,39)),host.confirm_build.bind(id),not built)
 	if host.Session.Roster.can_grow(host.session.profile): host.button("grow","给阿橙系上同心叶结",Rect2(412,404,280,43),host.dispatch.bind({"kind":"grow"}))
-	host.button("chat","和伙伴聊聊",Rect2(454,556,190,36),host.camp_chat)
+	host.button("chat","和伙伴聊聊",Rect2(448,646,210,46),host.camp_chat)
 
 
 static func draw_journal(host: Control) -> void:
 	host.navigation("林间手记","记下走过的路、遇见的人和恢复的地方。")
-	host.UIStyle.panel(host.ui,Rect2(55,159,1170,430),true)
-	var scroll = ScrollContainer.new(); scroll.position = Vector2(79,181); scroll.size = Vector2(1115,384); host.ui.add_child(scroll)
-	var content = VBoxContainer.new(); content.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(content)
+	host.UIStyle.panel(host.ui,Rect2(180,146,920,470),true)
+	var scroll = ScrollContainer.new(); scroll.position = Vector2(212,170); scroll.size = Vector2(856,420); host.ui.add_child(scroll)
+	var content = VBoxContainer.new(); content.add_theme_constant_override("separation",12); content.size_flags_horizontal = Control.SIZE_EXPAND_FILL; scroll.add_child(content)
 	if host.story_enabled:
 		for id in host.session.profile.story.seen:
 			var beat = host.Story.scene(id)
-			var label = Label.new(); label.text = beat.title+" · "+beat.speaker+"："+beat.text; label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; label.custom_minimum_size = Vector2(1060,62); label.add_theme_color_override("font_color",host.UIStyle.DARK); content.add_child(label)
+			var label = Label.new(); label.text = beat.title+" · "+beat.speaker+"："+beat.text; label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; label.custom_minimum_size = Vector2(820,62); label.add_theme_color_override("font_color",host.UIStyle.DARK); content.add_child(label)
 		for id in host.session.catalog.levels:
 			if (id in host.Session.Flow.SIDES or id in host.session.profile.progress.completed_levels) and host.session.catalog.available(id,host.session.profile.progress.completed_levels):
 				var caption = "回忆 / 再玩 · " if id in host.session.profile.progress.completed_levels else "邻居的邀请 · "
@@ -64,7 +64,7 @@ static func draw_journal(host: Control) -> void:
 		for entry in saved.hint_log: lines.append("暂存提示："+entry.text)
 		for path in saved.tools.route_tags: lines.append("暂存路签："+path+" → %d层"%saved.tools.route_tags[path])
 	for line in lines:
-		var label = Label.new(); label.text = line; label.add_theme_color_override("font_color",host.UIStyle.DARK); label.add_theme_font_size_override("font_size",20); label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; label.custom_minimum_size = Vector2(1070,42); content.add_child(label)
+		var label = Label.new(); label.text = line; label.add_theme_color_override("font_color",host.UIStyle.DARK); label.add_theme_font_size_override("font_size",20); label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; label.custom_minimum_size = Vector2(820,42); content.add_child(label)
 	host.button("back","合上手记",Rect2(1044,659,200,39),host.back)
 
 
@@ -151,23 +151,23 @@ static func draw_story(host: Control) -> void:
 	host.story_stage.setup(node,host.session.profile,host.time_scale)
 	host.region = beat.region if beat.region != "camp" else "treetop"
 	host.navigation(beat.title,"林间来信 · "+("旧事与新的约定" if host.session.profile.story.seen.is_empty() and not host.session.profile.progress.completed_levels.is_empty() else "故事进行中"))
-	var grain_scene = beat.region in ["village","mill","heart"] and not host.story_stage.cargo_scene and beat.effect != "bridge"
-	var upper_dialogue = beat.region in ["treetop","camp"] and not host.story_stage.cargo_scene
-	host.UIStyle.panel(host.ui,Rect2(60,155,1160,132) if upper_dialogue else (Rect2(60,557,1160,96) if grain_scene else Rect2(60,493,1160,158)),true)
-	host.text(beat.speaker,Rect2(106,168,1070,26) if upper_dialogue else (Rect2(106,562,1070,26) if grain_scene else Rect2(106,507,1070,29)),19 if grain_scene else 21,true)
-	host.text(beat.text,Rect2(106,203,1070,72) if upper_dialogue else (Rect2(106,590,1070,60) if grain_scene else Rect2(106,545,1070,100)),20 if grain_scene or upper_dialogue else 23,true)
-	host.button("story_skip","跳过本段动作",Rect2(1020,110,200,36),func(): host.story_stage.skip(); host.refresh(),not host.story_stage.done)
-	host.button("story_pause","继续播放" if host.story_stage.paused else "暂停",Rect2(885,110,125,36),func(): host.story_stage.paused = not host.story_stage.paused; host.refresh())
+	var upper_dialogue = beat.region in ["treetop","camp"]
+	var dialogue_y = 316.0 if host.story_stage.cargo_scene else (155.0 if upper_dialogue else 550.0)
+	host.UIStyle.panel(host.ui,Rect2(64,dialogue_y,900,104),true)
+	host.text(beat.speaker,Rect2(88,dialogue_y+10,852,28),20,true)
+	host.text(beat.text,Rect2(88,dialogue_y+40,852,60),20,true)
+	host.button("story_skip","跳过动作",Rect2(218,663,140,42),func(): host.story_stage.skip(); host.refresh(),not host.story_stage.done)
+	host.button("story_pause","继续播放" if host.story_stage.paused else "暂停",Rect2(64,663,140,42),func(): host.story_stage.paused = not host.story_stage.paused; host.refresh())
 	var ready: bool = host.story_stage.done and not host.story_stage.paused
 	if node == "post_branch":
 		for i in range(2):
 			var id: String = ["FL09","FL10"][i]
 			if id not in host.session.profile.progress.completed_levels: host.button("choose_"+id,"先去落石路口" if i == 0 else "先安排两封信",Rect2(590+i*320,665,300,39),host.dispatch.bind({"kind":"story_choose","level_id":id},"story"),ready,null,true)
 	else: host.button("story_continue",beat.action,Rect2(780,665,440,39),host.story_continue.bind(node),ready,null,true)
-	if host.session.profile.story.return_node != "": host.button("story_return","稍后再来 · 返回故事",Rect2(60,665,330,39),func():
+	if host.session.profile.story.return_node != "": host.button("story_return","稍后再来 · 返回故事",Rect2(380,665,330,39),func():
 		if host.dispatch({"kind":"story_return"},"story"): host.resume_story())
-	elif node in ["joined","rest_village","rest_post","rest_growth","end","voyage"]: host.button("story_rest","在营地歇脚",Rect2(60,665,230,39),host.go_camp)
-	if node == "rest_growth" and host.Session.Roster.can_grow(host.session.profile): host.button("story_grow","系上同心叶结",Rect2(320,665,260,39),host.dispatch.bind({"kind":"grow"}),ready)
+	elif node in ["joined","rest_village","rest_post","rest_growth","end","voyage"]: host.button("story_rest","在营地歇脚",Rect2(380,665,230,39),host.go_camp)
+	if node == "rest_growth" and host.Session.Roster.can_grow(host.session.profile): host.button("story_grow","系上同心叶结",Rect2(620,610,260,39),host.dispatch.bind({"kind":"grow"}),ready)
 	if node.begins_with("post_") and beat.level != "":
 		var reward: Dictionary = host.session.catalog.levels[beat.level].reward
 		host.text(("收藏 · "+host.Story.ITEMS[beat.level].name) if host.Story.ITEMS.has(beat.level) else "林间手记 · "+host.session.catalog.levels[beat.level].title,Rect2(60,615,1120,35) if upper_dialogue else Rect2(60,153,1120,35),19)

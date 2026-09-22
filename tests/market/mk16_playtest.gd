@@ -67,6 +67,7 @@ func differ(from: String, to: String, region: Rect2 = Rect2()) -> float:
 	return float(apart) / float(maxi(1, seen))
 
 func click(id: String) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	if not game.buttons.has(id) or game.buttons[id].disabled:
 		check(false,"hotspot unavailable "+id); return
 	var button: Control = game.buttons[id]
@@ -80,6 +81,7 @@ func click(id: String) -> void:
 	while game.transient > 0: await process_frame
 
 func key(code: int) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	for down in [true,false]:
 		var event = InputEventKey.new(); event.keycode = code; event.pressed = down
 		root.push_input(event)

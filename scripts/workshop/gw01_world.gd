@@ -102,10 +102,16 @@ func _draw() -> void:
 	draw_line(Vector2(705,83),lift+Vector2(69,-20),Color("c49c5e"),3)
 	prop(LIFT,lift,172)
 	contact(cart_foot(),72); prop(CART,cart_foot(),159)
+	# The existing overhead winch carries the loading tray; the lift takes over at contact.
+	if state.stage == "delivery" and progress < 0.45:
+		var tray = tray_foot(0)
+		var hook = tray-Vector2(0,76)
+		draw_line(Vector2(661,83),hook,Color("bca375"),3)
+		for dx in [-62,62]: draw_line(hook,tray+Vector2(dx,-15),Color("bca375"),3)
 	# All 23 authoritative items remain either loose, in one tray, or inside the repair box.
 	for n in range(Rules.stock(state)):
 		if not hidden(-1,n): spindle(source_foot(n))
-	plaque("待整理 %d 根"%Rules.stock(state),Rect2(25,450,158,38))
+	if state.stage not in ["arrival","approach"]: plaque("待整理 %d 根"%Rules.stock(state),Rect2(25,450,158,38))
 	for i in range(5):
 		var foot = tray_foot(i)
 		contact(foot,69); prop(TRAY,foot,145)
@@ -113,12 +119,12 @@ func _draw() -> void:
 			var at = foot+Vector2(-45+slot*30,-17)
 			draw_rect(Rect2(at-Vector2(10,31),Vector2(20,33)),Color("25485a",0.65),false,2)
 			if slot < state.trays[i] and not hidden(i,slot): spindle(at)
-		plaque("%d托 · %d / 4"%[i+1,state.trays[i]],Rect2(foot+Vector2(-74,5),Vector2(148,35)),18)
+		if state.stage not in ["arrival","approach"] and not (i == 0 and state.stage == "delivery"): plaque("%d托 · %d / 4"%[i+1,state.trays[i]],Rect2(foot+Vector2(-74,5),Vector2(148,35)),18)
 		if selected == i and state.stage == "puzzle": draw_rect(tray_rect(i),Color("ffe19c"),false,3)
 	contact(Vector2(1082,461),57); prop(BOX,Vector2(1082,461),140)
 	for n in range(state.box):
 		if not hidden(5,n): spindle(target_foot(5,n),10)
-	plaque("维修盒 · %d 根"%state.box,Rect2(1003,469,165,38),18)
+	if state.stage not in ["arrival","approach"]: plaque("维修盒 · %d 根"%state.box,Rect2(1003,469,165,38),18)
 	if selected == 5 and state.stage == "puzzle": draw_rect(box_rect(),Color("ffe19c"),false,3)
 	if land_progress < 1:
 		for item in moving:

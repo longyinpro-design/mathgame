@@ -426,7 +426,7 @@ static func distant_pair() -> Array:
 static func distant_line() -> String:
 	var pair := distant_pair()
 	if pair.is_empty(): return "三单两两之间都只挪一枚"
-	return "%d 与 %d 只差 %d 单位，却要动两枚砝码" % [pair[0], pair[1], absi(pair[0] - pair[1])]
+	return "%d与%d差%d单位，需动两枚砝码" % [pair[0], pair[1], absi(pair[0] - pair[1])]
 
 # ---- 数学事实：作者验算用，运行时只在回执与提示那一行文字里出现 ----
 # 27 种摆法（每枚三个去处）全部列出来，供检查逐一对账。

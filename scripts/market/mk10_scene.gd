@@ -95,7 +95,7 @@ func receipt_lines() -> Array:
 func receipt_rect() -> Rect2: return Rect2(24, 176, 306, 194)
 func receipt_text_rect() -> Rect2:
 	var board = receipt_rect()
-	return Rect2(board.position + Vector2(16, 12), board.size - Vector2(32, 26))
+	return Rect2(board.position + Vector2(12, 12), board.size - Vector2(24, 26))
 
 func extra() -> void:
 	if state.stage != "complete": return

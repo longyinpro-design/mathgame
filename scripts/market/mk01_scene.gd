@@ -148,7 +148,7 @@ func refresh() -> void:
 	for child in world.get_children(): world.remove_child(child); child.queue_free()
 	buttons = {}; world.state = state; world.selected = selected
 	update_camera()
-	sign_text("千灯集市  /  找回杯子的刻度",Rect2(24,20,394,48),24)
+	sign_text("千灯集市 · 找回杯子的刻度",Rect2(24,20,394,48),22)
 	if state.stage not in ["arrival","complete","delivery"]:
 		# 三幕三种目标：还没核对时说的是复核规矩，推容量那一幕要说的是这一步真正要做的事，
 		# 已经把签挂回去之后才轮到那张交货单。

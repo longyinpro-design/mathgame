@@ -153,7 +153,7 @@ func run() -> void:
 		"13 is one weight away from both of the other two")
 	check(not Rules.one_move(4, 7) and not Rules.one_move(7, 4), "the two nearest-looking orders are the farthest apart by weights")
 	check(Rules.distant_pair() == [4, 7, 2], "the receipt names the 4-vs-7 pair and the two weights it costs")
-	check(Rules.distant_line() == "4 与 7 只差 3 单位，却要动两枚砝码", "and states it as arithmetic, not as a hint")
+	check(Rules.distant_line() == "4与7差3单位，需动两枚砝码", "and states it as arithmetic, not as a hint")
 	# ---- 六条顺序：走得完的只有两条 ----
 	var finished := []
 	var broken := []
@@ -657,7 +657,7 @@ func run() -> void:
 		if child is Label and "回执 · 一单只挪一枚" in child.text: paper_label = child
 	check(paper_label != null, "the receipt is drawn on the panel")
 	check(paper_label != null and paper_label.text.contains("起手 4 单位"), "it restates the order the player actually picked first")
-	check(paper_label != null and paper_label.text.contains("4 与 7 只差 3 单位"), "and closes on the maths it was built to teach")
+	check(paper_label != null and paper_label.text.contains("4与7差3单位"), "and closes on the maths it was built to teach")
 	check(paper_label != null and width_of(paper_label.text, 16) <= 276.0, "the receipt holds its own paper")
 	# 纸面量的是真高度：主题把 16 号字落到 18 像素，六行压不压得下只有排版器说了算。
 	var stacked := 0.0

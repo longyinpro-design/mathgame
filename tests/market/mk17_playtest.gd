@@ -65,6 +65,7 @@ func shot_pixel(image: Image, at: Vector2) -> Color:
 	return image.get_pixel(int(at.x * step.x), int(at.y * step.y))
 
 func click(id: String) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	game.paused = false
 	if not game.buttons.has(id) or game.buttons[id].disabled:
 		check(false, "点不动的牌子：" + id); return
@@ -79,6 +80,7 @@ func click(id: String) -> void:
 	await drained()
 
 func key(code: int) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	game.paused = false
 	for down in [true, false]:
 		var event = InputEventKey.new(); event.keycode = code; event.pressed = down

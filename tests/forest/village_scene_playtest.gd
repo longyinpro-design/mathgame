@@ -17,6 +17,7 @@ func capture(label: String) -> void:
 	await process_frame; await process_frame; RenderingServer.force_draw(false)
 	root.get_texture().get_image().save_png(OUT+label+".png")
 func click(id: String, wait: bool = true) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	var control = game.buttons[id]
 	var point: Vector2 = control.get_global_rect().get_center()
 	for pressed in [true,false]:

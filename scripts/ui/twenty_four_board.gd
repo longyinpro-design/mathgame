@@ -4,9 +4,9 @@ const Style = preload("res://scripts/cargo/skin.gd")
 const TILE = preload("res://assets/runtime/forest/ui/button-gold.png")
 const TILE_BRIGHT = preload("res://assets/runtime/forest/ui/button-gold-bright.png")
 
-static func tile_style(texture: Texture2D, tint: Color = Color.WHITE) -> StyleBoxTexture:
-	var s = StyleBoxTexture.new(); s.texture = texture; s.modulate_color = tint
-	s.texture_margin_left = 20; s.texture_margin_right = 20; s.texture_margin_top = 18; s.texture_margin_bottom = 18
+static func tile_style(_texture: Texture2D, tint: Color = Color.WHITE) -> StyleBoxFlat:
+	var s = StyleBoxFlat.new(); s.bg_color = Color("e6d5a5")*tint
+	s.set_corner_radius_all(6); s.set_border_width_all(2); s.border_color = Color("a99b73")
 	return s
 static func tag_style() -> StyleBoxFlat:
 	# Small parchment tag carrying the engine-rendered expression under each tile.
@@ -27,7 +27,7 @@ static func draw(host: Control, definition: Dictionary, run: Dictionary) -> void
 	console.steps = run.state.steps.size()
 	console.done = Rules.complete(definition.params,run.state)
 	console.target_value = float(tokens[0].n)/float(tokens[0].d) if tokens.size() == 1 else 0.0
-	host.text("数字卡："+"、".join(definition.params.cards.map(func(n): return str(n)))+"　每张恰好用一次，最后只留一张24。",Rect2(335,213,744,35),19,false)
+	host.text("选两张数字牌进行运算，最后得到 24",Rect2(335,213,744,35),19,false)
 	host.twenty_view = {"tokens":tokens,"cards":[],"empty":[]}
 	var width = 152.0; var gap = 32.0
 	var start = 339.0
@@ -49,9 +49,11 @@ static func draw(host: Control, definition: Dictionary, run: Dictionary) -> void
 		card.add_theme_color_override("font_outline_color",Color("f6ecd2")); card.add_theme_constant_override("outline_size",0)
 		var tag = Panel.new(); tag.position = Vector2(x-2,y+62); tag.size = Vector2(width+4,40); tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tag.add_theme_stylebox_override("panel",tag_style()); host.ui.add_child(tag)
-		var expression = host.text(tokens[i].expression,Rect2(x+3,y+64,width-6,36),16,true)
+		var expression = host.text(tokens[i].expression,Rect2(x+3,y+64,width-6,36),20,true)
+		tag.visible = tokens[i].expression != Rules.value_text(tokens[i])
+		expression.visible = tag.visible
 		host.twenty_view.cards.append({"button":card,"tag":tag,"expression":expression})
-	host.twenty_view.instruction = host.text("",Rect2(335,359,742,45),18,false)
+	host.twenty_view.instruction = host.text("",Rect2(335,359,742,45),20,false)
 	var operators = ["+","-","*","/"]
 	for i in operators.size():
 		var op: String = operators[i]
@@ -77,7 +79,7 @@ static func update_selection(host: Control) -> void:
 		card.button.text = Rules.value_text(tokens[i])+("　①" if slot == 0 else ("　②" if slot == 1 else ""))
 		card.tag.position = point+Vector2(-2,62)
 		card.expression.position = point+Vector2(3,64)
-	var instruction = "依次点两张卡，再选 +、−、×、÷；减法和除法按①到②的顺序。"
+	var instruction = "先选两张牌，再选运算。减法和除法按 ① → ②。"
 	if host.twenty_selection.size() == 2:
 		instruction = "将计算："+Rules.value_text(tokens[host.twenty_selection[0]])+"　□　"+Rules.value_text(tokens[host.twenty_selection[1]])+"　（结果会变成一张新卡）"
 	elif tokens.size() == 1:

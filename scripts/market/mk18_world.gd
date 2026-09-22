@@ -332,7 +332,7 @@ func draw_paper(foot: Vector2, title: String, lines: Array, stamped: bool) -> vo
 # 世界层的字一律是浅字加深描边，落在蓝蜡上就糊成一片；纸上反过来描——浅纸色光晕托着深墨字，
 # 落在米色纸上看不见，压在蜡上就把字托出来。
 func paper_words(text: String, at: Vector2, size_px: int) -> void:
-	draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, 3, PAPER)
+	draw_string_outline(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, 4, PAPER)
 	draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, Color("40291a"))
 
 func stamp(foot: Vector2) -> void:

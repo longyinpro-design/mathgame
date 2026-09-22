@@ -3,7 +3,7 @@ const INK = Color("f1e5ca")
 const GOLD = Color("d7bd83")
 const MINT = Color("ccceb0")
 const DARK = Color("3c3a2a")
-const FONT_PATH = "res://assets/fonts/ZCOOLKuaiLe-Regular.ttf"
+const FONT_PATH = "res://assets/fonts/NotoSansSC.ttf"
 const PAPER_PANEL = preload("res://assets/runtime/forest/ui/panel-paper.png")
 const BUTTON_STATES = {
 	"normal": preload("res://assets/runtime/forest/ui/button-teal-small.png"),
@@ -20,10 +20,10 @@ const PRIMARY_STATES = {
 static func face() -> FontFile:
 	var font: FontFile = load(FONT_PATH)
 	font.allow_system_fallback = false
-	font.fallbacks = [load("res://assets/fonts/NotoSansSC.ttf")]
+	font.fallbacks = []
 	return font
 static func text_size(requested: int) -> int:
-	return 28 if requested >= 24 else 22 if requested >= 18 else 18
+	return maxi(requested,18)
 static func make() -> Theme:
 	var result = Theme.new()
 	result.default_font = face()
@@ -45,26 +45,19 @@ static func text(parent: Node, value: String, rect: Rect2, size_px: int = 18, co
 		label.add_theme_color_override("font_shadow_color",Color(0.035,0.06,0.035,0.65))
 		label.add_theme_constant_override("shadow_offset_x",0); label.add_theme_constant_override("shadow_offset_y",1)
 	parent.add_child(label); return label
-static func paper_style() -> StyleBoxTexture:
-	var s = StyleBoxTexture.new(); s.texture = PAPER_PANEL
-	s.texture_margin_left = 36; s.texture_margin_right = 36; s.texture_margin_top = 30; s.texture_margin_bottom = 32
-	s.content_margin_left = 30; s.content_margin_right = 30; s.content_margin_top = 24; s.content_margin_bottom = 22
+static func paper_style() -> StyleBoxFlat:
+	var s = StyleBoxFlat.new(); s.bg_color = Color("eee5cf")
+	s.set_corner_radius_all(6); s.set_border_width_all(1); s.border_color = Color("aa9b7e")
+	s.content_margin_left = 24; s.content_margin_right = 24; s.content_margin_top = 20; s.content_margin_bottom = 20
 	return s
 static func dark_style() -> StyleBoxFlat:
-	# Machine housing: deep moss-green wood with a brass double border.
-	var s = StyleBoxFlat.new(); s.bg_color = Color("27301f")
-	s.set_corner_radius_all(8)
-	s.set_border_width_all(2); s.border_color = Color("93763d")
-	s.shadow_color = Color(0.03,0.055,0.03,0.5); s.shadow_size = 7; s.shadow_offset = Vector2(0,4)
+	var s = StyleBoxFlat.new(); s.bg_color = Color("24382f")
+	s.set_corner_radius_all(6); s.set_border_width_all(1); s.border_color = Color("617468")
 	return s
 static func sign_style() -> StyleBoxFlat:
-	# In-world wooden sign: warm walnut board with carved edge, replaces debug-black strips.
-	var s = StyleBoxFlat.new(); s.bg_color = Color(0.157,0.118,0.075,0.94)
-	s.set_corner_radius_all(7)
-	s.border_width_left = 2; s.border_width_right = 2; s.border_width_top = 2; s.border_width_bottom = 3
-	s.border_color = Color(0.58,0.45,0.26,0.95)
-	s.shadow_color = Color(0.02,0.04,0.02,0.45); s.shadow_size = 4; s.shadow_offset = Vector2(0,3)
-	s.content_margin_left = 18; s.content_margin_right = 18; s.content_margin_top = 7; s.content_margin_bottom = 9
+	var s = StyleBoxFlat.new(); s.bg_color = Color(0.10,0.16,0.13,0.94)
+	s.set_corner_radius_all(5)
+	s.content_margin_left = 14; s.content_margin_right = 14; s.content_margin_top = 7; s.content_margin_bottom = 9
 	return s
 static func panel(parent: Node, rect: Rect2, paper: bool = false) -> Panel:
 	var p = Panel.new(); p.position = rect.position; p.size = rect.size; p.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -84,17 +77,21 @@ static func style_button(b: Button, primary: bool = false) -> void:
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.add_theme_font_size_override("font_size",20)
 	b.add_theme_font_override("font",face())
-	var states = PRIMARY_STATES if primary else BUTTON_STATES
-	for key in ["normal","hover","pressed","disabled"]:
-		var s = _state_box(states[key])
-		if key == "pressed" and primary: s.modulate_color = Color(0.85,0.8,0.7)
-		b.add_theme_stylebox_override(key,s)
-	var focus = StyleBoxFlat.new(); focus.bg_color = Color.TRANSPARENT; focus.set_border_width_all(2); focus.border_color = GOLD
-	focus.set_corner_radius_all(6)
-	b.add_theme_stylebox_override("focus",focus)
-	for key in ["font_color","font_hover_color","font_pressed_color","font_focus_color"]: b.add_theme_color_override(key,INK)
-	b.add_theme_color_override("font_disabled_color",Color("6e6a58"))
-	b.add_theme_color_override("font_outline_color",Color("28291e")); b.add_theme_constant_override("outline_size",0)
+	for state in ["normal","hover","pressed","disabled"]:
+		var box = StyleBoxFlat.new(); box.set_corner_radius_all(5)
+		box.bg_color = Color("d5b976") if primary else Color("29453a")
+		if state == "hover": box.bg_color = Color("edce88") if primary else Color("3b5b4c")
+		elif state == "pressed": box.bg_color = Color("b49a60") if primary else Color("20372e")
+		elif state == "disabled": box.bg_color = Color("354139")
+		box.set_border_width_all(1); box.border_color = Color("e5cb92") if primary else Color("789181")
+		if state == "disabled": box.border_color = Color("59645c")
+		box.content_margin_left = 6; box.content_margin_right = 6; box.content_margin_top = 2; box.content_margin_bottom = 3
+		b.add_theme_stylebox_override(state,box)
+	var focus = StyleBoxFlat.new(); focus.bg_color = Color.TRANSPARENT; focus.set_border_width_all(2); focus.border_color = Color("f5dc91")
+	focus.set_corner_radius_all(5); b.add_theme_stylebox_override("focus",focus)
+	for key in ["font_color","font_hover_color","font_pressed_color","font_focus_color"]: b.add_theme_color_override(key,Color("26372b") if primary else INK)
+	b.add_theme_color_override("font_disabled_color",Color("a9b2a9"))
+	b.add_theme_constant_override("outline_size",0)
 static func button(parent: Node, value: String, rect: Rect2, action: Callable, primary: bool = false) -> Button:
 	var b = Button.new(); b.text = value; b.position = rect.position; b.size = rect.size
 	style_button(b,primary); b.pressed.connect(action); parent.add_child(b)

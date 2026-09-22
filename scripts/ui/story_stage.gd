@@ -145,13 +145,13 @@ func _update_pose() -> void:
 		backdrop.ground.region = place; backdrop.ground.queue_redraw()
 		feet = Layout.party(place)
 	if cargo_scene:
-		var zoom = smoothstep(0.05,0.7,t) if scene.effect == "delivery" else (1.0 if node_id == "letter" else 0.0)
-		cargo.scale = Vector2.ONE*lerpf(0.74,1.50,zoom)
-		cargo.position = Vector2(162,12).lerp(Vector2(-1040,-18),zoom)
+		# Keep the painted dock and all supported objects in the same art-space.
+		cargo.scale = Vector2.ONE
+		cargo.position = Vector2.ZERO
 		feet.hero = cargo.position+cargo.item_position(1)*cargo.scale
 		feet.acheng = cargo.position+cargo.item_position(0)*cargo.scale
 		npc.position = cargo.position+Vector2(1195,cargo.UPPER_Y)*cargo.scale
-		npc.scale = Vector2.ONE*lerpf(0.78,1.20,zoom)
+		npc.scale = Vector2.ONE*0.78
 	else:
 		npc.position = Layout.npc_foot(scene.region); npc.scale = Vector2.ONE*0.82
 		if backdrop.original_village: npc.position = Vector2(1183,535); npc.scale = Vector2.ONE*0.75

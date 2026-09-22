@@ -39,12 +39,14 @@ func make_hub(done: Array) -> void:
 func free_hub() -> void:
 	hub.queue_free(); await process_frame
 func tap(control: Control) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	var point = control.get_global_transform_with_canvas()*(control.size/2)*Vector2(root.size)/Vector2(1280,720)
 	for down in [true,false]:
 		var event = InputEventMouseButton.new(); event.position = point; event.button_index = MOUSE_BUTTON_LEFT; event.pressed = down
 		root.push_input(event)
 	await process_frame
 func key(code: int) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	for down in [true,false]:
 		var event = InputEventKey.new(); event.keycode = code; event.pressed = down; root.push_input(event)
 	await process_frame

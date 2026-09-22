@@ -46,14 +46,17 @@ func item_position(item: int) -> Vector2:
 	for i in item_count():
 		if state.places[i] == loc: items.append(i)
 	var index = items.find(item)
-	var columns = 3
 	var center = Vector2(224,LOWER_Y) if loc == 0 else Vector2(1100,UPPER_Y)
 	if loc in [1,2]: center = basket_position(loc)-Vector2(0,4)
-	var count = mini(columns,items.size())
-	return center+Vector2((index%columns-(count-1)*0.5)*65,-floori(index/float(columns))*65)
+	var pitch = minf(65.0,190.0/maxi(1,items.size()-1))
+	return center+Vector2((index-(items.size()-1)*0.5)*pitch,0)
+func item_rect(item: int) -> Rect2:
+	var count = state.places.count(state.places[item])
+	var width = minf(58.0,190.0/maxi(1,count-1))
+	return Rect2(item_position(item)-Vector2(width/2,59),Vector2(width,66))
 func hit_item(p: Vector2) -> int:
 	for i in range(item_count()-1,-1,-1):
-		if Rect2(item_position(i)-Vector2(29,59),Vector2(58,66)).has_point(p): return i
+		if item_rect(i).has_point(p): return i
 	return -1
 func hit_zone(p: Vector2) -> int:
 	for loc in [1,2,0,3]:
@@ -77,6 +80,7 @@ func _draw() -> void:
 	if page not in ["cargo","camp"]:
 		draw_rect(Rect2(0,0,1280,720),Color(0.025,0.045,0.03,0.65))
 	else:
+		upper_gangway()
 		# Two docks, one continuous rope: the math is visible in the mechanism.
 		# Both unloading areas use the original lower bridge and upper treehouse deck.
 		# The pulley attaches to the existing branch rather than an unrelated flat bar.
@@ -90,8 +94,8 @@ func _draw() -> void:
 		draw_line(Vector2(510,169),Vector2(805,169),Color("d6b578"),4,true)
 		for side in [1,2]:
 			var x = basket_position(side).x
-			draw_line(Vector2(x,170),basket_position(side)-Vector2(0,105),Color("403a25"),7,true)
-			draw_line(Vector2(x-1,170),basket_position(side)-Vector2(1,105),Color("d9bc83"),3,true)
+			draw_line(Vector2(x,170),basket_position(side)-Vector2(0,90),Color("403a25"),7,true)
+			draw_line(Vector2(x-1,170),basket_position(side)-Vector2(1,90),Color("d9bc83"),3,true)
 			draw_set_transform(Vector2(x,169),lift*4)
 			draw_texture_rect_region(props,Rect2(-25,-25,50,50),REGIONS[5])
 			draw_set_transform(Vector2.ZERO)
@@ -111,11 +115,25 @@ func _draw() -> void:
 	for i in range(20):
 		var p = Vector2(fposmod(i*131+time*(5+i%4),1280),180+fposmod(i*47+sin(time+i)*10,400))
 		draw_circle(p,1.5,Color(1,0.90,0.62,0.15+0.12*sin(time+i)))
+func gangway_rect() -> Rect2:
+	# Extend only at a stopped upper basket; retract before either basket moves.
+	if moving or (not is_zero_approx(lift) and not is_equal_approx(lift,1.0)): return Rect2()
+	var start = 617.0 if is_equal_approx(lift,1.0) else 912.0
+	return Rect2(start,UPPER_Y-4,1190-start,16)
+func upper_gangway() -> void:
+	var deck = gangway_rect()
+	if deck.size.x <= 0: return
+	# Existing timber asset supplies the load-bearing surface, with cables to the branch.
+	for x in range(int(deck.position.x),int(deck.end.x),96):
+		draw_texture_rect(timber,Rect2(x,deck.position.y,minf(96,deck.end.x-x),16),false)
+	for x in [deck.position.x+12,deck.end.x-12]:
+		draw_line(Vector2(x,118),Vector2(x,deck.position.y),Color("b9a578"),3)
+
 func basket(side: int) -> void:
 	var p = basket_position(side)
 	for dx in [-99,99]:
-		draw_line(p-Vector2(0,105),p+Vector2(dx,-9),Color("383c29"),6,true)
-		draw_line(p-Vector2(0,105),p+Vector2(dx,-9),Color("c6ab76"),2,true)
+		draw_line(p-Vector2(0,90),p+Vector2(dx,-9),Color("383c29"),6,true)
+		draw_line(p-Vector2(0,90),p+Vector2(dx,-9),Color("c6ab76"),2,true)
 	draw_texture_rect_region(props,Rect2(p-Vector2(117,23),Vector2(234,73)),REGIONS[0])
 	if page != "cargo": return
 	var w = Rules.weight(state,side)
@@ -143,7 +161,7 @@ func basket(side: int) -> void:
 func item(i: int, p: Vector2, active: bool) -> void:
 	if active:
 		draw_set_transform(p-Vector2(0,6),0,Vector2(1,0.25)); draw_circle(Vector2.ZERO,31,Color(0.95,0.85,0.54,0.6)); draw_set_transform(Vector2.ZERO)
-	p.y -= 7 if active else 0
+	# Selection changes the contact ring, never the supported foot or body scale.
 	var goal = Rules.goal_count(state)
 	var weights: Array = Rules.item_weights(state)
 	if i == 0: actor(FOX,Rect2(200,190,920,880),p,58)

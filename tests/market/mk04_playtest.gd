@@ -24,6 +24,7 @@ func capture(name: String) -> void:
 	root.get_texture().get_image().save_png(CAPTURE+"/"+name+".png")
 # 一次真实点击：按下、抬起、等一帧，但不排掉落地锁，让调用方能看见货物在半空的那一帧。
 func press(id: String) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	if not game.buttons.has(id) or game.buttons[id].disabled:
 		check(false,"button unavailable "+id); return
 	var b: Control = game.buttons[id]
@@ -37,6 +38,7 @@ func click(id: String) -> void:
 	lock = game.transient
 	while game.transient > 0: await process_frame
 func key(code: int) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	for down in [true,false]:
 		var event = InputEventKey.new(); event.keycode = code; event.pressed = down; root.push_input(event)
 	await process_frame

@@ -36,6 +36,7 @@ func capture(name: String) -> void:
 	root.get_texture().get_image().save_png(CAPTURE+"/"+name+".png")
 # 一次真实的按下-抬起：不等帧，所以能看见宿主 0.28 秒的落秤锁。
 func tap(id: String) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	if not game.buttons.has(id) or game.buttons[id].disabled:
 		check(false,"button unavailable "+id); return
 	var b: Control = game.buttons[id]
@@ -44,6 +45,7 @@ func tap(id: String) -> void:
 	for down in [true,false]:
 		var event = InputEventMouseButton.new(); event.position = point; event.button_index = MOUSE_BUTTON_LEFT; event.pressed = down; root.push_input(event)
 func send(code: int) -> void:
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	for down in [true,false]:
 		var event = InputEventKey.new(); event.keycode = code; event.pressed = down; root.push_input(event)
 func settle() -> void:
@@ -351,9 +353,9 @@ func run() -> void:
 		var title_board := panel_at(Vector2(24,20))
 		var title_sign := ui_text("千灯集市")
 		check(title_board != null and title_board.size == Vector2(410,48) and title_sign != null
-			and title_sign.get_theme_font_size("font_size") == 28
-			and fits(title_sign.text, 24, 382.0),
-			"the title board is wide enough for the 28px floor the skin puts on it")
+			and title_sign.get_theme_font_size("font_size") == 22
+			and fits(title_sign.text, title_sign.get_theme_font_size("font_size"), title_sign.size.x),
+			"the compact title stays readable and fits its actual text area")
 		check(game.state.weighs == 0 and not speaks_a_total(),
 			"before the first lift no readout anywhere on the street says what a pan weighs")
 		check(game.status_line() == "接油 0 · 上秤 0 枚 · 抬 0 次",

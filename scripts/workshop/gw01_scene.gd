@@ -78,7 +78,7 @@ func refresh() -> void:
 	for child in world.get_children(): world.remove_child(child); child.queue_free()
 	buttons = {}
 	sign_text("齿轮工坊 · 装不满的最后一托",Rect2(24,18,480,52),24)
-	sign_text("本班订单：5 个满托，每托 4 根",Rect2(640,18,616,52),22)
+	if state.stage not in ["arrival","approach"]: sign_text("本班订单：5 个满托，每托 4 根",Rect2(640,18,616,52),22)
 	sign_text(message if not message.is_empty() else line(),Rect2(250,92,880,88),20)
 	if state.stage == "puzzle":
 		for i in range(6):

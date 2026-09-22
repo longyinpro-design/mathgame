@@ -31,7 +31,7 @@ docs/playtest/**/*.import
 *.import.tmp
 
 # Kept on disk but out of history: rejected art drafts, and the two Noto cuts that no
-# script or .tscn loads (the UI uses ZCOOLKuaiLe-Regular with NotoSansSC as fallback).
+# script or .tscn loads (the current UI uses NotoSansSC Regular).
 # Re-add them if a scene starts referencing these exact paths.
 art/rejected/
 assets/fonts/NotoSerifSC-Medium.ttf

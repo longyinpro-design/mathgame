@@ -29,6 +29,8 @@ func body(actor: Node2D) -> Rect2:
 	return result
 
 func inspect(id: String, state: String) -> void:
+	# Stage this view as a focused player would; native test windows stay minimized.
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	# Stress every owned companion in the view without altering the saved party.
 	game.world.party = game.session.profile.roster.owned.duplicate()
 	await process_frame; await process_frame
@@ -96,6 +98,7 @@ func run() -> void:
 		root.size = size; await inspect("FL18","missed"); await capture("FL18-missed-"+str(size.x))
 	# Catch draw-order regressions in the actual opening of a moving seed flight.
 	check(Scenarios.send(game.session,{"kind":"reset","confirmed":true}),"reset for live flight")
+	root.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
 	game.time_scale = 1.0; game.refresh(); game.rule({"kind":"probe","value":6})
 	await create_timer(0.03).timeout
 	var tweens = get_processed_tweens()
