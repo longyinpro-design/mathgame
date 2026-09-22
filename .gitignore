@@ -6,6 +6,11 @@
 .scratch/
 .zcode/
 
+# Agent state (WorkBuddy): project memory and skills live next to the checkout that
+# produced them. The same repo is open in more than one worktree, so each keeps its
+# own copy and nothing here is shared; the files stay on disk, out of history.
+.workbuddy/
+
 # Python bytecode from the verification runners
 __pycache__/
 *.pyc
