@@ -15,6 +15,7 @@ const BattleWorld = preload("res://scripts/ui/battle_world.gd")
 const BattleBoards = preload("res://scripts/ui/battle_boards.gd")
 const StoryStage = preload("res://scripts/ui/story_stage.gd")
 const Story = preload("res://scripts/content/story_catalog.gd")
+const Discovery = preload("res://scripts/content/discovery_catalog.gd")
 const MarketSample = preload("res://scripts/market/mk01_scene.gd")
 const MARKET_SCENE = "res://game/market_mk01.tscn"
 const SKILL_NAMES = {"mark":"观察签","compare":"前后手记","group":"抱团搬运","bands":"分组带","route_tag":"路签","shadow":"影子探路"}
@@ -381,22 +382,26 @@ func draw_field_level(definition: Dictionary, run: Dictionary) -> void:
 func draw_completion(definition: Dictionary, run: Dictionary) -> void:
 	# Unmissable banner: the mechanism is restored, what was earned, and where to go next.
 	# A soft top scrim keeps the restored mechanism visible underneath.
-	var scrim = ColorRect.new(); scrim.color = Color(0.02,0.05,0.03,0.55); scrim.size = Vector2(1280,172); scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE; overlay.add_child(scrim)
-	UIStyle.panel(overlay,Rect2(58,16,1164,150),true)
+	var first_clear = _first_clear_was_this_run(definition)
+	# 有发现卡的关卡横幅多出一段（见 draw_discovery）；没有的仍是 172，
+	# 上下两块的坐标一个都没动，未覆盖的关卡布局与旧版逐像素一致。
+	var discovery: Dictionary = Discovery.card(definition.id)
+	var banner = 312.0 if not discovery.is_empty() else 172.0
+	var scrim = ColorRect.new(); scrim.color = Color(0.02,0.05,0.03,0.55); scrim.size = Vector2(1280,banner); scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE; overlay.add_child(scrim)
+	UIStyle.panel(overlay,Rect2(58,16,1164,banner-22),true)
 	text("机关恢复了！",Rect2(90,28,420,48),30,true,overlay)
 	text(definition.title+" · 完成",Rect2(92,76,420,30),20,true,overlay)
-	var first_clear = _first_clear_was_this_run(definition)
 	if first_clear:
 		text("+%d 行旅经验　+%d 木片" % [int(definition.reward.journey_exp),int(definition.reward.camp_wood)],Rect2(92,108,420,30),20,true,overlay)
 	else:
 		text("再玩一次 · 首通奖励已经领过",Rect2(92,108,420,30),20,true,overlay)
 	var story: String = Story.REACTIONS.get(definition.id,"")
 	if first_clear and Story.ITEMS.has(definition.id): story = "获得收藏："+Story.ITEMS[definition.id].name+"　"+story
-	if definition.family == "disjoint_route_pairs": story = "先向右的必过(1,0)、先向上的必过(0,1)，所以三封里必有两封相撞——一组最多两封。　"+story
-	# A short "why" line for levels whose insight is a counting argument.
-	if definition.family == "cargo_optimal": story = "为什么不能只用一趟：3 个对象、每篮最多 2 位，一趟最多送 2 个。　"+story
-	elif definition.family == "route_partition": story = "6 + 3 + 1 = 10 条路线，一条不多一条不少。　"+story
 	text(story,Rect2(540,40,660,74),19,true,overlay)
+	# 原先在这里按 family 硬写三条「为什么」，用的是审稿人语言（(1,0) 坐标、C(4,2)、
+	# 「3 个对象」）。三条对应 FL08/FL10/FL13，现在都进了 discovery_catalog，
+	# 换成孩子能读的说法，所以这段硬编码整体撤掉，不留两份要同步的文案。
+	if not discovery.is_empty(): draw_discovery(definition,discovery,first_clear)
 	var next_id: String = ""
 	for level_id in session.catalog.levels:
 		if session.catalog.region_for(level_id) == region and session.catalog.available(level_id,session.profile.progress.completed_levels) and level_id not in session.profile.progress.completed_levels:
@@ -406,6 +411,21 @@ func draw_completion(definition: Dictionary, run: Dictionary) -> void:
 	else:
 		button("to_region","回到"+(REGIONS[region].name if region != "" else "林间"),Rect2(884,100,320,50),show_region.bind(region),true,overlay)
 	button("to_region_alt","回到林间看看",Rect2(540,100,320,50),show_region.bind(region),true,overlay)
+
+func draw_discovery(definition: Dictionary, discovery: Dictionary, first_clear: bool) -> void:
+	# 通关横幅的下半段，也是「学到」这一步唯一的落点：把玩家刚才做对的动作命名出来。
+	# 三行——叫什么、一句话解释、还在哪儿用过。第三行只写真实数据，见 cross_reference。
+	# 首通写「你发现了一个办法」，重玩写「这一关用的办法」：同一张卡，两种说法。
+	var tint: Color = UIStyle.GOLD; tint.a = 0.4
+	var divider = ColorRect.new(); divider.color = tint
+	divider.position = Vector2(90,180); divider.size = Vector2(1100,1)
+	divider.mouse_filter = Control.MOUSE_FILTER_IGNORE; overlay.add_child(divider)
+	text("你发现了一个办法" if first_clear else "这一关用的办法",Rect2(90,188,420,24),18,true,overlay)
+	# 名字与解释同排：名字最长六个字，320 宽在 28 号字下够放；解释排在 250 起，
+	# 940 宽刚好是一行 40 字的版面，超过就会折行压到下面的回指上（EXPLAIN_LIMIT 卡住它）。
+	text(discovery.name,Rect2(90,214,320,40),28,true,overlay)
+	text(discovery.explain,Rect2(250,220,940,34),19,true,overlay)
+	text(Discovery.cross_reference(definition.id,discovery.concept,session.catalog.levels,session.profile.progress.completed_levels),Rect2(90,276,1100,26),18,true,overlay)
 
 func _first_clear_was_this_run(definition: Dictionary) -> bool:
 	# The learning record for this run exists exactly when its reward was granted now.

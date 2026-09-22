@@ -212,7 +212,7 @@ func validate_base(value: Variant) -> bool:
 			if not observation[key] is String: return false
 		if not catalog.levels.has(observation.level_id) or observation.level_id not in progress.completed_levels: return false
 		var observed_definition: Dictionary = catalog.legacy_fl07 if observation.level_id == "FL07" and observation.context_id == "machine_ambiguity" else catalog.levels[observation.level_id]
-		if observation.concept_id not in observed_definition.concept_ids or not Numbers.integer(observation.highest_hint,0,3): return false
+		if observation.concept_id not in observed_definition.concept_ids or not Numbers.integer(observation.highest_hint,0,4): return false
 		if not observation.hint_log is Array or (observation.highest_hint == 0) != observation.hint_log.is_empty(): return false
 		for entry in observation.hint_log:
 			if not entry is Dictionary or not entry.has_all(["tier","text"]) or not Numbers.integer(entry.tier,1,observation.highest_hint) or not entry.text is String or entry.text.is_empty(): return false
@@ -249,7 +249,7 @@ func valid_run(run: Variant, completed: Array, owned: Array) -> bool:
 	if not catalog.available(run.level_id,completed): return false
 	var definition: Dictionary = run_definition(run)
 	if run.params_snapshot != definition.params or not Rules.valid(definition,run.state): return false
-	if not Numbers.integer(run.attempt_count,0,1000000) or not Numbers.integer(run.highest_hint,0,3) or not Numbers.integer(run.rewind_count,0,1000000): return false
+	if not Numbers.integer(run.attempt_count,0,1000000) or not Numbers.integer(run.highest_hint,0,4) or not Numbers.integer(run.rewind_count,0,1000000): return false
 	if not run.hint_log is Array or (run.highest_hint == 0) != run.hint_log.is_empty(): return false
 	for entry in run.hint_log:
 		if not entry is Dictionary or not entry.has_all(["tier","text"]) or not Numbers.integer(entry.tier,1,run.highest_hint) or not entry.text is String or entry.text.is_empty(): return false
@@ -381,7 +381,7 @@ func command(action: Dictionary, revision: int) -> bool:
 			if candidate.active_run == null or candidate.active_run.outcome != "active": feedback = "当前没有进行中的机关。"; return false
 			var run: Dictionary = candidate.active_run; var definition = catalog.definition(run.level_id)
 			if action.kind == "hint":
-				run.highest_hint = mini(3,int(run.highest_hint)+1); feedback = Rules.hint(definition,run.state,int(run.highest_hint))
+				run.highest_hint = mini(4,int(run.highest_hint)+1); feedback = Rules.hint(definition,run.state,int(run.highest_hint))
 				if run.hint_log.is_empty() or run.hint_log.back().text != feedback: run.hint_log.append({"tier":run.highest_hint,"text":feedback})
 			elif action.kind == "undo":
 				if next_history.is_empty(): feedback = "没有可撤销步骤，可以确认重摆。"; return false

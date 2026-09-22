@@ -42,6 +42,12 @@ static func apply(definition: Dictionary, state: Dictionary, action: Dictionary)
 static func complete(definition: Dictionary, state: Dictionary) -> bool:
 	return implementation(definition.family).complete(definition.params,state)
 
+# 提示分四档：1 问看哪里 / 2 说用哪条关系 / 3 指出关系但不给结论 / 4 才一步一报。
+# 第 3 档以前直接报出下一步或答案，而档位封在 3、内容又按当前状态重算，
+# 于是「连按 H」等于一份不限次数的逐步答案播报——这正是各关 shortcut_to_check
+# 明说必须挡住的那条捷径。原来的逐句引导保留为第 4 档，兜底还在，只是要先想三轮。
 static func hint(definition: Dictionary, state: Dictionary, tier: int) -> String:
-	if definition.family == "twenty_four" and tier >= 3: return TwentyFour.hint(definition.params,state)
-	return definition.hints[tier-1] if tier < 3 else CurrentHint.next(definition,state)
+	if tier <= 2: return definition.hints[tier-1]
+	if tier == 3: return CurrentHint.guide(definition,state)
+	if definition.family == "twenty_four": return TwentyFour.hint(definition.params,state)
+	return CurrentHint.next(definition,state)
