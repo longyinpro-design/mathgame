@@ -2,9 +2,9 @@ extends "res://scripts/market/level_host.gd"
 const Rules = preload("res://scripts/workshop/gw01_rules.gd")
 const World = preload("res://scripts/workshop/gw01_world.gd")
 const ARRIVAL = ["阿橙：灯轴明明做好了，小车怎么又空着回来了？",
-	"嗒嗒：这里有 23 根。本班收 5 个满托，每托 4 根。多的也挤上车？",
-	"小岚：先装好整托。装不满的留下维修，别让它们没了去处。"]
-const AFTER = ["嗒嗒：五个满托都准备好了！维修盒里的三根，也不会丢掉。",
+	"嗒嗒：这里有 23 根。本班收 5 个满托，衬板可选 3 槽或 5 槽。",
+	"小岚：维修还要留 1～2 根。五托怎样配，才能都装满？"]
+const AFTER = ["嗒嗒：五个满托都准备好了！维修盒里的两根，也不会丢掉。",
 	"阿橙：等等……托盘还在上面，小车却已经走过去了。",
 	"小岚：数量整理好了。下一步，得看看升降台和小车什么时候到。"]
 var selected = -1
@@ -13,7 +13,7 @@ var gw_pending_feedback = ""
 
 func configure() -> void:
 	scene_id = "dock"; level_id = "GW01"; title = "装不满的最后一托"
-	if save_path.is_empty(): save_path = "user://profiles/workshop-gw01-1/save-v1.json"
+	if save_path.is_empty(): save_path = "user://profiles/workshop-gw01-2/save-v1.json"
 	rules = Rules; world_script = World
 	durations = {"approach":2.4,"delivery":4.0}
 	zoom_stages = []
@@ -50,7 +50,7 @@ func _process(delta: float) -> void:
 		if world.progress >= 1: commit(Rules.advance(state),history)
 	if changed: world.queue_redraw()
 
-func snapshot(v: Dictionary) -> Dictionary: return {"trays":v.trays.duplicate(),"box":v.box}
+func snapshot(v: Dictionary) -> Dictionary: return {"trays":v.trays.duplicate(),"capacities":v.capacities.duplicate(),"box":v.box}
 func cleared_state() -> Dictionary:
 	var n = state.duplicate(true); n.trays = [0,0,0,0,0]; n.box = 0; return n
 func reset_prompt() -> Array: return ["把五托和维修盒里的灯轴全部放回原处？\n本次求助与验收记录仍保留。","继续整理","全部放回"]
@@ -59,8 +59,8 @@ func line() -> String:
 	match state.stage:
 		"arrival": return ARRIVAL[state.beat]
 		"approach": return "先看一遍：升降台上去的时候，小车从下面经过了。"
-		"ready": return "看看这批灯轴：五个托盘、每托四槽；维修盒留给装不成整托的。"
-		"puzzle": return "先点一托或维修盒，再放入或取回。整理好了，请嗒嗒验收。"
+		"ready": return "看看这批灯轴：五个托盘可换 3 槽或 5 槽衬板；维修必须留 1～2 根。"
+		"puzzle": return "先选托盘，用 C 换衬板，再装灯轴。空托才能换板；维修留 1～2 根。"
 		"delivery": return "满托已备好，维修用的灯轴留在盒里。升降台试着把第一托抬起来……"
 		"aftermath": return AFTER[state.beat]
 		"complete": return "这一批整理好了。货还在码头，接下来要让升降台和小车赶上彼此。"
@@ -68,7 +68,7 @@ func line() -> String:
 
 func target_name() -> String: return "维修盒" if selected == 5 else "第 %d 托"%(selected+1)
 func target_count() -> int: return state.box if selected == 5 else state.trays[selected]
-func batch_size() -> int: return Rules.stock(state) if selected == 5 else 4-target_count()
+func batch_size() -> int: return mini(Rules.stock(state),2-state.box) if selected == 5 else state.capacities[selected]-target_count()
 
 func refresh() -> void:
 	if not is_instance_valid(world): return
@@ -78,7 +78,7 @@ func refresh() -> void:
 	for child in world.get_children(): world.remove_child(child); child.queue_free()
 	buttons = {}
 	sign_text("齿轮工坊 · 装不满的最后一托",Rect2(24,18,480,52),24)
-	if state.stage not in ["arrival","approach"]: sign_text("本班订单：5 个满托，每托 4 根",Rect2(640,18,616,52),22)
+	if state.stage not in ["arrival","approach"]: sign_text("5 个满托 · 3/5 槽 · 维修留 1～2 根",Rect2(640,18,616,52),22)
 	sign_text(message if not message.is_empty() else line(),Rect2(250,92,880,88),20)
 	if state.stage == "puzzle":
 		for i in range(6):
@@ -91,9 +91,12 @@ func refresh() -> void:
 			sign_text("已选："+target_name(),Rect2(279,514,235,46),20)
 			add_button("one","放 1 根 A",Rect2(530,514,160,48),move_goods.bind(1)).disabled = not can_move(1)
 			var n = batch_size()
-			var batch_label = "放余下 %d 根"%n if selected == 5 else "补满此托 B"
+			var batch_label = "放入 %d 根 B"%n if selected == 5 else "补满此托 B"
 			add_button("batch",batch_label,Rect2(705,514,160,48),batch).disabled = n < 1 or not can_move(n)
 			add_button("take","取回 1 根 D",Rect2(880,514,175,48),move_goods.bind(-1)).disabled = not can_move(-1)
+			if selected < 5:
+				add_button("resize","换成 %d 槽 C"%(5 if state.capacities[selected] == 3 else 3),Rect2(530,577,220,48),resize_tray).disabled = transient > 0 or target_count() > 0
+				sign_text("先取空，才能换板",Rect2(765,577,290,48),20)
 		else: sign_text("点选托盘 1—5 或维修盒 6",Rect2(326,517,590,44),20)
 		add_button("undo","撤销 Z",Rect2(24,650,130,50),undo).disabled = history.is_empty() or transient > 0
 		add_button("reset","重摆 X",Rect2(166,650,130,50),confirm_reset).disabled = transient > 0
@@ -109,7 +112,7 @@ func refresh() -> void:
 		if caption.has(state.stage): add_button("next",caption[state.stage],Rect2(966,650,290,50),confirm_restart if state.stage == "complete" else advance,true)
 	add_button("journal","回看与发现",Rect2(520,650,168,50),journal).disabled = transient > 0
 	if state.stage == "complete":
-		sign_text("留住剩下的：一托装不满的先留住，下次还能用。",Rect2(276,535,754,54),20)
+		sign_text("配好大小托：既装满五托，也为维修留下材料。",Rect2(276,535,754,54),20)
 	if modal:
 		for b in buttons.values(): b.disabled = true
 
@@ -148,20 +151,31 @@ func hint() -> void:
 	commit(n,history)
 
 func hint_texts() -> Array:
-	var next = ""
-	for i in range(5):
-		if state.trays[i] < 4:
-			next = "选第 %d 托，点「补满此托」。"%(i+1); break
-	if state.trays == [4,4,4,4,4]: next = "五托已满。把剩下的灯轴放进维修盒。"
-	elif state.box > 3: next = "维修盒先取回几根，让五个托盘都有机会装满。"
-	return ["先看本班收几托、每托几个槽，余下的灯轴也要有去处。",
-		"可以先装一个满托，再看原处还剩多少。不必逐根点。",
-		"五托每托四根，共要二十根；和原有的二十三根比一比。",
+	var next = "五托已满，把余下两根放入维修盒。"
+	var large = state.capacities.count(5)
+	if large != 3:
+		for i in range(5):
+			if state.capacities[i] == (3 if large < 3 else 5):
+				next = "第 %d 托%s，换成 %d 槽；目标是三个大托、两个小托。"%[i+1,"先取空" if state.trays[i] > 0 else "是空托",5 if large < 3 else 3]
+				break
+	else:
+		for i in range(5):
+			if state.trays[i] < state.capacities[i]:
+				next = "选第 %d 托，补满当前衬板；大小托的组合已经配好了。"%(i+1)
+				break
+	if Rules.solved(state): next = "五托和维修预留都好了，可以请嗒嗒验收。"
+	return ["先试大小托的组合；装满五托后，还必须有 1～2 根留给维修。",
+		"如果全用 3 槽，五托装 15 根。换一块 5 槽衬板，会多装几根？",
+		"维修留 1～2 根，五托应装 21 或 22 根。从 15 根起，每换一块增加 2 根。",
 		"示范下一步："+next]
+func resize_tray() -> void:
+	if modal or transient > 0 or selected < 0 or selected >= 5: return
+	place(Rules.resize(state,selected))
 func handle_key(key: int) -> bool:
 	if key >= KEY_1 and key <= KEY_6: select_target(key-KEY_1)
 	elif key == KEY_A: move_goods(1)
 	elif key == KEY_B: batch()
+	elif key == KEY_C: resize_tray()
 	elif key == KEY_D: move_goods(-1)
 	else: return false
 	return true
@@ -171,7 +185,7 @@ func journal() -> void:
 	var shade = ColorRect.new(); shade.size = Vector2(1280,720); shade.color = Color(0.02,0.04,0.07,0.82); overlay.add_child(shade)
 	UIStyle.panel(overlay,Rect2(250,153,780,462),true)
 	var text = "码头手记\n" + "\n".join(ARRIVAL.slice(0,state.beat+1) if state.stage == "arrival" else ARRIVAL)
-	if state.stage == "complete": text += "\n\n留住剩下的\n23 根 = 5 托 × 4 根 + 维修盒 3 根。\n只是整理好，货还没有交到小车。"
+	if state.stage == "complete": text += "\n\n配好大小托\n23 根 = 3 托 × 5 根 + 2 托 × 3 根 + 维修 2 根。\n只是整理好，货还没有交到小车。"
 	UIStyle.text(overlay,text,Rect2(290,181,700,349),20,UIStyle.DARK)
 	add_button("close_journal","回到现场",Rect2(761,549,225,48),close_modal,true,overlay).grab_focus()
 

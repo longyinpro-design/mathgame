@@ -21,21 +21,38 @@ func run() -> void:
 	check(R.move(s,0,-1).is_empty(),"cannot remove from empty")
 	check(R.advance(s).is_empty(),"cannot complete empty board")
 	var solutions = 0
-	# Independent exhaustive allocations: every legal tray combination and repair-box amount.
-	for encoded in range(3125):
-		var digits = encoded; var sum = 0; var trays = []
+	# Independent enumeration of all 32 insert layouts and every allocation.
+	for mask in range(32):
+		var caps = []
+		var combinations = 1
 		for i in range(5):
-			var n = digits%5; digits = int(digits/5); trays.append(n); sum += n
-		for box in range(24-sum):
-			var c = s.duplicate(true); c.trays = trays.duplicate(); c.box = box
-			check(R.validate(c),"legal allocation")
-			var expected = sum == 20 and box == 3
-			check(R.solved(c) == expected,"only five full trays plus remainder completes")
-			if R.solved(c): solutions += 1
-	check(solutions == 1,"unique allocation, independent of action order")
-	for i in [4,2,0,3,1]: s = R.move(s,i,4)
-	s = R.move(s,5,3)
+			caps.append(5 if mask & (1 << i) else 3)
+			combinations *= caps[i]+1
+		for encoded in range(combinations):
+			var digits = encoded; var sum = 0; var trays = []
+			for cap in caps:
+				var n = digits%(cap+1); digits = int(digits/(cap+1)); trays.append(n); sum += n
+			for box in range(3):
+				var c = s.duplicate(true); c.capacities = caps.duplicate(); c.trays = trays.duplicate(); c.box = box
+				check(R.validate(c) == (sum+box <= 23),"allocation conservation boundary")
+				var expected = trays == caps and sum == 21 and box == 2
+				check(R.solved(c) == expected,"only three large and two small full trays with reserve")
+				if R.solved(c): solutions += 1
+	check(solutions == 10,"all ten permutations accepted")
+	for i in [4,2,0]: s = R.resize(s,i)
+	for i in [4,2,0,3,1]: s = R.move(s,i,s.capacities[i])
+	s = R.move(s,5,2)
 	check(R.solved(s) and R.stock(s) == 0,"batch actions conserve 23")
+	check(R.resize(s,0).is_empty(),"occupied insert cannot change")
+	check(R.resize(R.fresh(),0).is_empty(),"no insert changes during dialogue")
+	check(R.resize(puzzle(),5).is_empty(),"repair box has no insert")
+	var no_reserve = puzzle(); no_reserve.capacities = [5,5,5,5,3]; no_reserve.trays = [5,5,5,5,3]
+	check(R.validate(no_reserve) and not R.solved(no_reserve),"four large trays leave no repair reserve and cannot pass")
+	for bad_caps in [[3,3,3,3], [4,3,3,3,3], [true,3,3,3,3], [3.0,3,3,3,3]]:
+		var c = puzzle(); c.capacities = bad_caps
+		check(not R.validate(c),"malformed insert configuration rejected")
+	var legacy = puzzle(); legacy.sample = "workshop-gw01-1"; legacy.erase("capacities")
+	check(not R.validate(legacy),"legacy schema is not interpreted as new game")
 	var delivery = R.advance(s)
 	check(delivery.stage == "delivery" and R.validate(delivery),"verified board saved before animation")
 	check(R.move(delivery,0,-1).is_empty(),"cannot remove goods after acceptance")
@@ -54,7 +71,7 @@ func run() -> void:
 	bad = s.duplicate(true); bad.extra = true
 	check(not R.validate(bad),"unknown schema field rejected")
 	var helped = s.duplicate(true); helped.hint = 4; helped.attempts = 2
-	var restored = R.restore(helped,{"trays":[0,0,0,0,0],"box":0})
+	var restored = R.restore(helped,{"trays":[0,0,0,0,0],"capacities":[3,3,3,3,3],"box":0})
 	check(restored.hint == 4 and restored.attempts == 2,"undo retains assistance and attempts")
 	var repo = Repo.new(); repo.path = "/tmp/gw01-rules-%d/save.json"%OS.get_process_id()
 	check(repo.write_profile(delivery,R.validate),"save accepted board")

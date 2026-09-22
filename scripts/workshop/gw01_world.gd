@@ -51,7 +51,7 @@ func source_foot(index: int) -> Vector2:
 	return Vector2(50+(index%6)*20,373+floori(index/6.0)*22)
 func target_foot(target: int, index: int) -> Vector2:
 	if target == 5: return Vector2(1027+(index%6)*18,400-floori(index/6.0)*16)
-	return tray_foot(target)+Vector2(-45+index*30,-17)
+	return tray_foot(target)+Vector2(-48+index*24,-17)
 
 func begin_land(previous: Dictionary) -> void:
 	land_place = ""; moving = []
@@ -115,11 +115,11 @@ func _draw() -> void:
 	for i in range(5):
 		var foot = tray_foot(i)
 		contact(foot,69); prop(TRAY,foot,145)
-		for slot in range(4):
-			var at = foot+Vector2(-45+slot*30,-17)
+		for slot in range(state.capacities[i]):
+			var at = foot+Vector2(-48+slot*24,-17)
 			draw_rect(Rect2(at-Vector2(10,31),Vector2(20,33)),Color("25485a",0.65),false,2)
 			if slot < state.trays[i] and not hidden(i,slot): spindle(at)
-		if state.stage not in ["arrival","approach"] and not (i == 0 and state.stage == "delivery"): plaque("%d托 · %d / 4"%[i+1,state.trays[i]],Rect2(foot+Vector2(-74,5),Vector2(148,35)),18)
+		if state.stage not in ["arrival","approach"] and not (i == 0 and state.stage == "delivery"): plaque("%d托 · %d / %d"%[i+1,state.trays[i],state.capacities[i]],Rect2(foot+Vector2(-74,5),Vector2(148,35)),18)
 		if selected == i and state.stage == "puzzle": draw_rect(tray_rect(i),Color("ffe19c"),false,3)
 	contact(Vector2(1082,461),57); prop(BOX,Vector2(1082,461),140)
 	for n in range(state.box):
