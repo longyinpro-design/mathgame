@@ -15,8 +15,9 @@ var state = Rules.fresh()
 var selected = -1
 var progress = 0.0
 var land_place = ""
-var land_slot = -1
 var land_progress = 1.0
+# 宿主契约：暂停/失焦时 level_host 会写这里。GW01 的动效全部由 scene 的 progress 驱动，
+# 世界本身没有自走动画，所以目前只写不读；删掉它会让宿主的赋值报错。
 var presentation_paused = false
 var font: Font
 var moving = []

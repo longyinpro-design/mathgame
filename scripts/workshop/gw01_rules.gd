@@ -43,7 +43,7 @@ static func solved(s: Dictionary) -> bool:
 	return stock(s) == 0 and after_rounds(s.trays,3) == [8,8,8]
 
 static func shortfalls(s: Dictionary) -> Array:
-	if stock(s) > 0: return ["先把 24 根都摆进三托，试出发时的数量；现在还剩 %d 根。"%stock(s)]
+	if stock(s) > 0: return ["先把 24 根都摆进三托，还原出发时的数量；现在还剩 %d 根。"%stock(s)]
 	var current = s.trays.duplicate()
 	for i in range(3):
 		var next = transfer(current,i)

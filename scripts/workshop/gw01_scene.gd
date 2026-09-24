@@ -1,4 +1,4 @@
-extends "res://scripts/market/level_host.gd"
+extends "res://scripts/workshop/workshop_host.gd"
 const Rules = preload("res://scripts/workshop/gw01_rules.gd")
 const World = preload("res://scripts/workshop/gw01_world.gd")
 const ARRIVAL = ["阿橙：搬运记录被蒸汽打湿了，只剩最后一行：甲、乙、丙各 8 根。",
@@ -8,7 +8,6 @@ const AFTER = ["嗒嗒：三轮后果然各 8 根！起始货单找回来了。"
 	"阿橙：等等……托盘还在上面，小车却已经走过去了。",
 	"小岚：数量的来龙去脉清楚了。下一步，再查升降台和小车的时间。"]
 var selected = -1
-var gw_focused = true
 var gw_pending_feedback = ""
 
 func configure() -> void:
@@ -18,37 +17,9 @@ func configure() -> void:
 	durations = {"approach":2.4,"delivery":4.0}
 	zoom_stages = []
 
-func _ready() -> void:
-	super._ready()
-	get_window().title = "齿轮工坊 · GW01 被蒸汽抹去的货单"
-
+# 工坊镜头固定：宿主 _process 每帧都会调用这里，覆写后整幕保持 1:1、不平移。
 func update_camera() -> void:
 	world.scale = Vector2.ONE; world.position = Vector2.ZERO
-
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
-		gw_focused = false
-		if is_instance_valid(world) and state.stage in Rules.ANIMATIONS: paused = true
-	elif what == NOTIFICATION_APPLICATION_FOCUS_IN: gw_focused = true
-	else: return
-	if is_instance_valid(world):
-		world.presentation_paused = modal or paused or not gw_focused
-	if buttons.has("pause"): buttons.pause.text = "继续动画" if paused else "暂停动画"
-
-func _process(delta: float) -> void:
-	if not is_instance_valid(world) or not is_visible_in_tree() or modal or paused or not gw_focused: return
-	var changed = false
-	if transient > 0:
-		changed = true
-		transient = maxf(0,transient-delta/maxf(0.01,time_scale))
-		world.land_progress = 1-transient/LAND_TIME
-		if transient == 0: refresh()
-	if state.stage in Rules.ANIMATIONS:
-		changed = true
-		elapsed += delta/maxf(0.01,time_scale)
-		world.progress = minf(1,elapsed/duration())
-		if world.progress >= 1: commit(Rules.advance(state),history)
-	if changed: world.queue_redraw()
 
 func snapshot(v: Dictionary) -> Dictionary: return {"trays":v.trays.duplicate()}
 func cleared_state() -> Dictionary:
@@ -74,12 +45,12 @@ func target_count() -> int: return state.trays[selected]
 
 func refresh() -> void:
 	if not is_instance_valid(world): return
-	world.state = state; world.selected = selected; world.presentation_paused = modal or paused or not gw_focused
+	world.state = state; world.selected = selected; world.presentation_paused = modal or paused or not focused
 	world.queue_redraw()
 	clear_children(ui)
 	for child in world.get_children(): world.remove_child(child); child.queue_free()
 	buttons = {}
-	sign_text("齿轮工坊 · 被蒸汽抹去的货单",Rect2(24,18,480,52),24)
+	sign_text(title_prefix() + title,Rect2(24,18,480,52),24)
 	if state.stage not in ["arrival","approach"]: sign_text("24 根 · 甲→乙→丙 · 最后各 8 根",Rect2(640,18,616,52),22)
 	sign_text(message if not message.is_empty() else line(),Rect2(250,92,880,88),20)
 	if state.stage == "puzzle":
@@ -124,11 +95,11 @@ func can_move(amount: int) -> bool:
 	return selected >= 0 and transient <= 0 and not Rules.move(state,selected,amount).is_empty()
 func move_goods(amount: int) -> void:
 	if modal or transient > 0 or selected < 0 or state.stage != "puzzle": return
-	var n = Rules.move(state,selected,amount)
-	if n.is_empty(): message = "原处没有这么多灯轴，或这一托不够取回。"; refresh(); return
-	place(n)
+	# 键盘 A/B/C/D 不受按钮禁用态约束：与按钮同一条 can_move 判据，不合法就安静地什么都不做。
+	if not can_move(amount): return
+	place(Rules.move(state,selected,amount))
 func empty_tray() -> void:
-	if selected >= 0 and state.stage == "puzzle": move_goods(-target_count())
+	if selected >= 0 and state.stage == "puzzle" and target_count() > 0: move_goods(-target_count())
 func back_to_plan() -> void:
 	if modal or transient > 0: return
 	commit(Rules.back_to_plan(state),history)

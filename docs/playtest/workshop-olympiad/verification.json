@@ -2,7 +2,7 @@
   "scope": "Design-model evidence only; no Godot or child difficulty acceptance",
   "inputs": {
     "tests/design/workshop_olympiad.py": "d3502669abfe2910f143dddc4c50b862b127a0a58a236cb472d100c4caaac3fb",
-    "docs/production/workshop_chapter_olympiad.md": "674f46616bf68583d1d68a22d54a22197fbb273fd43c5db0b6b83c938e42d825"
+    "docs/production/workshop_chapter_olympiad.md": "8bc9b900b58243673e714bed2ed9f7a878a34bbf7609bd729aa278bc05749d64"
   },
   "levels": {
     "GW02": {

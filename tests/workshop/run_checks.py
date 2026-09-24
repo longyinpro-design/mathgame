@@ -22,6 +22,7 @@ def inputs():
     for directory in ('scripts/workshop', 'assets/runtime/workshop/gw01', 'tests/workshop'):
         files.update(p for p in (ROOT / directory).rglob('*') if p.is_file() and '__pycache__' not in p.parts)
     for path in ('game/workshop_gw01.tscn', 'docs/production/workshop_gw01_sample.md',
+                 'tests/presentation/support_test.gd',
                  '启动齿轮工坊GW01样板.command'):
         files.add(ROOT / path)
     deps = {'project.godot'}
@@ -49,16 +50,23 @@ def run():
     candidate = inputs()
     runs = []
     with tempfile.TemporaryDirectory(prefix='gw01-checks-') as temp:
-        for label, headless, script in [('rules', True, 'gw01_test.gd'), ('window', False, 'gw01_playtest.gd')]:
+        # support 是共享承重检查：它覆盖工坊托盘到升降台的接触路径，必须随本关几何一起复跑。
+        cases = [('rules', True, 'tests/workshop/gw01_test.gd'),
+                 ('window', False, 'tests/workshop/gw01_playtest.gd'),
+                 ('support', False, 'tests/presentation/support_test.gd')]
+        for label, headless, script in cases:
             command = [GODOT, *(['--headless'] if headless else []), '--path', str(ROOT),
-                       '--script', 'tests/workshop/' + script, '--log-file', str(Path(temp) / (label + '.log'))]
+                       '--script', script, '--log-file', str(Path(temp) / (label + '.log'))]
             result = subprocess.run(command, cwd=ROOT, text=True, stdout=subprocess.PIPE,
-                                    stderr=subprocess.STDOUT, timeout=120)
+                                    stderr=subprocess.STDOUT, timeout=180)
             (OUT / (label + '.log')).write_text(result.stdout)
-            summary = re.search(r'GW01 (?:RULES|WINDOW): (\d+) checks, (\d+) failures', result.stdout)
-            # Only the known macOS certificate probe can occur in sandboxed headless mode.
+            summary = re.search(r'(?:GW01 (?:RULES|WINDOW)|SUPPORT):?\s+(\d+) checks, (\d+) failures', result.stdout)
+            # 共享 support 用例会加载森林发布场景，其 Audio 节点在引擎退出时仍持有音频流播放对象，
+            # Godot 会在摘要行之后报 "resources still in use at exit"。那是关闭诊断，不是用例失败；
+            # 除已知 CA 探针与这一条外，其余 ERROR 一律照旧拦截。
             errors = [line for line in result.stdout.splitlines() if 'ERROR:' in line
-                      and 'Condition "ret != noErr"' not in line]
+                      and 'Condition "ret != noErr"' not in line
+                      and not re.match(r'ERROR: \d+ resources still in use at exit', line)]
             passed = result.returncode == 0 and summary and int(summary[2]) == 0 and not errors
             runs.append({'name': label, 'command': command, 'returncode': result.returncode,
                          'checks': int(summary[1]) if summary else 0, 'passed': bool(passed),

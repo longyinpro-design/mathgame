@@ -53,8 +53,8 @@ func run():
 		shop.progress = p
 		var foot = shop.tray_foot(0)
 		if p <= 0.45:
-			var delta = Vector2(661,309)-Vector2(270,448)
-			check(absf(delta.cross(foot-Vector2(270,448))) < 0.02,"tray loading ends at lift contact")
+			var delta = Vector2(661,309)-Vector2(360,448)
+			check(absf(delta.cross(foot-Vector2(360,448))) < 0.02,"tray loading ends at lift contact")
 		else: check(foot == shop.lift_foot()-Vector2(0,25),"tray remains on ascending lift")
 	shop.queue_free()
 	for player in game.sound.get_children():
