@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "source_mode": "AtlasTexture regions; source pixels unchanged",
+  "sources": {
+    "harbor": {
+      "path": "assets/source/workshop/harbor-props-source-v1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "718c34726890f18448ff42ffb46b4d01bdfd184d07960aa3f53799abc7ca62cc"
+    },
+    "mechanisms": {
+      "path": "assets/source/workshop/mechanisms-source-v1.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "335ea33cb5ad97088c7764ffffb0231f044d6a23e6773dd869f61d93ffcf9b15"
+    },
+    "dada": {
+      "path": "assets/source/workshop/dada-poses-source-v1.png",
+      "size": [
+        2172,
+        724
+      ],
+      "sha256": "9a3d584bfad28a7f6e07a61a764121c354ef63e4f818456e21554e9248579e31"
+    }
+  },
+  "sprites": [
+    {
+      "id": "bell",
+      "source": "assets/source/workshop/harbor-props-source-v1.png",
+      "region": [
+        1168,
+        549,
+        281,
+        374
+      ],
+      "anchor_px": [
+        1308.5,
+        923
+      ],
+      "purpose": "开船铃：放行灯与报时铃",
+      "atlas": "assets/runtime/workshop/kit-v1/bell.tres"
+    },
+    {
+      "id": "box",
+      "source": "assets/source/workshop/harbor-props-source-v1.png",
+      "region": [
+        1097,
+        98,
+        366,
+        352
+      ],
+      "anchor_px": [
+        1280.0,
+        450
+      ],
+      "purpose": "维修盒：留样盒与封存箱",
+      "atlas": "assets/runtime/workshop/kit-v1/box.tres"
+    },
+    {
+      "id": "cart",
+      "source": "assets/source/workshop/harbor-props-source-v1.png",
+      "region": [
+        605,
+        715,
+        508,
+        217
+      ],
+      "anchor_px": [
+        859.0,
+        932
+      ],
+      "purpose": "空货车：小车",
+      "atlas": "assets/runtime/workshop/kit-v1/cart.tres"
+    },
+    {
+      "id": "dada_brace",
+      "source": "assets/source/workshop/dada-poses-source-v1.png",
+      "region": [
+        1174,
+        91,
+        392,
+        521
+      ],
+      "anchor_px": [
+        1370.0,
+        612
+      ],
+      "purpose": "嗒嗒忍住加速",
+      "atlas": "assets/runtime/workshop/kit-v1/dada_brace.tres"
+    },
+    {
+      "id": "dada_hold",
+      "source": "assets/source/workshop/dada-poses-source-v1.png",
+      "region": [
+        613,
+        83,
+        430,
+        529
+      ],
+      "anchor_px": [
+        828.0,
+        612
+      ],
+      "purpose": "嗒嗒夹拍/抱料",
+      "atlas": "assets/runtime/workshop/kit-v1/dada_hold.tres"
+    },
+    {
+      "id": "dada_idle",
+      "source": "assets/source/workshop/dada-poses-source-v1.png",
+      "region": [
+        68,
+        78,
+        416,
+        534
+      ],
+      "anchor_px": [
+        276.0,
+        612
+      ],
+      "purpose": "嗒嗒待机",
+      "atlas": "assets/runtime/workshop/kit-v1/dada_idle.tres"
+    },
+    {
+      "id": "dada_invite",
+      "source": "assets/source/workshop/dada-poses-source-v1.png",
+      "region": [
+        1643,
+        77,
+        476,
+        535
+      ],
+      "anchor_px": [
+        1881.0,
+        612
+      ],
+      "purpose": "嗒嗒邀请休息",
+      "atlas": "assets/runtime/workshop/kit-v1/dada_invite.tres"
+    },
+    {
+      "id": "dial",
+      "source": "assets/source/workshop/mechanisms-source-v1.png",
+      "region": [
+        42,
+        560,
+        511,
+        368
+      ],
+      "anchor_px": [
+        297.5,
+        928
+      ],
+      "purpose": "双空表盘：抛光机与冷却机",
+      "atlas": "assets/runtime/workshop/kit-v1/dial.tres"
+    },
+    {
+      "id": "ingot",
+      "source": "assets/source/workshop/mechanisms-source-v1.png",
+      "region": [
+        657,
+        335,
+        273,
+        142
+      ],
+      "anchor_px": [
+        793.5,
+        477
+      ],
+      "purpose": "铜锭：待加工料",
+      "atlas": "assets/runtime/workshop/kit-v1/ingot.tres"
+    },
+    {
+      "id": "lever",
+      "source": "assets/source/workshop/mechanisms-source-v1.png",
+      "region": [
+        625,
+        560,
+        356,
+        368
+      ],
+      "anchor_px": [
+        803.0,
+        928
+      ],
+      "purpose": "启动杆：开工与换模",
+      "atlas": "assets/runtime/workshop/kit-v1/lever.tres"
+    },
+    {
+      "id": "lift",
+      "source": "assets/source/workshop/harbor-props-source-v1.png",
+      "region": [
+        59,
+        567,
+        492,
+        360
+      ],
+      "anchor_px": [
+        305.0,
+        927
+      ],
+      "purpose": "升降平台：吊台",
+      "atlas": "assets/runtime/workshop/kit-v1/lift.tres"
+    },
+    {
+      "id": "plate",
+      "source": "assets/source/workshop/mechanisms-source-v1.png",
+      "region": [
+        1068,
+        343,
+        376,
+        134
+      ],
+      "anchor_px": [
+        1256.0,
+        477
+      ],
+      "purpose": "铜板：铜料片与模具底",
+      "atlas": "assets/runtime/workshop/kit-v1/plate.tres"
+    },
+    {
+      "id": "press",
+      "source": "assets/source/workshop/mechanisms-source-v1.png",
+      "region": [
+        92,
+        41,
+        453,
+        452
+      ],
+      "anchor_px": [
+        318.5,
+        493
+      ],
+      "purpose": "压机：压制/钻孔工位",
+      "atlas": "assets/runtime/workshop/kit-v1/press.tres"
+    },
+    {
+      "id": "rack",
+      "source": "assets/source/workshop/mechanisms-source-v1.png",
+      "region": [
+        1036,
+        634,
+        469,
+        294
+      ],
+      "anchor_px": [
+        1270.5,
+        928
+      ],
+      "purpose": "单批暂存架：暂存位与炉架",
+      "atlas": "assets/runtime/workshop/kit-v1/rack.tres"
+    },
+    {
+      "id": "spindle",
+      "source": "assets/source/workshop/harbor-props-source-v1.png",
+      "region": [
+        769,
+        122,
+        125,
+        311
+      ],
+      "anchor_px": [
+        831.5,
+        433
+      ],
+      "purpose": "单根灯轴：一切计数物的实体",
+      "atlas": "assets/runtime/workshop/kit-v1/spindle.tres"
+    },
+    {
+      "id": "tray",
+      "source": "assets/source/workshop/harbor-props-source-v1.png",
+      "region": [
+        64,
+        195,
+        584,
+        251
+      ],
+      "anchor_px": [
+        356.0,
+        446
+      ],
+      "purpose": "空槽盘壳：托盘、交付架",
+      "atlas": "assets/runtime/workshop/kit-v1/tray.tres"
+    }
+  ]
+}

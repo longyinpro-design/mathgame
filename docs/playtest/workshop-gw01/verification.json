@@ -1,5 +1,6 @@
 {
-  "candidate_sha256": "4cf0b13b32d465d2b2dfe263e352d3ee222f8c7b2642261492eb2a6c22bb7586",
+  "level": "GW01",
+  "candidate_sha256": "a27dd16903e1a2b91dbc2553c5d83b4b1648bee6697d099dc1bdbb62e07bb9fe",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -8,11 +9,11 @@
         "/Applications/Godot.app/Contents/MacOS/Godot",
         "--headless",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-28e153dc",
         "--script",
         "tests/workshop/gw01_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-x6k5c5ok/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-b5h89kp2/gw01_test.gd.log"
       ],
       "returncode": 0,
       "checks": 1797,
@@ -25,11 +26,11 @@
       "command": [
         "/Applications/Godot.app/Contents/MacOS/Godot",
         "--path",
-        "/Users/long/Code/像素数学",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-28e153dc",
         "--script",
         "tests/workshop/gw01_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-x6k5c5ok/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-b5h89kp2/gw01_playtest.gd.log"
       ],
       "returncode": 0,
       "checks": 453,

@@ -73,6 +73,8 @@ func _exit_tree() -> void:
 
 # ---- overridable hooks ----
 func configure() -> void: pass
+# 标题栏上的章节名：集市各关沿用默认值，齿轮工坊在自己的关卡里覆盖它。
+func chapter_label() -> String: return "千灯集市"
 func line() -> String: return ""
 func goal_line() -> String: return ""
 func status_line() -> String: return ""
@@ -199,7 +201,7 @@ func refresh() -> void:
 	update_camera()
 	# 关卡名最长 9 个汉字：24 号被 skin 抬到 28 号，394 宽只剩 366 内框，
 	# 「千灯集市 / 四张被雨打湿的货签」量到 372 就会折成第二行压过板底。410 留到 382。
-	sign_text("千灯集市 · "+title,Rect2(24,20,410,48),22)
+	sign_text(chapter_label()+" · "+title,Rect2(24,20,410,48),22)
 	var goal = goal_line()
 	if not goal.is_empty() and state.stage not in ["arrival","complete","delivery"]:
 		sign_text(goal,Rect2(442,20,790,48),22)
