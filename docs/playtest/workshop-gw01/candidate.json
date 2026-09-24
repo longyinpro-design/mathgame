@@ -1,10 +1,11 @@
 {
   "candidate": {
-    "docs/production/workshop_gw01_sample.md": "08ebe959796d94a47fdf80226a36f26ddfe53fd74c42afabb182c75c1a5f83c3",
+    "docs/production/workshop_gw01_sample.md": "b6dfbc7bdff432515c6748fe9c0247a5561b5f0039878d0083d83cc639eb36c7",
     "game/workshop_gw01.tscn": "d00c93022cf99716ebbce8d97b0f30ae152e69e8b17aa5db13dd97b36ef33808",
-    "scripts/workshop/gw01_rules.gd": "72b56a50f440ef4ae1387def28fc17832c41f7b56d1a1d8ecc2f0d6f5a9a612e",
-    "scripts/workshop/gw01_scene.gd": "c7e397704eb588e7a53c36f81ac333628b5b6b36501379fec40e8c5e99604bc2",
-    "scripts/workshop/gw01_world.gd": "f9a4e81eabae9d69403196eb4203a43593c354af2e9f83d6b03b002fbacd0567",
+    "scripts/workshop/gw01_rules.gd": "ac097041fc9e69e781c00fe04ffa33a61cc231e28e4e958787c32c470b2a8756",
+    "scripts/workshop/gw01_scene.gd": "090bfe51c27d8a86c592e9eaacc6f058693d96f28e88e870dcc1b85b66631b7a",
+    "scripts/workshop/gw01_world.gd": "01381920836814cdd9e18e22f820b973110c7d64f171e9fea6acb1e67608c608",
+    "tests/presentation/support_test.gd": "0796c9f09ca3bd285ca5f55ed2544df76540b95651cacd854bb23cdb479de3c9",
     "tests/workshop/gw01_playtest.gd": "3bfb52fcf7fb23ac072563b65198bbe17126050edf13cdbf2cfb884cf6a257b2",
     "tests/workshop/gw01_test.gd": "bce3adbc2fc73867a6f8726d8d61ef6ec527eb2f4118b824604c476d026ea349",
     "启动齿轮工坊GW01样板.command": "691b06e97b687ca1b70e0a0b486f26bf26ef1ca7254b43024421d0148a84825d"
@@ -103,7 +104,7 @@
     "scripts/market/chapter_progress.gd": "f44605037254fca05e3733a7369ec9118db8cabe85bbda42906ef2aeb38ecae8",
     "scripts/market/hub_world.gd": "d145dfb73177766d4f0ca2e87db82c289e3a6d2afad801734c47c57cd0ff80aa",
     "scripts/market/kit_world.gd": "80f6adebada0c73edfa6ad8220055e7a9e298c39e121fc23e62c786bb5e06cb7",
-    "scripts/market/level_host.gd": "1369fea33264cffcedc97a22a4b629a433510e0f226e4cc73e69e30f0029559b",
+    "scripts/market/level_host.gd": "2cef1d9ff918d59fe640d19bcc42537bb52f1d7a820ccba5dd5c074846def9b0",
     "scripts/market/market_bridge.gd": "e9aa9e57cf031ba416ad6f5e9d56b3e2b02344f223edecf03325e69bb3d9429e",
     "scripts/market/market_hub.gd": "db05f65b049a5d23f4dc485ce6339a2562c944ed147ac095b74ae9a55f49f52f",
     "scripts/market/mk01_rules.gd": "c96ad1aeb4e8701d5f9db5e205cd71430fbb0d23c76de286faec9d6df38d07f1",
@@ -199,6 +200,8 @@
     "scripts/ui/twenty_four_board.gd": "5518eedb7689dedaccadc5b173047be3fe87cfc6f6ce1b1648dd4caf85b06f2f",
     "scripts/ui/twenty_four_console.gd": "b267bca99e50a1721d1cd48e898d3d94ae275ecfeaeafe0c3dbb641207c8a960",
     "scripts/ui/workbench.gd": "d85952554c3a4a96f125b7fa9e9b7653c3d0fd420e1cc28a151a07856df0688e",
+    "scripts/workshop/workshop_host.gd": "e0facd440b4fd4015273cf47a5c6970fa949273725f3cf1774335ce28f08efdb",
+    "tests/forest/scenarios.gd": "1f2d1771d91538f14d9f166ef0106835dc246644768f94f7086a4b6494dcd6fd",
     "tests/forest/window_focus.gd": "0a9dceed841c35977f0e0b5286105d0258f7386584302932a987d70ab2fdcc30"
   }
 }

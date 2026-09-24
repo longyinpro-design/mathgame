@@ -1,6 +1,6 @@
 {
   "level": "GW04",
-  "candidate_sha256": "c52cbc57881ee4d35b79ca3ae1d7a62b3cede666e0f35c12579380026f642ba3",
+  "candidate_sha256": "d20bc21f5ac0997ee1db7f79bd49b5e7935524c1cf7caf92201947efc6f6afb1",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -9,11 +9,11 @@
         "/Applications/Godot.app/Contents/MacOS/Godot",
         "--headless",
         "--path",
-        "/Users/long/WorkBuddy/Worktrees/像素数学/main-28e153dc",
+        "/Users/long/Code/像素数学",
         "--script",
         "tests/workshop/gw04_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw04-checks-2mo37z7c/gw04_test.gd.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw04-checks-ctppmh6j/rules.log"
       ],
       "returncode": 0,
       "checks": 905,
@@ -26,11 +26,11 @@
       "command": [
         "/Applications/Godot.app/Contents/MacOS/Godot",
         "--path",
-        "/Users/long/WorkBuddy/Worktrees/像素数学/main-28e153dc",
+        "/Users/long/Code/像素数学",
         "--script",
         "tests/workshop/gw04_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw04-checks-2mo37z7c/gw04_playtest.gd.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw04-checks-ctppmh6j/window.log"
       ],
       "returncode": 0,
       "checks": 213,
@@ -42,12 +42,12 @@
   "screenshots": {
     "1280-01-arrival.png": "cdf8c878eb26aaf11554b332c17931b79fc2713f657e950a27bd470639dc9c75",
     "1280-02-puzzle.png": "7608726767870346efc4e1b80d4bb10c0de7253ea285f9c2d6b16d37fb68c695",
-    "1280-03-delivery.png": "57e5ac60e079ab7fad9561616d2a5c8826a170e00a80d8b1a924789e394a45fe",
+    "1280-03-delivery.png": "5a7eaae00eaaa3d82977e8673327416b2fb727a87b0f987d2ab1448b8b5efe1e",
     "1280-04-complete.png": "2c63c890a1041d391e51dcf6247015e4663128adc3bf5bab41320413a366fc7f",
     "1280-05-discovery.png": "df39243ee2e0bf5482c531d1cd96b211a4a3c48a520ff5dc06734a5bc121244a",
     "960-01-arrival.png": "44f4eb5888cc9f528971d517fc5c8412568e85cf8274d3c72768af10f53d07ab",
     "960-02-puzzle.png": "1fd4718cfbd03ad306dd2795928876321e7959fdc6dcfd871421c6da3c9fdae4",
-    "960-03-delivery.png": "866e51f2d343ed18adcfda2c3ed943150da84372054696f5c166a407059db091",
+    "960-03-delivery.png": "7ba85fcabba97ef70ee87be5b6ca3b0e67543e323fe82d94554042fa11d113d7",
     "960-04-complete.png": "3807feb3a0344965248bd5aab4036662a3e7c5977b344583c8f05b9f47379bc4",
     "960-05-discovery.png": "9d4be367a898148ff534c412324e316f42b15de4d2099054b58fd4dbfa4ef21d"
   },

@@ -1,6 +1,6 @@
 {
   "level": "GW03",
-  "candidate_sha256": "eebbdcf5dbffc319be6920f7937b2dce57fb05779ce065e7b4eb1f3525f47ad0",
+  "candidate_sha256": "50132b5d1e06e27b98800de5ee7131aeb01c7bbf73bd6b3a1d83c36087cffed4",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -9,11 +9,11 @@
         "/Applications/Godot.app/Contents/MacOS/Godot",
         "--headless",
         "--path",
-        "/Users/long/WorkBuddy/Worktrees/像素数学/main-28e153dc",
+        "/Users/long/Code/像素数学",
         "--script",
         "tests/workshop/gw03_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw03-checks-vk0r0138/gw03_test.gd.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw03-checks-dsasijbo/rules.log"
       ],
       "returncode": 0,
       "checks": 433,
@@ -26,11 +26,11 @@
       "command": [
         "/Applications/Godot.app/Contents/MacOS/Godot",
         "--path",
-        "/Users/long/WorkBuddy/Worktrees/像素数学/main-28e153dc",
+        "/Users/long/Code/像素数学",
         "--script",
         "tests/workshop/gw03_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw03-checks-vk0r0138/gw03_playtest.gd.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw03-checks-dsasijbo/window.log"
       ],
       "returncode": 0,
       "checks": 199,
@@ -43,13 +43,13 @@
     "1280-01-arrival.png": "c7c39e930bf3c6234f6358895b2f08d771fed41e59e970fe49a8d166768604fa",
     "1280-02-puzzle.png": "d8739488643e8383b2cab8a97ec0d7772c2f74e7b3fe1cd4b71ad3adb471d2cc",
     "1280-03-watched.png": "90ca920e554a7a5476f8a93069b353b3b8db82606bba06d24db56ee910c324c1",
-    "1280-04-delivery.png": "16682efdd6f4c5adfdeaf5586666f64c829b324231fc14099df1a3527a831ef5",
+    "1280-04-delivery.png": "6c3ffc30eed82a932c5a078c1d0e2c9f17aa8f19e4294601fb2455dea3db7938",
     "1280-05-complete.png": "26636c800c250df4c3832469a7d2303b27bfe84a605195417eb390fa006da04f",
     "1280-06-discovery.png": "50542925e658ca94ddb310799d60903828d83145a99e783bc014b9e3047fb72f",
     "960-01-arrival.png": "e0d2c7ec89e45a05dab997cbc6271f55ddb665995e683e0c146bc0ce53dd915a",
     "960-02-puzzle.png": "a6cb1a3c5904bb93ab100ae11d44b63321229196e96ce5b6c95de2611e1b8d72",
     "960-03-watched.png": "f07d3fb855af568b8fc14275e480302b38e902d768bf68bee88912c60ba3eb49",
-    "960-04-delivery.png": "80af58945209295f849a23e4d902fd8b816b2bcd1e6ccad966181ff40d672038",
+    "960-04-delivery.png": "1ea5817c80e14ded2415661f6b538fc7c8860d0ff449843201e4b6bb1206411a",
     "960-05-complete.png": "b66cfbca5b02a8e2bba886f94d23b3315fd7a2b0dd1e71d5ed21a95207a20991",
     "960-06-discovery.png": "52ea1f80005d71a32e4eb4f3cf44f9a224c21c55711c1e4d003e2e279ffa4dd1"
   },

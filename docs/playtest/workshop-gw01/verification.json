@@ -1,6 +1,6 @@
 {
   "level": "GW01",
-  "candidate_sha256": "a27dd16903e1a2b91dbc2553c5d83b4b1648bee6697d099dc1bdbb62e07bb9fe",
+  "candidate_sha256": "65ec86d0d2838aec57870348ec26f1cbaa919f138867505477077f4a37dc537d",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -9,11 +9,11 @@
         "/Applications/Godot.app/Contents/MacOS/Godot",
         "--headless",
         "--path",
-        "/Users/long/WorkBuddy/Worktrees/像素数学/main-28e153dc",
+        "/Users/long/Code/像素数学",
         "--script",
         "tests/workshop/gw01_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-b5h89kp2/gw01_test.gd.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-qoq563gu/rules.log"
       ],
       "returncode": 0,
       "checks": 1797,
@@ -26,22 +26,39 @@
       "command": [
         "/Applications/Godot.app/Contents/MacOS/Godot",
         "--path",
-        "/Users/long/WorkBuddy/Worktrees/像素数学/main-28e153dc",
+        "/Users/long/Code/像素数学",
         "--script",
         "tests/workshop/gw01_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-b5h89kp2/gw01_playtest.gd.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-qoq563gu/window.log"
       ],
       "returncode": 0,
       "checks": 453,
       "passed": true,
       "output_sha256": "ee04c30a5c27b607ab0144990ce29ff3009081833dd506514273d85c304f9056",
       "errors": []
+    },
+    {
+      "name": "support",
+      "command": [
+        "/Applications/Godot.app/Contents/MacOS/Godot",
+        "--path",
+        "/Users/long/Code/像素数学",
+        "--script",
+        "tests/presentation/support_test.gd",
+        "--log-file",
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-qoq563gu/support.log"
+      ],
+      "returncode": 0,
+      "checks": 276,
+      "passed": true,
+      "output_sha256": "a8b766682a3983cabca6a6156890b0ff34dd7d2c69f673179d2b3aa82f356d70",
+      "errors": []
     }
   ],
   "screenshots": {
     "1280-01-arrival.png": "a5f031a12d69b7a46b798814ce88d49837583072fee76ae240c8fdcac456278c",
-    "1280-02-puzzle.png": "a57833b807a2e10ab6dda4bd7d4ba7b52a2f50d2648e836d9d4eb11f400211b3",
+    "1280-02-puzzle.png": "b4244401e2e079a688741d34d1c3dc7d05f41d99038c90c063e733a3190647ce",
     "1280-03-ready-to-inspect.png": "b86b27778f7d406d7876d6d470eacbdf3003cf52e6ac807c69fd3aa196a79c84",
     "1280-04-mistimed-lift.png": "6a66edfd95a25aa6f22a98e440e322fc67d81b68a4bc366f72a67628d7ba3d24",
     "1280-05-complete.png": "69a48690b87026a1a774a0d25674cb8b722a898ed2b3def4774d9918d891d2ed",
@@ -50,7 +67,7 @@
     "1280-trial-2.png": "cee2ee0fd0e94eecef8e20dac81c13a82dc9cd70594e03269ef05921be1c56f6",
     "1280-trial-3.png": "4207f932cb9fb3c8379ccc267e8a0f1555bc2f71a113ce5af2e6319813cfa3ee",
     "960-01-arrival.png": "5415c89f5a5406342befb2a707315fbdfa3864233874b8d1edc172e7e2eff6df",
-    "960-02-puzzle.png": "3fe1de97b0a9a1b1863e24c04d3747ad12776c16537a78f31613c2d0b2ec92b0",
+    "960-02-puzzle.png": "d8b5dd082e91f673aa3959101792bf97b128fce0f5e6c79965311f10fb031c98",
     "960-03-ready-to-inspect.png": "0db8ef100f7aba4ad2e0fe0dac6fcf128fc72a5079af0774dfc06cd703645043",
     "960-04-mistimed-lift.png": "177b8edc062a40d06012f44168dba7156373d311fdb4607ebc3822d21761c844",
     "960-05-complete.png": "cdd25e160b55e9fd998fe88871114baadb7470c61ceb227d07baa3915b5dc8a8",
