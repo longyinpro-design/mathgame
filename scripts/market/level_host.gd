@@ -61,7 +61,7 @@ func _ready() -> void:
 	world = world_script.new(); world.scene_id = scene_id; add_child(world)
 	ui = Control.new(); ui.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(ui)
 	overlay = Control.new(); overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(overlay)
-	get_window().title = title_prefix() + title
+	get_window().title = chapter_label() + " · " + title
 	# 热点是隐形按钮，它的中文说明只靠 tooltip。tooltip 的 Label 挂在 viewport 自己的画布上，
 	# 主题继承只到 Window 这一级——挂在宿主 Control 上传不到它，于是全章唯一不用关卡字体的
 	# 文字就是它（默认细灰字、压在石板上）。这里换成木纹牌主题，并在离场时还原，不漏给森林岛。
@@ -75,9 +75,9 @@ func _exit_tree() -> void:
 
 # ---- overridable hooks ----
 func configure() -> void: pass
-# 标题前缀与千灯桥来源是集市宿主里仅有的两处章专属行为；其他章（齿轮工坊）覆写这两个钩子，
+# 章节名与千灯桥来源是集市宿主里仅有的两处章专属行为；其他章（齿轮工坊）覆写这两个钩子，
 # 就能继续共用存档事务与演出生命周期，而不必复制 _ready()/refresh()。
-func title_prefix() -> String: return "千灯集市 · "
+func chapter_label() -> String: return "千灯集市"
 func consumes_origin() -> bool: return true
 func line() -> String: return ""
 func goal_line() -> String: return ""
@@ -205,7 +205,7 @@ func refresh() -> void:
 	update_camera()
 	# 关卡名最长 9 个汉字：24 号被 skin 抬到 28 号，394 宽只剩 366 内框，
 	# 「千灯集市 / 四张被雨打湿的货签」量到 372 就会折成第二行压过板底。410 留到 382。
-	sign_text(title_prefix() + title,Rect2(24,20,410,48),22)
+	sign_text(chapter_label()+" · "+title,Rect2(24,20,410,48),22)
 	var goal = goal_line()
 	if not goal.is_empty() and state.stage not in ["arrival","complete","delivery"]:
 		sign_text(goal,Rect2(442,20,790,48),22)

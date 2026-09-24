@@ -50,7 +50,7 @@ func refresh() -> void:
 	clear_children(ui)
 	for child in world.get_children(): world.remove_child(child); child.queue_free()
 	buttons = {}
-	sign_text(title_prefix() + title,Rect2(24,18,480,52),24)
+	sign_text(chapter_label() + " · " + title,Rect2(24,18,480,52),24)
 	if state.stage not in ["arrival","approach"]: sign_text("24 根 · 甲→乙→丙 · 最后各 8 根",Rect2(640,18,616,52),22)
 	sign_text(message if not message.is_empty() else line(),Rect2(250,92,880,88),20)
 	if state.stage == "puzzle":

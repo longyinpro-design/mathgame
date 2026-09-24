@@ -1,0 +1,61 @@
+{
+  "level": "GW02",
+  "candidate_sha256": "05863b4366fd8768caebc04e023178b3081b371d13df2daa92bfd62e7574db6e",
+  "godot": "4.7.2.stable.official.ed1daf0bf",
+  "runs": [
+    {
+      "name": "rules",
+      "command": [
+        "/Applications/Godot.app/Contents/MacOS/Godot",
+        "--headless",
+        "--path",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-28e153dc",
+        "--script",
+        "tests/workshop/gw02_test.gd",
+        "--log-file",
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw02-checks-tasc3s9g/gw02_test.gd.log"
+      ],
+      "returncode": 0,
+      "checks": 13215,
+      "passed": true,
+      "output_sha256": "6260fc089796d6b8f3aecf1337964c41b031b35a2f2f533bccb119a98a78e13e",
+      "errors": []
+    },
+    {
+      "name": "window",
+      "command": [
+        "/Applications/Godot.app/Contents/MacOS/Godot",
+        "--path",
+        "/Users/long/WorkBuddy/Worktrees/像素数学/main-28e153dc",
+        "--script",
+        "tests/workshop/gw02_playtest.gd",
+        "--log-file",
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw02-checks-tasc3s9g/gw02_playtest.gd.log"
+      ],
+      "returncode": 0,
+      "checks": 203,
+      "passed": true,
+      "output_sha256": "dca5b21c03b426e071d9f32187e69ea29fad08256f5acb2580051e1cdf9af4ab",
+      "errors": []
+    }
+  ],
+  "screenshots": {
+    "1280-01-arrival.png": "e7907faa51405690929c9f869ed0006b911ea9bd201731a766845e00d70e457a",
+    "1280-02-puzzle.png": "39e53daec83b3ed285465788d398032c69627dca3d60ba9113a73bbc63a22376",
+    "1280-03-pressing.png": "648c88b7781f86329f9e01befda11bd426b7a67fb64977c2dd356dac1a94e999",
+    "1280-04-delivery.png": "e5c1d50e60dbaff8c78fe9ac3623c110ba5964b1d81444ad67b376860daffdf8",
+    "1280-05-complete.png": "dfc67586dd65b484e729139cc81b76eeb9128a0ad8f84c2c6fe4ecbf989eb8ef",
+    "1280-06-discovery.png": "4f9770c35ad8cdf8cc1c11488ad6427cf4d889b4fe6626ba5ff8ce913a09e8ac",
+    "960-01-arrival.png": "bad4e38654acaabddb984e2b9edefc2899c225d1488092f1e3d679d1509fc505",
+    "960-02-puzzle.png": "e8168d9efaefb2a78857cff27a7fdb269298e00e7c2983aa8348f86d0f4c5eac",
+    "960-03-pressing.png": "74f0b824f8ca064a5adad0ed2b3bf76d9a5b27ac5e7675fbcc1b740174919620",
+    "960-04-delivery.png": "21d969b164ae10072502d4bdd899df7d559a2bdebb7a77641a908a1634cd7dd9",
+    "960-05-complete.png": "409eb27fa79c52e77b1475d8d48887e6ef23eeded9ff56f75be0438f95dc04a8",
+    "960-06-discovery.png": "970f496b973a9fd4e5641b6fa1d4258dd858ca15d540eb0a6941f358d00f530e"
+  },
+  "limitations": [
+    "macOS desktop mouse and keyboard at 1280x720 and 960x540 only",
+    "Independent GW02 profile, no cross-island journey/unlock/reward integration",
+    "No touch-device, child comprehension or learning outcome acceptance"
+  ]
+}

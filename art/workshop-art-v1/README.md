@@ -26,4 +26,8 @@
 
 后续源图已见 [第二批母版](../workshop-art-v2/README.md)；上句记录的是首批交付时的边界。
 
+## 引擎实现进度（2026-09-24）
+
+本批母版已用于 GW01～GW07 的可玩实现：错拍码头用于 GW01/03/04，装配间用于 GW02/05/06/07，嗒嗒四姿态与码头/机关道具经 `assets/runtime/workshop/kit-v1/manifest.json` 切成 AtlasTexture（源像素不变）供各关引用。关卡内的数量、孔位、时间格、刻度、暂存位与货物归属仍由引擎绘制，母版只提供造型。GW08～GW18 与齿轮工坊航图尚未实现；各关契约与验证见 `docs/production/workshop_gwNN_sample.md` 与 `docs/playtest/workshop-gwNN/`。
+
 预览：打开 `index.html`，可切换浅色、深色与棋盘背景检查透明素材。页面使用原文件，不修改图片像素。

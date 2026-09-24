@@ -63,6 +63,24 @@
 
 2026-09-21 十八关玩法复核后修掉三处：MK03 第三级提示的换箱算术改为算得通的「3 个蓝箱加 2 斤」；MK02 走死那一格（把线全换成 6 根灯芯）多给一枚只在走死时出现的「回本关开头」；MK17 的死局判定从「这一站交得出去」改成「剩下每一站都还办得成」，随之把两处回退措辞如实化。断言与证据见这三关的契约与 `verification.json`（mk02 71+110、mk03 174+118、mk17 314+212）。
 
+## 齿轮工坊 · 第三岛 GW01–GW07
+
+第三岛（齿轮工坊）已实现前七关，每关一个独立入口与独立存档（`user://profiles/workshop-gwNN-1/save-v1.json`）。双击 `启动齿轮工坊GWNN样板.command` 或从 `game/workshop_gwNN.tscn` 进关。
+
+| 关卡 | 这一幕要办成的事 | 契约 / 验证 |
+| --- | --- | --- |
+| GW01 被蒸汽抹去的货单 | 从三轮各 8 根倒推出甲、乙、丙的起始货单 | [契约](docs/production/workshop_gw01_sample.md) · [验证](docs/playtest/workshop-gw01/verification.json) |
+| GW02 留样之后，还缺多少 | 补回两种留样，给 8 片铜料选模具，安装数恰好 27 | [契约](docs/production/workshop_gw02_sample.md) · [验证](docs/playtest/workshop-gw02/verification.json) |
+| GW03 相遇了，还不能交接 | 找吊台、小车与放行灯第一次同时成立的时刻 | [契约](docs/production/workshop_gw03_sample.md) · [验证](docs/playtest/workshop-gw03/verification.json) |
+| GW04 两班船，都要赶上 | 调整吊台起点，让两班船都在第 16 拍前接到货 | [契约](docs/production/workshop_gw04_sample.md) · [验证](docs/playtest/workshop-gw04/verification.json) |
+| GW05 七拍能做完吗 | 排两条工序带，七拍内做完三件工具 | [契约](docs/production/workshop_gw05_sample.md) · [验证](docs/playtest/workshop-gw05/verification.json) |
+| GW06 产量一样，工时不同 | 选炉次少、换模也少的产量组合，八拍内做出 31 枚扣环 | [契约](docs/production/workshop_gw06_sample.md) · [验证](docs/playtest/workshop-gw06/verification.json) |
+| GW07 检修前，先留好位置 | 检修前留好暂存位，第 11 拍完成全部四件 | [契约](docs/production/workshop_gw07_sample.md) · [验证](docs/playtest/workshop-gw07/verification.json) |
+
+七关共用 `level_host.gd` 的宿主：事务存档、撤销、四档主动提示、暂停/跳过失焦、坏档保护与中途恢复一致；数量、时间格、刻度、指针与货物归属全部由引擎绘制，母版只提供场景与造型。GW02～GW07 的思考方法依次是还原总量、周期重合、调整起点、最早时刻下限、数量分类与有限空间留位。
+
+复验：`python3 tests/workshop/run_checks.py`（逐关无头规则 + 真实 macOS 窗口，1280×720 与 960×540），也可只跑指定几关，例如 `python3 tests/workshop/run_checks.py GW05 GW06`。GW08–GW18 与齿轮工坊航图尚未实现。
+
 ## 开始游戏
 
 优先双击 [启动剧情样板.command](启动剧情样板.command) 从送种子开始体验新流程；它使用独立样板存档，后续也能继续完整章节。原有进度仍通过 [启动森林岛.command](启动森林岛.command) 进入。首次运行会先让Godot导入项目资源，再打开当前故事停点。
