@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-25",
+  "tool": "built-in image_gen",
+  "style_references": [
+    "assets/source/workshop/assembly-room-stage-v1.png",
+    "assets/source/style-master-v1.png"
+  ],
+  "prompt_record": "art/prompts/workshop/06-remaining-batch.md",
+  "runtime_ready": false,
+  "assets": [
+    {
+      "id": "old-chime-corridor-stage-v1",
+      "name": "旧报时廊",
+      "path": "assets/source/workshop/old-chime-corridor-stage-v1.png",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "sha256": "dcbcc07ca7c67b52ebd081b54d0f5e02af88eeb0ae7445cd4b0eb4d3172cfb75",
+      "alpha": null,
+      "levels": [
+        "GW08",
+        "GW09",
+        "GW13",
+        "GW15"
+      ],
+      "kind": "background",
+      "integration_note": "5 empty wall sockets; center floor clear",
+      "status": "source_master_not_runtime_validated"
+    },
+    {
+      "id": "rooftop-repair-street-stage-v1",
+      "name": "屋顶修理街",
+      "path": "assets/source/workshop/rooftop-repair-street-stage-v1.png",
+      "width": 1671,
+      "height": 941,
+      "mode": "RGB",
+      "sha256": "857b5195e477b34f00a56de6129a1870a9a98b4b3573214f3b16d9ea3023458e",
+      "alpha": null,
+      "levels": [
+        "GW10",
+        "GW12",
+        "GW14",
+        "GW16"
+      ],
+      "kind": "background",
+      "integration_note": "repair and lunch furniture fixed at edges; central floor clear",
+      "status": "source_master_not_runtime_validated"
+    },
+    {
+      "id": "central-engine-dock-stage-v1",
+      "name": "总机船坞",
+      "path": "assets/source/workshop/central-engine-dock-stage-v1.png",
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB",
+      "sha256": "ca2bb14ade448c9755f3849fae28f26c507d9b2c360866c458e73418192bacd9",
+      "alpha": null,
+      "levels": [
+        "GW17",
+        "GW18"
+      ],
+      "kind": "background",
+      "integration_note": "rail and crane hook baked in; moving hook must replace or hide baked hook",
+      "status": "source_master_not_runtime_validated"
+    },
+    {
+      "id": "residents-source-v1",
+      "name": "弥师傅与阿舷",
+      "path": "assets/source/workshop/residents-source-v1.png",
+      "width": 1774,
+      "height": 887,
+      "mode": "RGBA",
+      "sha256": "596828598958aba4cd0d3a993e041a4cb2edd9214214374c5c734a6e96ae00ce",
+      "alpha": {
+        "min": 0,
+        "max": 255,
+        "zero_pixels": 1122259,
+        "partial_pixels": 450595,
+        "opaque_pixels": 684
+      },
+      "levels": [
+        "GW02",
+        "GW11",
+        "GW12",
+        "GW18"
+      ],
+      "kind": "character_sheet",
+      "integration_note": "two discrete poses; not an animation",
+      "status": "source_master_not_runtime_validated"
+    },
+    {
+      "id": "rail-guardian-source-v1",
+      "name": "巡轨兽双姿态",
+      "path": "assets/source/workshop/rail-guardian-source-v1.png",
+      "width": 1774,
+      "height": 887,
+      "mode": "RGBA",
+      "sha256": "bd4bd53b1db7c3611c266174e0a78150153082568bdfa0b105ea5fc21a1568dc",
+      "alpha": {
+        "min": 0,
+        "max": 255,
+        "zero_pixels": 967181,
+        "partial_pixels": 605804,
+        "opaque_pixels": 553
+      },
+      "levels": [
+        "GW17",
+        "GW18"
+      ],
+      "kind": "character_sheet",
+      "integration_note": "two discrete states; not an animation",
+      "status": "source_master_not_runtime_validated"
+    },
+    {
+      "id": "master-engine-parts-source-v1",
+      "name": "百臂总机与机器拆件",
+      "path": "assets/source/workshop/master-engine-parts-source-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGBA",
+      "sha256": "2b1b38f94d0c04d59f83a9f44af2fab4e46efd6b456c9c49199fe3c104d7c1fe",
+      "alpha": {
+        "min": 0,
+        "max": 254,
+        "zero_pixels": 903322,
+        "partial_pixels": 669542,
+        "opaque_pixels": 0
+      },
+      "levels": [
+        "GW18"
+      ],
+      "kind": "prop_sheet",
+      "integration_note": "six components require individually calibrated pivots",
+      "status": "source_master_not_runtime_validated"
+    },
+    {
+      "id": "support-props-source-v1",
+      "name": "工坊通用道具",
+      "path": "assets/source/workshop/support-props-source-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGBA",
+      "sha256": "85d677a642ead7727da2c464b45f4fb23022ee9d6bd0f33ffa653656ebce8aa1",
+      "alpha": {
+        "min": 0,
+        "max": 254,
+        "zero_pixels": 959778,
+        "partial_pixels": 613086,
+        "opaque_pixels": 0
+      },
+      "levels": [
+        "GW08",
+        "GW09",
+        "GW10",
+        "GW11",
+        "GW12",
+        "GW17",
+        "GW18"
+      ],
+      "kind": "prop_sheet",
+      "integration_note": "top-left is a spare press-like machine rather than an old chime frame; use separate chime-frame asset",
+      "status": "source_master_not_runtime_validated"
+    },
+    {
+      "id": "state-effects-source-v1",
+      "name": "独立状态特效",
+      "path": "assets/source/workshop/state-effects-source-v1.png",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGBA",
+      "sha256": "23f1d39a4edbc28071da10b085e8c236e573d929dfe2cc989e7881ee3e5cd00d",
+      "alpha": {
+        "min": 0,
+        "max": 255,
+        "zero_pixels": 1378176,
+        "partial_pixels": 193462,
+        "opaque_pixels": 890
+      },
+      "levels": [
+        "GW01",
+        "GW18"
+      ],
+      "kind": "effect_sheet",
+      "integration_note": "four discrete elements; no frame continuity verified",
+      "status": "source_master_not_runtime_validated"
+    },
+    {
+      "id": "dock-moving-parts-source-v1",
+      "name": "报时铃架、货船与吊钩",
+      "path": "assets/source/workshop/dock-moving-parts-source-v1.png",
+      "width": 2172,
+      "height": 724,
+      "mode": "RGBA",
+      "sha256": "f30b0396d46643cdc73fa1882899d5836781ae21c351c5daf43117af20192ba2",
+      "alpha": {
+        "min": 0,
+        "max": 255,
+        "zero_pixels": 969209,
+        "partial_pixels": 602280,
+        "opaque_pixels": 1039
+      },
+      "levels": [
+        "GW08",
+        "GW09",
+        "GW17",
+        "GW18"
+      ],
+      "kind": "prop_sheet",
+      "integration_note": "chime bell has a baked clapper; ship/hook need stage scale calibration",
+      "status": "source_master_not_runtime_validated"
+    }
+  ]
+}
