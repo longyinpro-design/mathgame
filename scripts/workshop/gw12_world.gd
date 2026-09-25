@@ -9,6 +9,7 @@ const TRAY = preload("res://assets/runtime/workshop/kit-v1/tray.tres")
 const SPINDLE = preload("res://assets/runtime/workshop/kit-v1/spindle.tres")
 const BOX = preload("res://assets/runtime/workshop/kit-v1/box.tres")
 const DADA = preload("res://assets/runtime/workshop/kit-v1/dada_hold.tres")
+const Batch2 = preload("res://scripts/workshop/batch2.gd")
 const PANEL = [Rect2(24,248,608,326),Rect2(648,248,608,326)]
 const BOOK = Rect2(830,196,426,44)
 const TALLY = Rect2(24,584,900,44)
@@ -172,3 +173,7 @@ func _draw() -> void:
 	var dada = Vector2(1205,622)
 	contact(dada,24); prop(DADA,dada,84)
 	words("嗒嗒",dada-Vector2(20,0),18)
+	# 装配班长弥师傅站在两张台面中间，两班的交接都经他的手。
+	var shifu = Vector2(620,636)
+	contact(shifu,30); Batch2.draw_part(self,"mi_shifu",shifu,80)
+	words("弥师傅",shifu-Vector2(34,0),18)

@@ -10,6 +10,7 @@ const LIFT = preload("res://assets/runtime/workshop/gw01/lift.tres")
 const CART = preload("res://assets/runtime/workshop/gw01/cart.tres")
 const BELL = preload("res://assets/runtime/workshop/gw01/bell.tres")
 const DADA = preload("res://assets/runtime/workshop/gw01/dada_idle.tres")
+const Batch2 = preload("res://scripts/workshop/batch2.gd")
 var scene_id = "dock"
 var state = Rules.fresh()
 var selected = -1
@@ -97,6 +98,9 @@ func _draw() -> void:
 	draw_line(Vector2(617,83),lift+Vector2(-69,-20),Color("c49c5e"),3)
 	draw_line(Vector2(705,83),lift+Vector2(69,-20),Color("c49c5e"),3)
 	prop(LIFT,lift,172)
+	# 蒸汽是这一关的题眼：升降台一动，平台顶上就冒一股。
+	if lift.y < 334.0:
+		Batch2.draw_centered(self,"steam",Vector2(lift.x,lift.y-86),134)
 	contact(cart_foot(),72); prop(CART,cart_foot(),159)
 	# The existing overhead winch carries the loading tray; the lift takes over at contact.
 	if state.stage == "delivery" and progress < 0.45:

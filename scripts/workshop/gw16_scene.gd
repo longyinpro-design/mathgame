@@ -111,6 +111,8 @@ func listen_tune() -> void:
 		refresh(); return
 	var next = Rules.listen(state)
 	if next.is_empty(): return
+	# 试听真的响：每段按拍数一拍拍敲出来，2/3/4 拍各一个音。
+	chime_tune(state.segments)
 	gw_pending_feedback = audition_text(state.segments)
 	if next == state:
 		message = gw_pending_feedback; gw_pending_feedback = ""; refresh(); return
@@ -129,7 +131,9 @@ func save_tune() -> void:
 	if next.is_empty():
 		message = Rules.save_reason(state); refresh(); return
 	gw_pending_feedback = "收下这首 %s：收集板已有 %d / 4 首。"%[Rules.order_text(state.segments),next.saved.size()]
+	var before = state.saved.size()
 	place(next)
+	if state.saved.size() > before: chime_strike(1046.5)
 
 func pick_tune(index: int) -> void:
 	if modal or transient > 0 or state.stage != "puzzle": return
@@ -160,6 +164,8 @@ func advance() -> void:
 		var missing = Rules.shortfalls(state)
 		if not missing.is_empty():
 			message = "；".join(missing); refresh(); return
+		# 交付这一段就是午休铃本身：整首 12 拍一段接一段响完。
+		chime_tune(state.segments)
 	commit(Rules.advance(state),history)
 
 func hint() -> void:

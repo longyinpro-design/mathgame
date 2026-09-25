@@ -9,6 +9,7 @@ const TRAY = preload("res://assets/runtime/workshop/kit-v1/tray.tres")
 const SPINDLE = preload("res://assets/runtime/workshop/kit-v1/spindle.tres")
 const BOX = preload("res://assets/runtime/workshop/kit-v1/box.tres")
 const DADA = preload("res://assets/runtime/workshop/kit-v1/dada_hold.tres")
+const Batch2 = preload("res://scripts/workshop/batch2.gd")
 const PANEL_TOP = 190.0
 const PANEL_W = 400.0
 const PANEL_H = 330.0
@@ -162,6 +163,8 @@ func _draw() -> void:
 	for record in range(3): draw_panel(record,off)
 	draw_table(off)
 	draw_marks(off)
+	# 三张记录台下的维修页架，翻页用的那件。
+	Batch2.draw_part(self,"page_rack",Vector2(700,640),90)
 	contact(Vector2(1085,638),26)
 	prop(BOX,Vector2(1085,638),112)
 	contact(Vector2(1215,640),24)

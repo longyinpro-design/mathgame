@@ -81,7 +81,10 @@ func toggle_mark(tick: int) -> void:
 	if modal or transient > 0 or state.stage != "puzzle": return
 	cursor = tick
 	message = ""
+	var before = state.marks.size()
 	place(Rules.mark(state,tick))
+	# 圈到两只鸟同拍的那一刻，两只鸟就对上一声。
+	if state.marks.size() > before and Rules.callers(tick).size() >= 2: chime_duet()
 
 func set_count(row: int, value: int) -> void:
 	if modal or transient > 0 or state.stage != "puzzle": return
@@ -120,7 +123,10 @@ func hint() -> void:
 
 # 提示那句话要等保存成功才说：中途失败重试后，话还是同一句。
 func apply_committed(candidate: Dictionary, next_history: Array) -> void:
+	var was = state.stage
 	super.apply_committed(candidate,next_history)
+	# 提交那一格是两只鸟的合鸣。
+	if was == "puzzle" and state.stage == "delivery": chime_duet()
 	if not gw_pending_feedback.is_empty():
 		message = gw_pending_feedback; gw_pending_feedback = ""; refresh()
 

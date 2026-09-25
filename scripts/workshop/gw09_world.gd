@@ -5,9 +5,9 @@ extends Node2D
 const Rules = preload("res://scripts/workshop/gw09_rules.gd")
 const ArtStyle = preload("res://scripts/cargo/skin.gd")
 const BACKDROP = preload("res://assets/source/workshop/old-chime-corridor-stage-v1.png")
-const BELL = preload("res://assets/runtime/workshop/kit-v1/bell.tres")
 const DIAL = preload("res://assets/runtime/workshop/kit-v1/dial.tres")
 const DADA = preload("res://assets/runtime/workshop/kit-v1/dada_hold.tres")
+const Batch2 = preload("res://scripts/workshop/batch2.gd")
 const PANEL = Rect2(620,196,636,448)
 const CENTER = Vector2(330,404)
 const RADIUS = 176.0
@@ -198,6 +198,8 @@ func draw_panel() -> void:
 func _draw() -> void:
 	if font == null: return
 	draw_texture_rect(BACKDROP,Rect2(0,0,1280,720),false)
+	# 灯晕垫在整圈灯后面，让旧报时廊的灯盘亮起来。
+	Batch2.draw_centered(self,"halo",CENTER,RADIUS*2.0+80,Color(1,1,1,0.5))
 	draw_track()
 	draw_run_path()
 	draw_claim()
@@ -205,7 +207,11 @@ func _draw() -> void:
 	draw_land_pulse()
 	draw_panel()
 	var bell = Vector2(108,642)
-	contact(bell,20); prop(BELL,bell,68)
+	contact(bell,22); Batch2.draw_part(self,"bell_rack",bell,104)
+	# 敲击件立在铃架左边，是这一关报时的那一件。
+	Batch2.draw_part(self,"striker",Vector2(32,640),30)
+	# 记录里说的 9 号灯还空着，灯座就摆在铃架右边。
+	Batch2.draw_part(self,"signal_lamp",Vector2(206,640),58)
 	var dial = Vector2(100,286)
 	contact(dial,16); prop(DIAL,dial,88)
 	var dada = Vector2(560,644)

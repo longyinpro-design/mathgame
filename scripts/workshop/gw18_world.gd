@@ -7,15 +7,14 @@ extends Node2D
 const Rules = preload("res://scripts/workshop/gw18_rules.gd")
 const ArtStyle = preload("res://scripts/cargo/skin.gd")
 const BACKDROP = preload("res://assets/source/workshop/central-engine-dock-stage-v1.png")
-const PRESS = preload("res://assets/runtime/workshop/kit-v1/press.tres")
-const RACK = preload("res://assets/runtime/workshop/kit-v1/rack.tres")
 const LIFT = preload("res://assets/runtime/workshop/kit-v1/lift.tres")
 const BOX = preload("res://assets/runtime/workshop/kit-v1/box.tres")
 const INGOT = preload("res://assets/runtime/workshop/kit-v1/ingot.tres")
 const BELL = preload("res://assets/runtime/workshop/kit-v1/bell.tres")
-const LEVER = preload("res://assets/runtime/workshop/kit-v1/lever.tres")
 const DADA = preload("res://assets/runtime/workshop/kit-v1/dada_brace.tres")
 const DADA_REST = preload("res://assets/runtime/workshop/kit-v1/dada_invite.tres")
+# 第二批母版：总机零件、码头可动件、状态特效、居民都在这一张运行期图集里取范围。
+const Batch2 = preload("res://scripts/workshop/batch2.gd")
 const TICK_LEFT = 196.0
 const TICK_W = 96.0
 const TICKS = 11
@@ -351,28 +350,42 @@ func draw_handover() -> void:
 	draw_style_box(ArtStyle.sign_style(),VERDICT)
 	words_tint("三处接收记录齐全：F 第 4 拍、V 第 %d 拍、M 第 10 拍——拉下右边的确认交接杆。"%(
 		state.branch+Rules.LOAD_TIME),VERDICT.position+Vector2(10,23),17,GREEN)
-	contact(Vector2(1180,502),26); prop(LEVER,Vector2(1180,502),100)
+	# 总机的确认交接杆换成母版零件，杆座迸出交接火花；旁边是接收箱。
+	contact(Vector2(1180,502),26); Batch2.draw_part(self,"engine_lever",Vector2(1180,502),104)
+	Batch2.draw_centered(self,"spark",Vector2(1180,516),112)
 	plaque("确认交接杆",Rect2(1108,404,144,30),15)
+	contact(Vector2(1050,642),28); Batch2.draw_part(self,"receive_box",Vector2(1050,642),112)
+	plaque("接收箱",Rect2(986,530,130,30),15)
 
 # 出海：船离开总机船坞，接收记录留档，嗒嗒挂上休息牌。
 func draw_departed() -> void:
 	var sail = 0.0
 	if land_place == "sail": sail = land_progress
 	var ship_x = 1220+sail*120
+	# 总机船换成母版里的空货船，烟囱口飘一股蒸汽。
 	contact(Vector2(ship_x,SHIP_Y+SHIP_H-2),30)
-	prop(LIFT,Vector2(ship_x,SHIP_Y+SHIP_H-2),124)
+	Batch2.draw_part(self,"cargo_ship",Vector2(ship_x,SHIP_Y+SHIP_H-2),214)
+	Batch2.draw_centered(self,"steam",Vector2(ship_x,SHIP_Y-118),130)
 	plaque("总机船已出海",Rect2(1030,296,226,38),18)
 	plaque("接收记录：F 第 4 拍 · V 第 %d 拍 · M 第 10 拍"%(state.branch+Rules.LOAD_TIME),
 		Rect2(24,300,620,38),18)
 	plaque("库存 7 件全部交清 · 第 %d 拍开船"%Rules.HORIZON,Rect2(24,346,620,38),18)
 	plaque("发现卡：把不同情况都想一遍",Rect2(24,392,620,38),18)
+	# 总机收回多余的臂，只留一只平托臂挂着休息牌——章末的定格画面。
+	contact(Vector2(760,480),40); Batch2.draw_part(self,"engine_core",Vector2(760,480),180)
+	Batch2.draw_part(self,"claw_arm",Vector2(880,300),110)
+	Batch2.draw_part(self,"flat_arm",Vector2(930,424),150)
+	Batch2.draw_centered(self,"placard",Vector2(988,372),54)
 	contact(Vector2(900,642),26); prop(DADA_REST,Vector2(900,642),96)
 	plaque("嗒嗒挂上休息牌",Rect2(760,556,220,34),16)
 	contact(Vector2(680,642),24); prop(BELL,Vector2(680,642),72)
 	plaque("开船铃",Rect2(600,556,120,34),16)
 	# 第四岛的交接物：阿舷递来的山谷退件包，只说明来件，不把本关刚完成的出货立刻否定掉。
-	contact(Vector2(330,642),26); prop(BOX,Vector2(330,642),104)
-	plaque("山谷退件包 · 旧桥件拓印 · 新桥墩草图",Rect2(170,556,300,34),16)
+	contact(Vector2(280,642),26); prop(BOX,Vector2(280,642),104)
+	plaque("山谷退件包 · 旧桥件拓印 · 新桥墩草图",Rect2(160,556,290,34),16)
+	var xian = Vector2(530,642)
+	contact(xian,30); Batch2.draw_part(self,"axian",xian,92)
+	words("阿舷",xian-Vector2(20,0),18)
 
 func draw_arrival() -> void:
 	plaque("库存 7 件 · 不拆批",Rect2(24,296,300,44),19)
@@ -382,8 +395,10 @@ func draw_arrival() -> void:
 	plaque("冷却每批 2 拍 · 暂存位各 1 批",Rect2(24,508,300,42),18)
 	contact(Vector2(420,642),34); prop(BOX,Vector2(420,642),120)
 	contact(Vector2(560,642),30); prop(INGOT,Vector2(560,642),96,Color("cfe0f2"))
-	contact(Vector2(700,642),30); prop(RACK,Vector2(700,642),116)
-	contact(Vector2(860,642),30); prop(PRESS,Vector2(860,642),120)
+	# 冷却机与暂存架直接用总机零件母版里的两件（运行期取范围，不生成 .tres）。
+	contact(Vector2(300,642),28); Batch2.draw_part(self,"cooler",Vector2(300,642),104)
+	contact(Vector2(700,642),30); Batch2.draw_part(self,"engine_rack",Vector2(700,642),116)
+	contact(Vector2(860,642),30); Batch2.draw_part(self,"spare_press",Vector2(860,642),120)
 	contact(Vector2(1000,642),28); prop(DADA,Vector2(1000,642),96)
 	words("嗒嗒",Vector2(920,624),18)
 

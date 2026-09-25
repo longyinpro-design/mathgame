@@ -106,7 +106,11 @@ func jump_once() -> void:
 		message = "先设一个步长：每次固定走 2～8 格。"; refresh(); return
 	if Rules.returned(state):
 		message = "这一圈已经跑完了：点「重跑这一圈」或换一个步长。"; refresh(); return
-	message = ""; place(Rules.jump(state))
+	message = ""
+	var before = state.jumps
+	place(Rules.jump(state))
+	# 落地那一下敲一声：停过的灯越多音越高，一圈走完正好上去八度。
+	if state.jumps > before: chime_strike(587.33*pow(2.0,float(state.visited.size())/12.0))
 
 # 重跑：停站清空，步长与预测都留着；跑过第 3 站之后想改预测就走这里。
 func rerun_circle() -> void:
@@ -118,7 +122,11 @@ func rerun_circle() -> void:
 	message = ""; place(Rules.choose_step(state,state.step))
 
 func apply_committed(candidate: Dictionary, next_history: Array) -> void:
+	var was = state.stage
 	super.apply_committed(candidate,next_history)
+	# 报时：提交那一格 12 盏灯一盏盏响上去，收尾再落一声长铃。
+	if was == "puzzle" and state.stage == "delivery": chime_scale(Rules.LAMPS)
+	elif was == "delivery" and state.stage == "aftermath": chime_bell()
 	if not gw_pending_feedback.is_empty():
 		message = gw_pending_feedback; gw_pending_feedback = ""; refresh()
 

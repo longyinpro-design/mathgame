@@ -11,6 +11,7 @@ const RACK = preload("res://assets/runtime/workshop/kit-v1/rack.tres")
 const LIFT = preload("res://assets/runtime/workshop/kit-v1/lift.tres")
 const BOX = preload("res://assets/runtime/workshop/kit-v1/box.tres")
 const DADA = preload("res://assets/runtime/workshop/kit-v1/dada_brace.tres")
+const Batch2 = preload("res://scripts/workshop/batch2.gd")
 const TICK_LEFT = 196.0
 const TICK_W = 58.0
 const TICKET_Y = 272.0
@@ -189,6 +190,10 @@ func draw_arrival() -> void:
 	plaque("两批材料都第 %d 拍到"%Rules.ARRIVAL_BEAT,Rect2(760,596,300,44),18)
 	contact(Vector2(1160,642),26); prop(DADA,Vector2(1160,642),92)
 	words("嗒嗒",Vector2(1040,626),18)
+	# 装配班长弥师傅在码头看着两批材料到货。
+	var shifu = Vector2(190,640)
+	contact(shifu,30); Batch2.draw_part(self,"mi_shifu",shifu,84)
+	words("弥师傅",shifu-Vector2(34,0),18)
 
 func _draw() -> void:
 	if font == null: return

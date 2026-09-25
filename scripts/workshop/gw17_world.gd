@@ -13,9 +13,8 @@ const GUARDIAN = preload("res://assets/source/workshop/rail-guardian-source-v1.p
 const GUARDIAN_BLOCK = Rect2(57,220,805,530)
 const GUARDIAN_RELEASE = Rect2(863,214,873,542)
 const CART = preload("res://assets/runtime/workshop/kit-v1/cart.tres")
-const BELL = preload("res://assets/runtime/workshop/kit-v1/bell.tres")
-const BOX = preload("res://assets/runtime/workshop/kit-v1/box.tres")
 const DADA = preload("res://assets/runtime/workshop/kit-v1/dada_idle.tres")
+const Batch2 = preload("res://scripts/workshop/batch2.gd")
 const TICK_LEFT = 206.0
 const TICK_W = 104.0
 const TICKS = Rules.HORIZON
@@ -266,9 +265,11 @@ func draw_arrival() -> void:
 func _draw() -> void:
 	if font == null: return
 	draw_texture_rect(BACKDROP,Rect2(0,0,1280,720),false)
-	# 坞口的小道具：报时铃与备用货箱，和背景里的吊机同一层。
-	contact(Vector2(1232,296),22); prop(BELL,Vector2(1232,296),58)
-	contact(Vector2(1230,398),26); prop(BOX,Vector2(1230,398),88)
+	# 坞口的小道具：报时铃架、重车与吊钩滑轮，和背景里的吊机同一层。
+	# 吊钩按背景吊机的吊点摆，正好把背景里画死的静态吊钩遮住，不叠出两个。
+	Batch2.draw_part(self,"bell_rack",Vector2(1232,296),92)
+	Batch2.draw_part(self,"heavy_cart",Vector2(1230,398),132)
+	Batch2.draw_part(self,"hook",Vector2(1262,230),64)
 	if state.stage == "arrival":
 		draw_arrival()
 	else:

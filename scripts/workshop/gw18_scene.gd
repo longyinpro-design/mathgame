@@ -157,7 +157,10 @@ func commit_plan(next: Dictionary) -> void:
 	commit(next,next_history)
 
 func apply_committed(candidate: Dictionary, next_history: Array) -> void:
+	var was = state.stage
 	super.apply_committed(candidate,next_history)
+	# 出海这一格：全岛午休铃响，章末收工。
+	if was == "handover" and state.stage == "aftermath": chime_lunch()
 	if not gw_pending_feedback.is_empty():
 		message = gw_pending_feedback; gw_pending_feedback = ""; refresh()
 
