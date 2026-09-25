@@ -13,7 +13,7 @@
         "--script",
         "tests/workshop/gw01_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-qoq563gu/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-9u8g3tg_/rules.log"
       ],
       "returncode": 0,
       "checks": 1797,
@@ -30,7 +30,7 @@
         "--script",
         "tests/workshop/gw01_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-qoq563gu/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-9u8g3tg_/window.log"
       ],
       "returncode": 0,
       "checks": 453,
@@ -47,7 +47,7 @@
         "--script",
         "tests/presentation/support_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-qoq563gu/support.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-9u8g3tg_/support.log"
       ],
       "returncode": 0,
       "checks": 276,

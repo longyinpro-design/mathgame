@@ -1,6 +1,6 @@
 {
   "level": "GW12",
-  "candidate_sha256": "cd8abf85dab330c1fb34bd04a624cdc68a5d3bf15794c1c021f4afd75b5648bb",
+  "candidate_sha256": "cd47ccdf410e235a96a78d2c802aefd3ab59db15c3f3b9add0829ba08683d823",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -13,7 +13,7 @@
         "--script",
         "tests/workshop/gw12_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw12-checks-c5r5jkuv/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw12-checks-czvontu8/rules.log"
       ],
       "returncode": 0,
       "checks": 454,
@@ -30,7 +30,7 @@
         "--script",
         "tests/workshop/gw12_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw12-checks-c5r5jkuv/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw12-checks-czvontu8/window.log"
       ],
       "returncode": 0,
       "checks": 269,
@@ -45,7 +45,7 @@
     "1280-03-executed.png": "f8ea364aaecd6ebaff115dfee9081f6b06ac41643cefdcfda2097335e92cb0cd",
     "1280-03-first-shift.png": "c8de7a5cee729942574e4d7623fa8ef1b16ad393b391d6350c2aa19010a84255",
     "1280-03-wrong-run.png": "1c370f13a42b8e3002941752a3955d24891c05e43a53852d1a218d840dc945a5",
-    "1280-04-delivery.png": "fbd1aa7b9876b1df15af8c8d82f26073308eac83266bc140b04900102ab9c8d4",
+    "1280-04-delivery.png": "a6bfc3cf546e8d064a5e41fa176470151e1d95d8513a38ab9258a5101d074394",
     "1280-05-complete.png": "7bb20ce91a2cc6bda077909f15fc0b1475738e145b0dd0f99b6bc10f11d86bb1",
     "1280-06-discovery.png": "8bebaca74d48b8c59076b71ec422b3b2077e7a6ab1ba20462f4967b6df46d181",
     "960-01-arrival.png": "ab80cd5665b920a30e8a78b81518c4494a57db7965286db0066bb7a42f4d7df7",
@@ -53,7 +53,7 @@
     "960-03-executed.png": "a36704331068857d350e7fd29fb0cd8932327e4fc9503bae9058b6467a987ecc",
     "960-03-first-shift.png": "38bf7294ac93bfb8c3301432bd5f9b20e64f665ad80ad3f179d4541ca5346a0f",
     "960-03-wrong-run.png": "b0d4e7443c2627ca1bc33558b5fce1b87256e6b3bdcbda7ce607df4c13a454fd",
-    "960-04-delivery.png": "7dfd8ab785e8469ba14089598c10c4f251aa3845695a6922153b96db6e0c0bc0",
+    "960-04-delivery.png": "602f72280c4dc4982fbb423f3ef83a8b4b107f57b87d9f38e1059eb81cf58e7a",
     "960-05-complete.png": "f460df8b17ae7b573ec17f978ab87290d9f02ccf17d83038351e7b9e6c91b6da",
     "960-06-discovery.png": "65ea93afc84dbb2879838aad240d50bc4a8f2f1b72aad3265e56d580ae48fe6a"
   },

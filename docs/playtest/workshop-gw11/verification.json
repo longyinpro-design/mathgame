@@ -1,6 +1,6 @@
 {
   "level": "GW11",
-  "candidate_sha256": "1e60a8f10ece19943fb4a92ca3e5b5abf8a67b04ce8a7832369bafaaf2dca9a4",
+  "candidate_sha256": "3da2c15cab57aa72da4038e735fe65420f12ea63e069e79e195f34bd844ef412",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -13,7 +13,7 @@
         "--script",
         "tests/workshop/gw11_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw11-checks-dcivmm86/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw11-checks-4mjv0v9s/rules.log"
       ],
       "returncode": 0,
       "checks": 540,
@@ -30,7 +30,7 @@
         "--script",
         "tests/workshop/gw11_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw11-checks-dcivmm86/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw11-checks-4mjv0v9s/window.log"
       ],
       "returncode": 0,
       "checks": 337,
@@ -44,14 +44,14 @@
     "1280-02-puzzle.png": "b6249648b5a08bb04af64cb1b8f081bc3fc3b295fc628d67382e1e254ccaf882",
     "1280-03-conflict.png": "f527a035fbc8e2fe55bce7d59191f092638ce3ef8396e1b822241d5d09021873",
     "1280-03b-plan.png": "a4694612933dfdb1e77b88650cf8d0de8de9f961be28a7f21a5b5d5700b39c23",
-    "1280-04-delivery.png": "b4edc4e30618745b3f29fc77255dc9f2b3f41368d3810f3e706e30d7731b2336",
+    "1280-04-delivery.png": "a24f585f19e3aa01056b40655500c331c0616b35eb999b35284877cbd750d9f9",
     "1280-05-complete.png": "ee57da2f74da1a82896d93acb7da46fa1a6e7a4fef3c5fa8334943f812db28e3",
     "1280-06-discovery.png": "d390f19b0bdab2d3b602dc8f12739b03dcec961b3b6c6407b5a6e77d5b83c928",
     "960-01-arrival.png": "dd497e3c342ed69bff45288644a7e2c559ef3114005ac6b47803755e48f11b14",
     "960-02-puzzle.png": "1a78af8e7dae494ab80d7b319ffa1b0c94f4c7916ede80181faf484133f9e1cc",
     "960-03-conflict.png": "a57bb30fff450b027f482fa4e0adcb1c2852e7f26431a5fe09c09e997846fd0b",
     "960-03b-plan.png": "1ceae354f53fee004f840e9feaa4ddc5ce1a7577d3f141634a06a759d7aca481",
-    "960-04-delivery.png": "bd2c17337fa601a68e6f451f7e597f894bf3351a8b7bc785257ca4c58c89c51f",
+    "960-04-delivery.png": "6f932011450c94495f8de44d05fc45f7253f2e6618c1a7749a805f9d50544578",
     "960-05-complete.png": "0614678ab00ff99f85c3c314fb6ab542de8e569a03d484e8fc6dca58cc309cce",
     "960-06-discovery.png": "9ac41ffbd3e8041abc5454ea9a3123c45a6425876ecb390b47e3d02cbbe68254"
   },

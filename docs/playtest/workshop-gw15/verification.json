@@ -13,7 +13,7 @@
         "--script",
         "tests/workshop/gw15_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw15-checks-2l1d8nrh/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw15-checks-imivr44x/rules.log"
       ],
       "returncode": 0,
       "checks": 714,
@@ -30,7 +30,7 @@
         "--script",
         "tests/workshop/gw15_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw15-checks-2l1d8nrh/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw15-checks-imivr44x/window.log"
       ],
       "returncode": 0,
       "checks": 523,
