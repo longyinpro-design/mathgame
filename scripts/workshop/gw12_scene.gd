@@ -7,13 +7,13 @@ const ARRIVAL = ["嗒嗒：第一班 23 枚标准件，第二班还有 24 枚，
 	"嗒嗒：交接册上写得明白：两班一共交 9 个满托，最后还剩 2 枚。把槽数找出来，两班才好分开记。"]
 const AFTER = ["嗒嗒：两班合起来 47 枚，扣掉最后剩的 2 枚，9 个满托一共装了 45 枚——每托 5 枚。",
 	"小岚：第一班 23 枚按 5 枚一托，交 4 托留 3；第二班接入 3 枚共 27 枚，交 5 托、最后留 2 枚。",
-	"嗒嗒：最后剩的 2 枚是第二班收工留下的，不是第一班的余料。写进交接册，安心坐下吃饭。"]
+	"嗒嗒：最后剩的 2 枚是第二班收工留下的，不是第一班的余料。写进交接册，安心吃饭；总机船坞还等着开工。"]
 var gw_pending_feedback = ""
 # ←/→ 走余料时的落点：只影响下一次按键从哪一枚开始数，不进存档。
 var keep_pick = 0
 
 func configure() -> void:
-	scene_id = "assembly"; level_id = "GW12"; title = "两班合并，槽数才找得到"
+	scene_id = "rooftop"; level_id = "GW12"; title = "两班合并，槽数才找得到"
 	if save_path.is_empty(): save_path = Catalog.save_path("GW12")
 	rules = Rules; world_script = World
 	durations = {"approach":2.2,"delivery":3.6}

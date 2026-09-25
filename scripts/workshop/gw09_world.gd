@@ -4,7 +4,7 @@ extends Node2D
 # 覆盖率与第 3 站由规则模块算，回 0 的那一跳用红金两色分开，漏灯一眼看得出。
 const Rules = preload("res://scripts/workshop/gw09_rules.gd")
 const ArtStyle = preload("res://scripts/cargo/skin.gd")
-const BACKDROP = preload("res://assets/source/workshop/assembly-room-stage-v1.png")
+const BACKDROP = preload("res://assets/source/workshop/old-chime-corridor-stage-v1.png")
 const BELL = preload("res://assets/runtime/workshop/kit-v1/bell.tres")
 const DIAL = preload("res://assets/runtime/workshop/kit-v1/dial.tres")
 const DADA = preload("res://assets/runtime/workshop/kit-v1/dada_hold.tres")
@@ -25,7 +25,7 @@ const VERDICT = Rect2(632,494,612,66)
 const GREEN = Color("8fd694")
 const RED = Color("f08a7a")
 const GOLD = Color("f2cf7a")
-var scene_id = "assembly"
+var scene_id = "corridor"
 var state = Rules.fresh()
 var progress = 0.0
 var presentation_paused = false

@@ -5,7 +5,7 @@ extends Node2D
 # 演出时扫过一条验收线，四单按做完的先后依次盖上「已验收」。
 const Rules = preload("res://scripts/workshop/gw10_rules.gd")
 const ArtStyle = preload("res://scripts/cargo/skin.gd")
-const BACKDROP = preload("res://assets/source/workshop/assembly-room-stage-v1.png")
+const BACKDROP = preload("res://assets/source/workshop/rooftop-repair-street-stage-v1.png")
 const PRESS = preload("res://assets/runtime/workshop/kit-v1/press.tres")
 const LEVER = preload("res://assets/runtime/workshop/kit-v1/lever.tres")
 const DADA = preload("res://assets/runtime/workshop/kit-v1/dada_brace.tres")
@@ -22,7 +22,7 @@ const EDGES = [Color("6b4525"),Color("33536b"),Color("41602e"),Color("6a4a70")]
 const GREEN = Color("8fd694")
 const RED = Color("e2604f")
 const AMBER = Color("e8c06a")
-var scene_id = "assembly"
+var scene_id = "rooftop"
 var state = Rules.fresh()
 var focus_item = 0
 var progress = 0.0

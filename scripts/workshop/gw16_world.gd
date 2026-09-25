@@ -4,7 +4,7 @@ extends Node2D
 # 收下新的一首时，收集板上那一枚从上方落下；交货时铃架按当前一段一段亮起来。
 const Rules = preload("res://scripts/workshop/gw16_rules.gd")
 const ArtStyle = preload("res://scripts/cargo/skin.gd")
-const BACKDROP = preload("res://assets/source/workshop/assembly-room-stage-v1.png")
+const BACKDROP = preload("res://assets/source/workshop/rooftop-repair-street-stage-v1.png")
 const BELL = preload("res://assets/runtime/workshop/kit-v1/bell.tres")
 const PLATE = preload("res://assets/runtime/workshop/kit-v1/plate.tres")
 const LEVER = preload("res://assets/runtime/workshop/kit-v1/lever.tres")
@@ -30,7 +30,7 @@ const BOARD_CHIP_STEP = 158.0
 const GREEN = Color("8fd694")
 const RED = Color("f08a7a")
 const GOLD = Color("f2cf7a")
-var scene_id = "assembly"
+var scene_id = "rooftop"
 var state = Rules.fresh()
 var progress = 0.0
 var presentation_paused = false

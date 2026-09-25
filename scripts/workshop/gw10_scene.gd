@@ -5,17 +5,19 @@ extends "res://scripts/workshop/workshop_host.gd"
 const Rules = preload("res://scripts/workshop/gw10_rules.gd")
 const World = preload("res://scripts/workshop/gw10_world.gd")
 const Catalog = preload("res://scripts/workshop/chapter_catalog.gd")
-const ARRIVAL = ["小岚：四张单都等着上维修台。台子一次只做一单，开了就不能停。",
+const ARRIVAL = ["小岚：四张单都等着上维修台，一次只做一单，开了不能停。山谷的实物先收着，忙完一起看。",
 	"嗒嗒：A、B、D 第 0 拍就在手边，C 要第 1 拍才送来；四单最晚第 8 拍都得做完。",
 	"小岚：每单还有自己的期限——A 最晚 5 拍、B 最晚 8 拍、C 最晚 3 拍、D 最晚 6 拍，用时也各不相同。"]
 const AFTER = ["嗒嗒：A 0–2、C 2–3、D 3–5、B 5–8，四单都不逾期，台子一刻没空。",
 	"小岚：D 先上、再接 C、A，最后 B，也一样成立。C 第 1 拍才到，所以第一件只能在 A 和 D 里挑。",
-	"嗒嗒：总工作量正好 8 拍，空一拍就赶不上第 8 拍。发现卡：紧急程度和到达时间要一起看。"]
+	"嗒嗒：总工作量正好 8 拍，空一拍就赶不上。发现卡：紧急程度和到达时间要一起看。码头还有两批货等着排。"]
+# 右下角是「回看与发现」；小岚站到它左边、嗒嗒的左侧。
+func companion_foot() -> Vector2: return Vector2(1000,620)
 var gw_pending_feedback = ""
 var focus_item = 0
 
 func configure() -> void:
-	scene_id = "assembly"; level_id = "GW10"; title = "最急的那单，不能先开"
+	scene_id = "rooftop"; level_id = "GW10"; title = "最急的那单，不能先开"
 	if save_path.is_empty(): save_path = Catalog.save_path("GW10")
 	rules = Rules; world_script = World
 	durations = {"approach":2.2,"delivery":3.6}

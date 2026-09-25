@@ -89,6 +89,8 @@ func exit_buttons() -> void: pass
 func snapshot(_value: Dictionary) -> Dictionary: return {}
 func cleared_state() -> Dictionary: return {}
 func hint_texts() -> Array: return []
+# 提醒按钮的署名：各章自己决定现场提醒来自谁。
+func hint_label() -> String: return "请扣扣提醒"
 func handle_key(_key: int) -> bool: return false
 func stage_labels() -> Dictionary: return {}
 func reset_prompt() -> Array: return ["把摆好的货全部放回台面？", "继续摆放", "全部放回台面"]
@@ -225,7 +227,7 @@ func refresh() -> void:
 		build()
 		add_button("undo","撤销 Z",Rect2(24,654,124,46),undo).disabled = history.is_empty() or transient > 0
 		add_button("reset","重摆 X",Rect2(162,654,110,46),confirm_reset).disabled = transient > 0
-		add_button("hint","请扣扣提醒",Rect2(286,654,168,46),hint).disabled = transient > 0
+		add_button("hint",hint_label(),Rect2(286,654,168,46),hint).disabled = transient > 0
 		add_button("deliver",submit_label(),Rect2(1020,646,235,54),advance,true).disabled = transient > 0
 		var status = status_line()
 		if not status.is_empty(): UIStyle.text(ui,status,Rect2(470,656,300,42),20)

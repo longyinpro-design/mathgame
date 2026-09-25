@@ -8,10 +8,12 @@ const ARRIVAL = ["嗒嗒：旧槽板换过一批，容量牌掉了，维修单�
 const AFTER = ["嗒嗒：8 槽！35 根装 4 个满托剩 3，47 根装 5 个满托剩 7，两张都吻合。",
 	"小岚：只看记录一，8 和 16 都说得通；只看记录二，8 和 10 都说得通。合起来才只剩 8。",
 	"嗒嗒：容量牌补上了。旧报时廊的灯还等着换，那边少一盏都报不准点。"]
+# 左下角留给「提出槽数 →」的读数；小岚站到右边记录板下、嗒嗒左侧。
+func companion_foot() -> Vector2: return Vector2(1100,620)
 var gw_pending_feedback = ""
 
 func configure() -> void:
-	scene_id = "assembly"; level_id = "GW08"; title = "两张旧单，锁定一块槽板"
+	scene_id = "corridor"; level_id = "GW08"; title = "两张旧单，锁定一块槽板"
 	if save_path.is_empty(): save_path = Catalog.save_path("GW08")
 	rules = Rules; world_script = World
 	durations = {"approach":2.2,"delivery":3.6}

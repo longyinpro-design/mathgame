@@ -4,7 +4,7 @@ extends Node2D
 # 余数与记录不符就当场标红。除法、候选与排除表都由规则模块算，画面只负责摆出来。
 const Rules = preload("res://scripts/workshop/gw08_rules.gd")
 const ArtStyle = preload("res://scripts/cargo/skin.gd")
-const BACKDROP = preload("res://assets/source/workshop/assembly-room-stage-v1.png")
+const BACKDROP = preload("res://assets/source/workshop/old-chime-corridor-stage-v1.png")
 const TRAY = preload("res://assets/runtime/workshop/kit-v1/tray.tres")
 const SPINDLE = preload("res://assets/runtime/workshop/kit-v1/spindle.tres")
 const DADA = preload("res://assets/runtime/workshop/kit-v1/dada_hold.tres")
@@ -16,7 +16,7 @@ const CAP_W = 72.0
 const CAP_STEP = 76.0
 const GREEN = Color("8fd694")
 const RED = Color("f08a7a")
-var scene_id = "assembly"
+var scene_id = "corridor"
 var state = Rules.fresh()
 var progress = 0.0
 var presentation_paused = false

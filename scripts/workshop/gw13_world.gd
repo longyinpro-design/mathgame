@@ -4,7 +4,7 @@ extends Node2D
 # 叫点、重合、独鸣与判定全部读规则模块现算的结果，画面不另存叫点表。
 const Rules = preload("res://scripts/workshop/gw13_rules.gd")
 const ArtStyle = preload("res://scripts/cargo/skin.gd")
-const BACKDROP = preload("res://assets/source/workshop/assembly-room-stage-v1.png")
+const BACKDROP = preload("res://assets/source/workshop/old-chime-corridor-stage-v1.png")
 const TRAY = preload("res://assets/runtime/workshop/kit-v1/tray.tres")
 const DADA = preload("res://assets/runtime/workshop/kit-v1/dada_invite.tres")
 const HEADER = Rect2(140,196,1100,40)
@@ -28,7 +28,7 @@ const GREEN = Color("8fd694")
 const RED = Color("f08a7a")
 const GOLD = Color("f2cf7a")
 const BIRD_TINTS = [Color("e8b45c"),Color("8fc7c0")]
-var scene_id = "assembly"
+var scene_id = "corridor"
 var state = Rules.fresh()
 # 时间尺上指着的拍：只影响下一次按键从哪一列起，不进存档。
 var cursor = 0

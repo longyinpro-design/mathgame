@@ -14,7 +14,7 @@ const AFTER = ["嗒嗒：第 9 拍，3 拍机器是 3 件、4 拍是 2 件、5 �
 var gw_pending_feedback = ""
 
 func configure() -> void:
-	scene_id = "assembly"; level_id = "GW15"; title = "最早的一次观察"
+	scene_id = "corridor"; level_id = "GW15"; title = "最早的一次观察"
 	if save_path.is_empty(): save_path = Catalog.save_path("GW15")
 	rules = Rules; world_script = World
 	durations = {"approach":2.2,"delivery":3.6}

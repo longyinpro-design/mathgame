@@ -7,11 +7,13 @@ const ARRIVAL = ["嗒嗒：午休铃要换一首新曲。老工匠留话说：�
 	"嗒嗒：工匠说这样的曲子一共有 4 首。排一段试听一段，把 4 首都收进收集板，午休就有曲子了。"]
 const AFTER = ["嗒嗒：四首都收齐了！两个 3 隔开，首段 2 的一首、首段 4 的一首、首段 3 的两首。",
 	"小岚：要是把末段和首段当成不相邻，2/3/4/2 这样的也会被算进来，就会多算。",
-	"嗒嗒：同一首重存一遍不算新的一首。留 %s 作章末午休曲，分类着找才不重也不漏。"]
+	"嗒嗒：同一首重存一遍不算新的一首。留 %s 作章末午休曲，分类着找才不重也不漏。总机船坞那边还等着放行。"]
+# 左下角是差段提示与试听提示；小岚站在提示行上方、收集板的下面。
+func companion_foot() -> Vector2: return Vector2(990,620)
 var gw_pending_feedback = ""
 
 func configure() -> void:
-	scene_id = "assembly"; level_id = "GW16"; title = "找全四种午休曲"
+	scene_id = "rooftop"; level_id = "GW16"; title = "找全四种午休曲"
 	if save_path.is_empty(): save_path = Catalog.save_path("GW16")
 	rules = Rules; world_script = World
 	durations = {"approach":2.2,"delivery":3.6}

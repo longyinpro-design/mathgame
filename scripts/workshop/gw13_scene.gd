@@ -8,13 +8,15 @@ const ARRIVAL = ["小岚：休息桌上那两只旧玩具鸟，第 0 拍一起�
 const AFTER = ["嗒嗒：甲叫 7 次、乙叫 5 次；0、12、24 三拍两只一起叫，只能算一个时刻。",
 	"小岚：所以听到叫声的时刻一共 9 个；其中只有一只鸟叫的有 6 个：4、6、8、16、18、20。",
 	"嗒嗒：把重合的部分分清，同一拍就不会数两遍。小鸟留在休息桌，午休曲那边还等着排。"]
+# 左下角是整行操作提示；小岚站在提示行上方、休息桌的左边。
+func companion_foot() -> Vector2: return Vector2(990,620)
 var gw_pending_feedback = ""
 # 时间尺上指着的拍与正在改的数量行：只影响下一次按键，不进存档。
 var cursor = 0
 var count_row = 0
 
 func configure() -> void:
-	scene_id = "assembly"; level_id = "GW13"; title = "两只鸟，到底叫了几次"
+	scene_id = "corridor"; level_id = "GW13"; title = "两只鸟，到底叫了几次"
 	if save_path.is_empty(): save_path = Catalog.save_path("GW13")
 	rules = Rules; world_script = World
 	durations = {"approach":2.2,"delivery":3.6}

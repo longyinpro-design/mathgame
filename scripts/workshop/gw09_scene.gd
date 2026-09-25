@@ -10,11 +10,13 @@ const ARRIVAL = ["嗒嗒：旧报时廊的 12 盏灯都排在这一圈上，0 �
 	"嗒嗒：旧记录写着「第 3 次跳动后停在 9 号灯」。第一次回到 0 之前，要停遍 1～11 每一盏，还不许错站。"]
 const AFTER = ["小岚：步长 7：0→7→2→9→4→11→6→1→8→3→10→5→0，12 跳回到 0，一盏都没漏。",
 	"嗒嗒：步长 5 也能停遍每一盏，可它第 3 站是 3 号灯；步长 3 第 3 站正好是 9，但第 4 跳就回到 0 了。",
-	"小岚：不漏灯和不错站要同时成立，两个条件一起筛，才只剩 7 格。报时信号终于覆盖所有工段。"]
+	"小岚：不漏灯和不错站要同时成立，两个条件一起筛，才只剩 7 格。报时信号齐了，屋顶的工单也到了。"]
+# 左下角是报时铃的实物；小岚站到右下角、嗒嗒的左边。
+func companion_foot() -> Vector2: return Vector2(1100,620)
 var gw_pending_feedback = ""
 
 func configure() -> void:
-	scene_id = "assembly"; level_id = "GW09"; title = "既不漏灯，也不错站"
+	scene_id = "corridor"; level_id = "GW09"; title = "既不漏灯，也不错站"
 	if save_path.is_empty(): save_path = Catalog.save_path("GW09")
 	rules = Rules; world_script = World
 	durations = {"approach":2.2,"delivery":3.6}

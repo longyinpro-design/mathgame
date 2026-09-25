@@ -4,7 +4,7 @@ extends Node2D
 # 画面只负责摆出来，换候选不会留下旧判定。
 const Rules = preload("res://scripts/workshop/gw14_rules.gd")
 const ArtStyle = preload("res://scripts/cargo/skin.gd")
-const BACKDROP = preload("res://assets/source/workshop/assembly-room-stage-v1.png")
+const BACKDROP = preload("res://assets/source/workshop/rooftop-repair-street-stage-v1.png")
 const TRAY = preload("res://assets/runtime/workshop/kit-v1/tray.tres")
 const SPINDLE = preload("res://assets/runtime/workshop/kit-v1/spindle.tres")
 const BOX = preload("res://assets/runtime/workshop/kit-v1/box.tres")
@@ -24,7 +24,7 @@ const TABLE = Rect2(24,528,980,112)
 const GREEN = Color("8fd694")
 const RED = Color("f08a7a")
 const DIM = Color("c9c2ad")
-var scene_id = "assembly"
+var scene_id = "rooftop"
 var state = Rules.fresh()
 var progress = 0.0
 var presentation_paused = false

@@ -4,7 +4,7 @@ extends Node2D
 # 满托数、余料与合计一律由规则模块现算，画面不另存除法结果，换槽数不会留下旧判定。
 const Rules = preload("res://scripts/workshop/gw12_rules.gd")
 const ArtStyle = preload("res://scripts/cargo/skin.gd")
-const BACKDROP = preload("res://assets/source/workshop/assembly-room-stage-v1.png")
+const BACKDROP = preload("res://assets/source/workshop/rooftop-repair-street-stage-v1.png")
 const TRAY = preload("res://assets/runtime/workshop/kit-v1/tray.tres")
 const SPINDLE = preload("res://assets/runtime/workshop/kit-v1/spindle.tres")
 const BOX = preload("res://assets/runtime/workshop/kit-v1/box.tres")
@@ -22,7 +22,7 @@ const KEEP_W = 58.0
 const KEEP_STEP = 62.0
 const GREEN = Color("8fd694")
 const RED = Color("f08a7a")
-var scene_id = "assembly"
+var scene_id = "rooftop"
 var state = Rules.fresh()
 var progress = 0.0
 var presentation_paused = false

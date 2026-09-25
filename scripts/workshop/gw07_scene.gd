@@ -11,7 +11,7 @@ const ARRIVAL = ["小岚：A、B、C、D 依次过压机和冷却机。压制各
 	"小岚：两机之间只有一个暂存位，先来的先冷却——压机可不能当仓库。第 %d 拍前要全部做完。"%Rules.DEADLINE]
 const AFTER = ["小岚：A 冷却 1–3 是检修前唯一塞得下的完整 2 拍；B 只能等到第 5 拍才进冷却机。",
 	"嗒嗒：B 在暂存位上一等就是三拍，后面两件就得跟着往后压，不然位置不够。",
-	"小岚：冷却 5–7、7–9、9–11 一路排满，第 %d 拍正好是下限。"%Rules.DEADLINE]
+	"小岚：冷却 5–7、7–9、9–11 一路排满，第 %d 拍正好是下限。旧仓还有块没配牌的槽板，去看看。"%Rules.DEADLINE]
 var gw_pending_feedback = ""
 var focus_row = 0
 var focus_item = 0

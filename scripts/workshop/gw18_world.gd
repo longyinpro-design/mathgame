@@ -6,7 +6,7 @@ extends Node2D
 # 由规则模块现算，画面不另存会走样的表。正式运行、第 3 拍通知与交接杆都跟着真实轨迹走。
 const Rules = preload("res://scripts/workshop/gw18_rules.gd")
 const ArtStyle = preload("res://scripts/cargo/skin.gd")
-const BACKDROP = preload("res://assets/source/workshop/mistimed-dock-stage-v1.png")
+const BACKDROP = preload("res://assets/source/workshop/central-engine-dock-stage-v1.png")
 const PRESS = preload("res://assets/runtime/workshop/kit-v1/press.tres")
 const RACK = preload("res://assets/runtime/workshop/kit-v1/rack.tres")
 const LIFT = preload("res://assets/runtime/workshop/kit-v1/lift.tres")
@@ -36,7 +36,7 @@ const GREEN = Color("8fd694")
 const RED = Color("e2604f")
 const AMBER = Color("e8c06a")
 const DIM = Color(0.72,0.72,0.66,0.55)
-var scene_id = "dock"
+var scene_id = "engine"
 var state = Rules.fresh()
 # 焦点与推演页只属于工作台：不进存档，撤销与重摆都不动它。
 var focus_slot = 0
@@ -370,6 +370,9 @@ func draw_departed() -> void:
 	plaque("嗒嗒挂上休息牌",Rect2(760,556,220,34),16)
 	contact(Vector2(680,642),24); prop(BELL,Vector2(680,642),72)
 	plaque("开船铃",Rect2(600,556,120,34),16)
+	# 第四岛的交接物：阿舷递来的山谷退件包，只说明来件，不把本关刚完成的出货立刻否定掉。
+	contact(Vector2(330,642),26); prop(BOX,Vector2(330,642),104)
+	plaque("山谷退件包 · 旧桥件拓印 · 新桥墩草图",Rect2(170,556,300,34),16)
 
 func draw_arrival() -> void:
 	plaque("库存 7 件 · 不拆批",Rect2(24,296,300,44),19)

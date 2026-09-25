@@ -12,11 +12,14 @@ const ARRIVAL = ["小岚：总机船坞的轨口只有一段承重轨道，四�
 const AFTER = ["嗒嗒：巡轨兽逐段放行：第 0 拍空着等，B 1–3、C 3–4、A 4–7、D 7–9，四辆都赶上自己的期限。",
 	"小岚：A 先走会把 B 卡到第 5 拍；B 之后先接 A，C 就赶不上；为等 D 把 A 挪后也不行——只有这一张时刻表。",
 	"嗒嗒：空出的第一拍不是口令，是期限逼出来的。巡轨兽折下路障，工具开进总机船坞。发现卡：有依据地留空。"]
+# 左下角是放行牌、右下角是「回看与发现」；小岚缩小站在共用轨道的下沿、嗒嗒的左边。
+func companion_foot() -> Vector2: return Vector2(760,620)
+func companion_scale() -> float: return 0.8
 var gw_pending_feedback = ""
 var focus_item = 0
 
 func configure() -> void:
-	scene_id = "dock"; level_id = "GW17"; title = "巡轨兽 · 空出第一拍"
+	scene_id = "engine"; level_id = "GW17"; title = "巡轨兽 · 空出第一拍"
 	if save_path.is_empty(): save_path = Catalog.save_path("GW17")
 	rules = Rules; world_script = World
 	durations = {"approach":2.2,"delivery":4.2}

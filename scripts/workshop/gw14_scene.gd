@@ -14,7 +14,7 @@ const AFTER = ["嗒嗒：47 枚！按 4 一托 11 个满托剩 3，按 6 一托 
 var gw_pending_feedback = ""
 
 func configure() -> void:
-	scene_id = "assembly"; level_id = "GW14"; title = "第三张记录才有用"
+	scene_id = "rooftop"; level_id = "GW14"; title = "第三张记录才有用"
 	if save_path.is_empty(): save_path = Catalog.save_path("GW14")
 	rules = Rules; world_script = World
 	durations = {"approach":2.2,"delivery":3.6}

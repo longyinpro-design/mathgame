@@ -6,7 +6,7 @@ extends Node2D
 # 已放行的车在轨道上留下「已放行」记录，空着的拍写明「空着等」。
 const Rules = preload("res://scripts/workshop/gw17_rules.gd")
 const ArtStyle = preload("res://scripts/cargo/skin.gd")
-const BACKDROP = preload("res://assets/source/workshop/mistimed-dock-stage-v1.png")
+const BACKDROP = preload("res://assets/source/workshop/central-engine-dock-stage-v1.png")
 # 巡轨兽只有拦车、放行两张离散姿态的母版，没有 kit-v1 的 tres；这里按源图像素范围取两张运行期图集，
 # 不改动 assets/ 下的任何文件。
 const GUARDIAN = preload("res://assets/source/workshop/rail-guardian-source-v1.png")
@@ -33,7 +33,7 @@ const EDGES = [Color("6b4525"),Color("33536b"),Color("41602e"),Color("6a4a70")]
 const GREEN = Color("8fd694")
 const RED = Color("e2604f")
 const AMBER = Color("e8c06a")
-var scene_id = "dock"
+var scene_id = "engine"
 var state = Rules.fresh()
 var focus_item = 0
 var progress = 0.0

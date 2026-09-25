@@ -5,7 +5,7 @@ extends Node2D
 # 出料窗只开一次：锁好时刻、开过窗之后时间尺就冻住，要换时刻只能重摆。
 const Rules = preload("res://scripts/workshop/gw15_rules.gd")
 const ArtStyle = preload("res://scripts/cargo/skin.gd")
-const BACKDROP = preload("res://assets/source/workshop/assembly-room-stage-v1.png")
+const BACKDROP = preload("res://assets/source/workshop/old-chime-corridor-stage-v1.png")
 const PRESS = preload("res://assets/runtime/workshop/kit-v1/press.tres")
 const TRAY = preload("res://assets/runtime/workshop/kit-v1/tray.tres")
 const SPINDLE = preload("res://assets/runtime/workshop/kit-v1/spindle.tres")
@@ -34,7 +34,7 @@ const COMPARE_HINT = 2
 const GREEN = Color("8fd694")
 const RED = Color("f08a7a")
 const GOLD = Color("f2cf7a")
-var scene_id = "assembly"
+var scene_id = "corridor"
 var state = Rules.fresh()
 var progress = 0.0
 var presentation_paused = false

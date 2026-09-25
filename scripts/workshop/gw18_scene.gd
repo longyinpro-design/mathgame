@@ -12,13 +12,13 @@ const ARRIVAL = ["小岚：总机船第 10 拍就要开。库存 7 件分三批�
 	"小岚：吊机 F 固定第 3 拍、M 固定第 9 拍；V 走早班还是晚班，第 3 拍才收到确认——先做一套两班都能用的计划。"]
 const AFTER = ["嗒嗒：F 压制 0–1、冷却 1–3；V 压制 1–3、冷却 3–5；M 压制 3–4、冷却 6–8。",
 	"小岚：早班 V 第 6 拍吊运、晚班第 8 拍；M 的冷却放在 6–8，晚班第 7 拍暂存架上就不会两批挤在一起。",
-	"嗒嗒：三处接收记录齐全，总机船第 10 拍出海。发现卡：把不同情况都想一遍。"]
+	"嗒嗒：三处接收记录齐全，第 10 拍出海；总机留了一只臂给休息牌，阿舷递来山谷的退件包。发现卡：把不同情况都想一遍。"]
 var gw_pending_feedback = ""
 var focus_slot = 0
 var page = 6
 
 func configure() -> void:
-	scene_id = "dock"; level_id = "GW18"; title = "百臂总机 · 一套准备"
+	scene_id = "engine"; level_id = "GW18"; title = "百臂总机 · 一套准备"
 	if save_path.is_empty(): save_path = Catalog.save_path("GW18")
 	rules = Rules; world_script = World
 	durations = {"approach":2.2,"delivery":1.6,"launch":2.8}
