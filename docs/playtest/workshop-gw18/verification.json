@@ -1,6 +1,6 @@
 {
   "level": "GW18",
-  "candidate_sha256": "8431ec38ae356a37de49f387e8cdd908bf1816f943ed7bc05762ec566c4b0f96",
+  "candidate_sha256": "9aee5222fe955f1ad982a502f6110a798f8f574dfa4912bf21c33484beac1daf",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -13,7 +13,7 @@
         "--script",
         "tests/workshop/gw18_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw18-checks-vs0fpnji/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw18-checks-x60bnk_q/rules.log"
       ],
       "returncode": 0,
       "checks": 160,
@@ -30,7 +30,7 @@
         "--script",
         "tests/workshop/gw18_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw18-checks-vs0fpnji/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw18-checks-x60bnk_q/window.log"
       ],
       "returncode": 0,
       "checks": 243,
@@ -40,24 +40,24 @@
     }
   ],
   "screenshots": {
-    "1280-01-arrival.png": "af9000e5b54b120f2f5a5de441dd47e59ce84033d82ed12d9fa5615d55d9b4e4",
-    "1280-02-puzzle.png": "3237f5fa743dbe35b82dfa7bc429155c1e6489d47267443c332d8044e529c957",
-    "1280-03-early-branch.png": "3237f5fa743dbe35b82dfa7bc429155c1e6489d47267443c332d8044e529c957",
-    "1280-03b-late-conflict.png": "d4e80b9c0cde3a8dee89b4119631abd9b8a23aac38db64c232ce9795c10b9683",
-    "1280-03c-robust.png": "7c3280be1c1b44e8a53e0bb0117293bcaa7dfa5f719b2760a83ce1232d161e22",
-    "1280-04-delivery.png": "bf2f6a27b7059f21bdd9dd577a68a40ac988bc969f77f99719f4baf3fc26df38",
-    "1280-04b-handover.png": "7d9692ae2f9a0bf7dfb47e214550d62474561597f172a4567e259006d655cc7c",
-    "1280-05-complete.png": "a79f58547db6688ead6982cf2a2b4f88348386e4aa94715a0b0279e23f9d9b04",
-    "1280-06-discovery.png": "0c0f74089b9b63cc88e6953afb12b9a10fc6e891c75456e68baf1dedd445586f",
-    "960-01-arrival.png": "0286c91e06df5f1a6323ea7d8d2a3791b03738ff611cf7ba95a441051399f3a0",
-    "960-02-puzzle.png": "24f6a7f3718d7bb12c5ab669fdfa6223a1934b96e9bfbe22d5e2926d7fb6135d",
-    "960-03-early-branch.png": "24f6a7f3718d7bb12c5ab669fdfa6223a1934b96e9bfbe22d5e2926d7fb6135d",
-    "960-03b-late-conflict.png": "e5f597f78ad3c47515279263606f23c439122c07c6d4324cc099965229a1aa5a",
-    "960-03c-robust.png": "ae62a82331f5a7b89a6252006b800583b73e725074312c37ccb9f9dcae5c5615",
-    "960-04-delivery.png": "df9e3b13ab322190816b3a8c30f309ba08bf9567c1a1179be43de69d2effeab4",
-    "960-04b-handover.png": "8ac5c293e55efd423de66b6c3dc1f3ac5021674102c77a521893cd44e677b884",
-    "960-05-complete.png": "797c5eddb735d7fe6591a5a95c9d59ee0c17f456b0d5f1b36cdfb7c060c45eff",
-    "960-06-discovery.png": "ab81f04c53c2514ba09246f118eefbb04bfdabadb808f488cb80f931b92e35e3"
+    "1280-01-arrival.png": "67ea7d50c2b9da0f0cfad3d553811c17cc520602382e92ed9f83546e7362d330",
+    "1280-02-puzzle.png": "00e6fe20e193b8bd7f616344b66153d97a47e1f9e51305f785c8f614260b3f21",
+    "1280-03-early-branch.png": "00e6fe20e193b8bd7f616344b66153d97a47e1f9e51305f785c8f614260b3f21",
+    "1280-03b-late-conflict.png": "b1bea98f130418673337413936cf1a7026eb8dd14cb4d4d2d31be8b6c92c7686",
+    "1280-03c-robust.png": "4d665d91109cb7e619664686240dd76e25dc9a01809bd796e73d2b59d8bf3b7a",
+    "1280-04-delivery.png": "2f29745dea42872a94ae611fdc10122bc1d5f697c902676266937f599d6055c9",
+    "1280-04b-handover.png": "9e9b6dd2cddee507549dbea614383af9ff11f06787b7d71a0943670c07efb3a0",
+    "1280-05-complete.png": "2deb6d539a8c80e201ce9b0f31f51528d423e1312476db5d9f3c8bb1909ff0ea",
+    "1280-06-discovery.png": "d08bfd36cf6c554bf69e3670c049d5fcad1af34dd6717d2353feedb39f802c8e",
+    "960-01-arrival.png": "6b9c84bd7e0e739631e3f22b973f511eadca3deb5158a9c988292f1ddde68f26",
+    "960-02-puzzle.png": "0a7beeb40eb80126905656c2ad9d106a4125f1720e3e3aa8fc7a23e78b4b9e1e",
+    "960-03-early-branch.png": "0a7beeb40eb80126905656c2ad9d106a4125f1720e3e3aa8fc7a23e78b4b9e1e",
+    "960-03b-late-conflict.png": "70a06d3532ce0bc2859ee2c0b1ed93036b3257a351e13b7d6c855a72c61493fa",
+    "960-03c-robust.png": "065ccf206fde2dced245d1ba9570d3554d83d6155897f2e5cd74c5f35e956baf",
+    "960-04-delivery.png": "c5bba48eb7a5d831cf26d0edc97d4b13fd533b8c879b568cecea51412cbc7130",
+    "960-04b-handover.png": "ea3de32ee0b254ec1e19b356b0b29a0e7339dd30008496fb6973fcfe92b03017",
+    "960-05-complete.png": "80ff8b485e416fe8b4486fb5998c117cb29b99479133b54b59170e06144f5d95",
+    "960-06-discovery.png": "90cf56b262b22bd70e3fe8906439c28cae62fd173fbd1e7ac6c4351629cb85e8"
   },
   "limitations": [
     "macOS desktop mouse and keyboard at 1280x720 and 960x540 only",

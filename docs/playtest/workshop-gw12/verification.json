@@ -1,6 +1,6 @@
 {
   "level": "GW12",
-  "candidate_sha256": "cd47ccdf410e235a96a78d2c802aefd3ab59db15c3f3b9add0829ba08683d823",
+  "candidate_sha256": "719e323932c914ed63d33dbb0a84dbbe7a4ab7ed56d416698003e05eec6e57cf",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -13,7 +13,7 @@
         "--script",
         "tests/workshop/gw12_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw12-checks-czvontu8/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw12-checks-nt4nmt3h/rules.log"
       ],
       "returncode": 0,
       "checks": 454,
@@ -30,7 +30,7 @@
         "--script",
         "tests/workshop/gw12_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw12-checks-czvontu8/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw12-checks-nt4nmt3h/window.log"
       ],
       "returncode": 0,
       "checks": 269,
@@ -40,22 +40,22 @@
     }
   ],
   "screenshots": {
-    "1280-01-arrival.png": "4f6c894d803cbe77640a8851c7d9d25c00a3c12835c369c42d23313c057346ef",
-    "1280-02-puzzle.png": "3c1ec3571935e27397d763025abe517e99ce5ee31214dc9915820ecb24499031",
-    "1280-03-executed.png": "f8ea364aaecd6ebaff115dfee9081f6b06ac41643cefdcfda2097335e92cb0cd",
-    "1280-03-first-shift.png": "c8de7a5cee729942574e4d7623fa8ef1b16ad393b391d6350c2aa19010a84255",
-    "1280-03-wrong-run.png": "1c370f13a42b8e3002941752a3955d24891c05e43a53852d1a218d840dc945a5",
-    "1280-04-delivery.png": "a6bfc3cf546e8d064a5e41fa176470151e1d95d8513a38ab9258a5101d074394",
-    "1280-05-complete.png": "7bb20ce91a2cc6bda077909f15fc0b1475738e145b0dd0f99b6bc10f11d86bb1",
-    "1280-06-discovery.png": "8bebaca74d48b8c59076b71ec422b3b2077e7a6ab1ba20462f4967b6df46d181",
-    "960-01-arrival.png": "ab80cd5665b920a30e8a78b81518c4494a57db7965286db0066bb7a42f4d7df7",
-    "960-02-puzzle.png": "518885d9cea508370df4faa7eea26f44db35dac29240056d0c4de19a3f4299a9",
-    "960-03-executed.png": "a36704331068857d350e7fd29fb0cd8932327e4fc9503bae9058b6467a987ecc",
-    "960-03-first-shift.png": "38bf7294ac93bfb8c3301432bd5f9b20e64f665ad80ad3f179d4541ca5346a0f",
-    "960-03-wrong-run.png": "b0d4e7443c2627ca1bc33558b5fce1b87256e6b3bdcbda7ce607df4c13a454fd",
-    "960-04-delivery.png": "602f72280c4dc4982fbb423f3ef83a8b4b107f57b87d9f38e1059eb81cf58e7a",
-    "960-05-complete.png": "f460df8b17ae7b573ec17f978ab87290d9f02ccf17d83038351e7b9e6c91b6da",
-    "960-06-discovery.png": "65ea93afc84dbb2879838aad240d50bc4a8f2f1b72aad3265e56d580ae48fe6a"
+    "1280-01-arrival.png": "13ff19f09d4a1aec49c4b4088997ebc76fc2a85e3bd5e0418614b502e28df057",
+    "1280-02-puzzle.png": "2de6f7b16a93fbd5c28d526231c3d66ba66092a5f575108001cb3b9885ff6a3d",
+    "1280-03-executed.png": "1349211df93c66781b1ac1f8011528f7da6ac295cf9a11d70c2225fd3cf7d27c",
+    "1280-03-first-shift.png": "88cdc91e0d6e9652cab74e5690389488249c4f7595476aa0bbcc4362948f285b",
+    "1280-03-wrong-run.png": "10d4b2aa590d1dc55080f390c91e04923e05c4b92f570f4dc97c59e2dd1b5124",
+    "1280-04-delivery.png": "097cede86786ca7326b30ac72f9fcfad472b5be465c4b1cf7c30d7895d75862c",
+    "1280-05-complete.png": "53b9af2f863d54d061cd793c9d6ca8205ff1335ca257e7764de90aedf90e92ee",
+    "1280-06-discovery.png": "cbb6ba94e0b8cd45f4c0bfbc943ee651817d451b7257b48c8b5e1dcccfcea537",
+    "960-01-arrival.png": "4211d8d6395f66a8dd6c867bf0db411511c00b01108e3b91c6b8e7b575386a05",
+    "960-02-puzzle.png": "bbc56ff7d6db938d91367b9a435b66f34c6b79d599b562bc2cfd1ed0907aa368",
+    "960-03-executed.png": "58f5ff870acfb3f23061ca36591ca2c0de93fbdedb2e8d7c412a7b9f9c105800",
+    "960-03-first-shift.png": "c434f452e6941f295acbd943f820ce7a4f2958dd89e651581df003ca4fe9ac36",
+    "960-03-wrong-run.png": "05d62e18c06559c7556800cbe9ef4d175f009c85592b2123842f7a6b004e588e",
+    "960-04-delivery.png": "1b3ed3a36b046e388c832e702bc273b5b72e448a91a80e76456347953d83b0d2",
+    "960-05-complete.png": "ace0b15888a7399fdab57f2c70622368a582d9ed9e98149b1aafc3b6560b0723",
+    "960-06-discovery.png": "f34750517f3e9a52e1d04b23ec87da1d85b3cdcdd5d3352a4c1fb9065fca3507"
   },
   "limitations": [
     "macOS desktop mouse and keyboard at 1280x720 and 960x540 only",

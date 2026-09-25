@@ -1,6 +1,6 @@
 {
   "level": "GW09",
-  "candidate_sha256": "ec80415f3fed6cac86a6fd69a2aa3f0434b45d04e9f2ab5d08dc828a9c3d6471",
+  "candidate_sha256": "c41103b8d3688d23be3d540dbd1437645cc764f6070f50ce420a82bdfe4d1c81",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -13,7 +13,7 @@
         "--script",
         "tests/workshop/gw09_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw09-checks-x0gct30v/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw09-checks-vc2jvxbf/rules.log"
       ],
       "returncode": 0,
       "checks": 333,
@@ -30,7 +30,7 @@
         "--script",
         "tests/workshop/gw09_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw09-checks-x0gct30v/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw09-checks-vc2jvxbf/window.log"
       ],
       "returncode": 0,
       "checks": 367,
@@ -40,18 +40,18 @@
     }
   ],
   "screenshots": {
-    "1280-01-arrival.png": "29a8616ef3ba648e59faa3366347dc55b2edb029de6a63f4fb8b01255a0137f8",
-    "1280-02-puzzle.png": "e37fe7f97b02c5bd27066830f16c4469e8218ee39db8a5d404b6563b1cbb9107",
-    "1280-03-run.png": "7532fdb3f2a1a14a4132f04f0e9bde996b31859ee94723a9c6c5298f5070900b",
-    "1280-04-delivery.png": "2a6d8bfade15ffd90261eb475f24173f10f8f990f63b016655a621bbb611fc52",
-    "1280-05-complete.png": "bd353a733482226f4e307b1afcfb77c65f1831fdd0e898373705a607802b2ca0",
-    "1280-06-discovery.png": "e77c925d631f9593375154892d2ba1537377fa6adc132534cef9563dfdd81833",
-    "960-01-arrival.png": "4a0ef77799f50d96b61d76a8e75ce5834af99775f9c2f8e7b310b6269e042e3c",
-    "960-02-puzzle.png": "d7229b0ae57f19d6369cdbf0c790bf9b0a9b23f8026319eca6897de7af405ceb",
-    "960-03-run.png": "2a51e8dd11af8b51e64983694c726e8d048039f02512ceb10db18bf6d1c23d42",
-    "960-04-delivery.png": "6f218be7941c05b4c670e9a66b25cc810345d25d64e6f72b3cc94ac3ddc63fb7",
-    "960-05-complete.png": "31a7537157e01f7bdcda92c06b8b29129c8394294fce4c53db2634e15f0b906b",
-    "960-06-discovery.png": "d6219e6a2ea9ab49a59a84b9b9b43405d1327055115e30017a62fd8dd448b3b7"
+    "1280-01-arrival.png": "9102ab8b891a191778836e561c4775263bb6cc29f0a3eaf15ece8b233259e466",
+    "1280-02-puzzle.png": "18083380c4f128614e172c041316734ae3b3f897462965dcc68ebe480563cd1b",
+    "1280-03-run.png": "c977b99a66908350c62b640e1c0de20644cbf0136a8cfbdaa4309f263d3f2d4e",
+    "1280-04-delivery.png": "2cbd5922e32d7e354aaabaf91fa9337b847b74bb760b7bea3fc703e904cfb94b",
+    "1280-05-complete.png": "1b2ea219d95c13b759e487e4e4f8323db88c8c4c808f614d50b67571b85088df",
+    "1280-06-discovery.png": "85eee94c08e719458d22f06c891df9b26e67e32de907d581207e0a2095fe4616",
+    "960-01-arrival.png": "952dd184d606297ec4989d02ae43b42f0dc703e151140dca95dc6081e9e3a809",
+    "960-02-puzzle.png": "e5068cb613eb391c6945f36fbfd0d1b9ab78538594b839e9ee61a12d2313ca90",
+    "960-03-run.png": "a14e28642e747803ef4720f3275a7e573f490976b9ede48bd5862a10400f3da6",
+    "960-04-delivery.png": "0567d7eda43a739664cead60bcd14165db5c98d23afa09c0d59eeaa701e8b673",
+    "960-05-complete.png": "0a41c1207bd47c56cda50c651e819d19a1bd449706e9e4b55d5eea0f3283168e",
+    "960-06-discovery.png": "aa1c24ec2c0d1d7fad2f54007303ded7d92a9c213584e8777d0799d0bd7dc3d5"
   },
   "limitations": [
     "macOS desktop mouse and keyboard at 1280x720 and 960x540 only",
