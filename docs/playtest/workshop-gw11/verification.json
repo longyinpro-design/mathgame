@@ -1,6 +1,6 @@
 {
   "level": "GW11",
-  "candidate_sha256": "1f5d171b9864a096ce507c5350bb2c8afc4790d235a8b5fc4ee6a684aa6fad4f",
+  "candidate_sha256": "e99610d34731d5b776f83b83c9a446dbc81aa85ea495666e11bcc9683e05c7f3",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -13,7 +13,7 @@
         "--script",
         "tests/workshop/gw11_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw11-checks-t7nl3fio/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw11-checks-07naenzc/rules.log"
       ],
       "returncode": 0,
       "checks": 540,
@@ -30,7 +30,7 @@
         "--script",
         "tests/workshop/gw11_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw11-checks-t7nl3fio/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw11-checks-07naenzc/window.log"
       ],
       "returncode": 0,
       "checks": 337,
@@ -40,18 +40,18 @@
     }
   ],
   "screenshots": {
-    "1280-01-arrival.png": "86d7ad10e87364bcb1e12ff1efdb46dc0109c3acb76c466b61ba5e06e2ce10c0",
+    "1280-01-arrival.png": "4fb327a6b6253e6dfd3c0e0eb80b8252802f0b4b0c35c8d2987525e781cd8f15",
     "1280-02-puzzle.png": "3289efb8c444282bcec5e94d66c2124b0db5635e9e07707c0eeee9127de88921",
     "1280-03-conflict.png": "727775e031e4a73fb2dce153ecba1b3fda0b522e8d948854077275280658336a",
     "1280-03b-plan.png": "a5efafa19ea7c57aa2750023fd8941523b0b3a4d8366675590b406542a87f9ef",
-    "1280-04-delivery.png": "bf7fcf43b44f0a1181286d7fc8c0fdc8242d0111c5a396c04cb3e2c9883e2646",
+    "1280-04-delivery.png": "bda929cb0e9ffd37de81e772291d645a5a7b2fe11e8650003b854bf660412826",
     "1280-05-complete.png": "c9af0a9633a04eeb880d106fbfa2381ed51a734a742fc2d9978d9edf6a5da6f3",
     "1280-06-discovery.png": "654a3de98c750738d3e2036af515afea9a2baf24aec34680a68389b4b8ae1dfd",
-    "960-01-arrival.png": "929430a62e1205ee478b22f42b31232baaae8c115dd1d59ecd791aa99e4bb8e8",
+    "960-01-arrival.png": "f5d3be60563e13c3aa08a8190b39194f38baa68266138987b9cc1d7d87e25371",
     "960-02-puzzle.png": "8d64d317c7f13019b5653261adbc80ca44b7259a503c242b185617da552e581d",
     "960-03-conflict.png": "52bee7cb019fbe69aeb0f3413a8bba310e050108a31eea319395a823100febeb",
     "960-03b-plan.png": "6117e01185e42ce0817e6fd06ef4e328993d3f7eede5fb42a727b61a12c9fa94",
-    "960-04-delivery.png": "00da44ec15e784c3b0db59e85a6ba2256007ec1b197f77d950e89896254928e9",
+    "960-04-delivery.png": "db7382d7d60aadd1a4784b9aa4ff3f29f783fa377231e712952272ccc657fb1d",
     "960-05-complete.png": "663ba00dfb6c053afef658d2ba946c3f8b7186a9cfad45c01cbfb020fa060169",
     "960-06-discovery.png": "f1e73a167c82d16ed5b991f3cbbde639286aec5d9c6d67dee2b2a8a7c36b74a9"
   },

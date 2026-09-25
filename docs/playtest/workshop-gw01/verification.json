@@ -1,6 +1,6 @@
 {
   "level": "GW01",
-  "candidate_sha256": "17373d55e421ce6184d5a52960dc46cb5bf16718c87bb395dd54c637ed3f11bc",
+  "candidate_sha256": "81a272ccba35fd8ec7ded202c5dd3c4fc0efb0a6686e47fb568371510017ec8b",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -13,7 +13,7 @@
         "--script",
         "tests/workshop/gw01_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-jerrsqj5/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-hqx5rfot/rules.log"
       ],
       "returncode": 0,
       "checks": 1797,
@@ -30,7 +30,7 @@
         "--script",
         "tests/workshop/gw01_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-jerrsqj5/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-hqx5rfot/window.log"
       ],
       "returncode": 0,
       "checks": 453,
@@ -47,7 +47,7 @@
         "--script",
         "tests/presentation/support_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-jerrsqj5/support.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw01-checks-hqx5rfot/support.log"
       ],
       "returncode": 0,
       "checks": 276,
@@ -60,18 +60,18 @@
     "1280-01-arrival.png": "a5f031a12d69b7a46b798814ce88d49837583072fee76ae240c8fdcac456278c",
     "1280-02-puzzle.png": "b4244401e2e079a688741d34d1c3dc7d05f41d99038c90c063e733a3190647ce",
     "1280-03-ready-to-inspect.png": "b86b27778f7d406d7876d6d470eacbdf3003cf52e6ac807c69fd3aa196a79c84",
-    "1280-04-mistimed-lift.png": "6a66edfd95a25aa6f22a98e440e322fc67d81b68a4bc366f72a67628d7ba3d24",
-    "1280-05-complete.png": "69a48690b87026a1a774a0d25674cb8b722a898ed2b3def4774d9918d891d2ed",
-    "1280-06-discovery.png": "3f56cf93b0fb828b7df73ecf712e547cef8db09da2dad09bb4cac2efcf896436",
+    "1280-04-mistimed-lift.png": "beae28ab9a8cbf17b2815492c902e658e1d66850984d5a6c48dc27a7fb5e2d8d",
+    "1280-05-complete.png": "d83ffcfff176760173559eb62cbd5c39aa43fedf6df1ccbb90e77f3cd4c13283",
+    "1280-06-discovery.png": "929f6bd6af2b07a9c911d5ba056af335e8a3378658f3bffc5059d21a54ac4e7e",
     "1280-trial-1.png": "470205d456273d830c3f36fef5ec60daabb4509f0764c2ee72c9d191ca742f7b",
     "1280-trial-2.png": "cee2ee0fd0e94eecef8e20dac81c13a82dc9cd70594e03269ef05921be1c56f6",
     "1280-trial-3.png": "4207f932cb9fb3c8379ccc267e8a0f1555bc2f71a113ce5af2e6319813cfa3ee",
     "960-01-arrival.png": "5415c89f5a5406342befb2a707315fbdfa3864233874b8d1edc172e7e2eff6df",
     "960-02-puzzle.png": "d8b5dd082e91f673aa3959101792bf97b128fce0f5e6c79965311f10fb031c98",
     "960-03-ready-to-inspect.png": "0db8ef100f7aba4ad2e0fe0dac6fcf128fc72a5079af0774dfc06cd703645043",
-    "960-04-mistimed-lift.png": "177b8edc062a40d06012f44168dba7156373d311fdb4607ebc3822d21761c844",
-    "960-05-complete.png": "cdd25e160b55e9fd998fe88871114baadb7470c61ceb227d07baa3915b5dc8a8",
-    "960-06-discovery.png": "3aaa103403d7563f926363f52da32138415ae7f87fd944f530fd6686b06318cd",
+    "960-04-mistimed-lift.png": "8c792bed111b8cc94e31039deefe2ee00274e175b2887f6ab9c642c3e6143ac6",
+    "960-05-complete.png": "3822eb4d1063dfb6e0ebb2aff7460ccbff19b59962f0f7e08ab52f13bc73f741",
+    "960-06-discovery.png": "20063bd6dcffa791dfbb891023141ee4ea129b49ea89a113d288344cd31fa4a2",
     "960-trial-1.png": "6cfe1248a10e82aebadb9c86ab632d99c697f4b2b38de5125557932931f63536",
     "960-trial-2.png": "86633d01859ea9d2733de5c6764951f5c7543a348ecfd0219accd7b5210040a3",
     "960-trial-3.png": "8459a8277e44f28ebf9b1b06c94bd20a9dfe1e51169104f5045dfa111e5cdb3d"

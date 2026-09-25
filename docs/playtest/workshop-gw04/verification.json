@@ -1,6 +1,6 @@
 {
   "level": "GW04",
-  "candidate_sha256": "2646f73074a3b7df4a8def6debd295f705c54657f00a23340ba0db231ba52974",
+  "candidate_sha256": "a5e3e0d48b7ebf986997858af29367d2fffc9c148ff7d1a4b10889bd323ec1d4",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -13,7 +13,7 @@
         "--script",
         "tests/workshop/gw04_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw04-checks-o36rhn6s/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw04-checks-jqy50ffi/rules.log"
       ],
       "returncode": 0,
       "checks": 905,
@@ -30,7 +30,7 @@
         "--script",
         "tests/workshop/gw04_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw04-checks-o36rhn6s/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw04-checks-jqy50ffi/window.log"
       ],
       "returncode": 0,
       "checks": 213,
@@ -42,12 +42,12 @@
   "screenshots": {
     "1280-01-arrival.png": "7dbfb0c856682233259bbda01a1a9f2a5a626a9ca6b05ae6a01db4c88c3f7505",
     "1280-02-puzzle.png": "b327c039ce37eadf62a21522d41053048572824160c9d3a94fd7346a1d67c168",
-    "1280-03-delivery.png": "a977fb3797b52c0422030969487a9deccb4809db1e40e1bf0096d46328e0af57",
+    "1280-03-delivery.png": "270edc57bebd04bf5fc2be67eeb021ee73dbced0925a4267edcb68f536af7a8c",
     "1280-04-complete.png": "09b7d6d05514e0a4eb685e1a3b523008a9aeee11c77b9756c41c48c21bf8931c",
     "1280-05-discovery.png": "fed008e930e6c4b9e33d15cb7840463be6eb80266fcfbe840dae7764984c4b2e",
     "960-01-arrival.png": "7e7216c5cdc401960a88cc9561d641d1fdd1dd8e3d948fd4f569f56d2af0f975",
     "960-02-puzzle.png": "ac55442d4eb8c57cdd7a0bad9c5b7cef82b4078e82f501e72c97b8f79c9f8689",
-    "960-03-delivery.png": "89f0d0adfbc42de64edd57abe19c5325ec04ae8e05b41425b284ba6442a734b3",
+    "960-03-delivery.png": "1bc5a3e6670dfff092b36bb6dbabde24181b9dfaf73adebfeb887b62b023167f",
     "960-04-complete.png": "33926384fe47be3283ed2238d89f648b52743ffda0ffcf00bc23e38c90475487",
     "960-05-discovery.png": "3606573b6a6cd214293f2cb6dc8968d30594f3b126aaad13ccf8be8b914db94e"
   },

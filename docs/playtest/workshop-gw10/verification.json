@@ -1,6 +1,6 @@
 {
   "level": "GW10",
-  "candidate_sha256": "dacad9215d8deec3a505e851f001b157dfa801eefc62429154aeeeb1bb15fade",
+  "candidate_sha256": "19500fe91b34a4e4561f8cad5c4d4d74d7ed377d7025c231dec7fcb41541b25a",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -13,7 +13,7 @@
         "--script",
         "tests/workshop/gw10_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw10-checks-6xla8pmw/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw10-checks-zf_92k4u/rules.log"
       ],
       "returncode": 0,
       "checks": 107,
@@ -30,7 +30,7 @@
         "--script",
         "tests/workshop/gw10_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw10-checks-6xla8pmw/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw10-checks-zf_92k4u/window.log"
       ],
       "returncode": 0,
       "checks": 205,

@@ -1,6 +1,6 @@
 {
   "level": "GW15",
-  "candidate_sha256": "7d84829cd021754b14af80e3587979529a0ef81dc88989aef0ad4a5140e2cd70",
+  "candidate_sha256": "b72602d038ecf458d10c9f1366c7e4710fee96428f0ee0471c85a2fae2ce5513",
   "godot": "4.7.2.stable.official.ed1daf0bf",
   "runs": [
     {
@@ -13,7 +13,7 @@
         "--script",
         "tests/workshop/gw15_test.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw15-checks-tab8snk9/rules.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw15-checks-i32e8w3w/rules.log"
       ],
       "returncode": 0,
       "checks": 714,
@@ -30,7 +30,7 @@
         "--script",
         "tests/workshop/gw15_playtest.gd",
         "--log-file",
-        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw15-checks-tab8snk9/window.log"
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw15-checks-i32e8w3w/window.log"
       ],
       "returncode": 0,
       "checks": 523,
