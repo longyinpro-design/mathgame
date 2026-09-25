@@ -1,0 +1,61 @@
+{
+  "level": "GW13",
+  "candidate_sha256": "b656d7ab2fb23b8d4fafd8cbaa70ce5e876eafaf1fcf92d92817fe43b39defe0",
+  "godot": "4.7.2.stable.official.ed1daf0bf",
+  "runs": [
+    {
+      "name": "rules",
+      "command": [
+        "/Applications/Godot.app/Contents/MacOS/Godot",
+        "--headless",
+        "--path",
+        "/Users/long/Code/像素数学",
+        "--script",
+        "tests/workshop/gw13_test.gd",
+        "--log-file",
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw13-checks-s53dyvb2/rules.log"
+      ],
+      "returncode": 0,
+      "checks": 348,
+      "passed": true,
+      "output_sha256": "5d36378da985a51b353b916051be3f6775c7616828a0f27d665caf85b54061e1",
+      "errors": []
+    },
+    {
+      "name": "window",
+      "command": [
+        "/Applications/Godot.app/Contents/MacOS/Godot",
+        "--path",
+        "/Users/long/Code/像素数学",
+        "--script",
+        "tests/workshop/gw13_playtest.gd",
+        "--log-file",
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw13-checks-s53dyvb2/window.log"
+      ],
+      "returncode": 0,
+      "checks": 455,
+      "passed": true,
+      "output_sha256": "c43c4b3e39366f797834b0e6a5a9d515d23727e60bc6e36651675c7c9d3d21da",
+      "errors": []
+    }
+  ],
+  "screenshots": {
+    "1280-01-arrival.png": "9a60c7a9c4f7da40974e025d64cd673129bc9a0ee1278b9e1200978b03d6b860",
+    "1280-02-puzzle.png": "424715ca83880d6184dac3ed59f5c6b8b89725889fb1e6d54c7c893a73505d69",
+    "1280-03-refused-double-count.png": "1ca220054a0c25898a1dac152c34e2163a9fac8fbcce55dc57d83b0127601449",
+    "1280-04-delivery.png": "2fdb831d622331632fd4495fb77a8c6e461ef97311c3eaf80a0a84a727fae6e3",
+    "1280-05-complete.png": "c6e35b739751d0ba6203c9d6656169e1dd6551541ff69af6898627a0de268a9b",
+    "1280-06-discovery.png": "7574679e799943d9fc4af4748a299512a1d5e37c96786f5b83f00f4e095c1973",
+    "960-01-arrival.png": "736262c0c7363dc47ec1dd2e45d9072803a2d3504c95a221838c9b211b978ed7",
+    "960-02-puzzle.png": "78c30c5e9645590743be08273bcd51eed32c04e0db0a55b5803c49abdc0b9f02",
+    "960-03-refused-double-count.png": "571c992e38fbba479c3e2ce4e517cb15ff4c1376d8c2b3e0b0098406b3cb962d",
+    "960-04-delivery.png": "13dd558c9411642e16f0b49afa7c6b22d56fc10f89c35a8947c470304d401710",
+    "960-05-complete.png": "fcc825d505836b8cf0c2cb1d1ecbe27c78e0ce823634274af9abb2ef40d4c33b",
+    "960-06-discovery.png": "90cb0d3908c454167bde92c8ee762fc31367c29303bbae39e7a3efec3ae1c35b"
+  },
+  "limitations": [
+    "macOS desktop mouse and keyboard at 1280x720 and 960x540 only",
+    "Independent GW13 profile, no cross-island journey/unlock/reward integration",
+    "No touch-device, child comprehension or learning outcome acceptance"
+  ]
+}
