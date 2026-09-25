@@ -20,7 +20,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[2]
 GODOT = os.environ.get('GODOT', '/Applications/Godot.app/Contents/MacOS/Godot')
-LEVELS = ['GW01', 'GW02', 'GW03', 'GW04', 'GW05', 'GW06', 'GW07']
+LEVELS = ['GW01', 'GW02', 'GW03', 'GW04', 'GW05', 'GW06', 'GW07', 'GW08']
 SCANNED = {'.gd', '.tscn', '.tres', '.json'}
 
 
