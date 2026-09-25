@@ -1,0 +1,67 @@
+{
+  "level": "GW18",
+  "candidate_sha256": "8431ec38ae356a37de49f387e8cdd908bf1816f943ed7bc05762ec566c4b0f96",
+  "godot": "4.7.2.stable.official.ed1daf0bf",
+  "runs": [
+    {
+      "name": "rules",
+      "command": [
+        "/Applications/Godot.app/Contents/MacOS/Godot",
+        "--headless",
+        "--path",
+        "/Users/long/Code/像素数学",
+        "--script",
+        "tests/workshop/gw18_test.gd",
+        "--log-file",
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw18-checks-clkfukl2/rules.log"
+      ],
+      "returncode": 0,
+      "checks": 160,
+      "passed": true,
+      "output_sha256": "3d08c3ee872c09a2f92f9c76115142defb0e1ad48be57bd89add7b1ada0ae356",
+      "errors": []
+    },
+    {
+      "name": "window",
+      "command": [
+        "/Applications/Godot.app/Contents/MacOS/Godot",
+        "--path",
+        "/Users/long/Code/像素数学",
+        "--script",
+        "tests/workshop/gw18_playtest.gd",
+        "--log-file",
+        "/var/folders/6k/qqjd6ws1321dkd0r8j50xtc40000gn/T/gw18-checks-clkfukl2/window.log"
+      ],
+      "returncode": 0,
+      "checks": 243,
+      "passed": true,
+      "output_sha256": "e1cfa6a6cd9a6e5331f13b7002f33464689a190474b0b2a38bf5cc476d4f5c4b",
+      "errors": []
+    }
+  ],
+  "screenshots": {
+    "1280-01-arrival.png": "af9000e5b54b120f2f5a5de441dd47e59ce84033d82ed12d9fa5615d55d9b4e4",
+    "1280-02-puzzle.png": "3237f5fa743dbe35b82dfa7bc429155c1e6489d47267443c332d8044e529c957",
+    "1280-03-early-branch.png": "3237f5fa743dbe35b82dfa7bc429155c1e6489d47267443c332d8044e529c957",
+    "1280-03b-late-conflict.png": "d4e80b9c0cde3a8dee89b4119631abd9b8a23aac38db64c232ce9795c10b9683",
+    "1280-03c-robust.png": "7c3280be1c1b44e8a53e0bb0117293bcaa7dfa5f719b2760a83ce1232d161e22",
+    "1280-04-delivery.png": "bf2f6a27b7059f21bdd9dd577a68a40ac988bc969f77f99719f4baf3fc26df38",
+    "1280-04b-handover.png": "7d9692ae2f9a0bf7dfb47e214550d62474561597f172a4567e259006d655cc7c",
+    "1280-05-complete.png": "a79f58547db6688ead6982cf2a2b4f88348386e4aa94715a0b0279e23f9d9b04",
+    "1280-06-discovery.png": "0c0f74089b9b63cc88e6953afb12b9a10fc6e891c75456e68baf1dedd445586f",
+    "960-01-arrival.png": "0286c91e06df5f1a6323ea7d8d2a3791b03738ff611cf7ba95a441051399f3a0",
+    "960-02-puzzle.png": "24f6a7f3718d7bb12c5ab669fdfa6223a1934b96e9bfbe22d5e2926d7fb6135d",
+    "960-03-early-branch.png": "24f6a7f3718d7bb12c5ab669fdfa6223a1934b96e9bfbe22d5e2926d7fb6135d",
+    "960-03b-late-conflict.png": "e5f597f78ad3c47515279263606f23c439122c07c6d4324cc099965229a1aa5a",
+    "960-03c-robust.png": "ae62a82331f5a7b89a6252006b800583b73e725074312c37ccb9f9dcae5c5615",
+    "960-04-delivery.png": "df9e3b13ab322190816b3a8c30f309ba08bf9567c1a1179be43de69d2effeab4",
+    "960-04b-handover.png": "8ac5c293e55efd423de66b6c3dc1f3ac5021674102c77a521893cd44e677b884",
+    "960-05-complete.png": "797c5eddb735d7fe6591a5a95c9d59ee0c17f456b0d5f1b36cdfb7c060c45eff",
+    "960-06-discovery.png": "ab81f04c53c2514ba09246f118eefbb04bfdabadb808f488cb80f931b92e35e3"
+  },
+  "limitations": [
+    "macOS desktop mouse and keyboard at 1280x720 and 960x540 only",
+    "Independent GW18 profile, no cross-island journey/unlock/reward integration",
+    "No touch-device, child comprehension or learning outcome acceptance"
+  ]
+}
