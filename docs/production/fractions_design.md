@@ -1,5 +1,6 @@
 # 分数水庭 FW01–FW18
 
+> 2026-10-04 美术更新：本页原有程序绘制表现说明是实现阶段记录；当前版本已接入与前三岛同风格的 imagegen 场景、角色和材质，实际状态仍由引擎绘制。见 [本批来源与运行时契约](../../art/late-islands-v1/README.md) 及 [视觉复验](../playtest/late-islands-v1/verification.md)。
 Local Godot 4.6.3 implementation. The continuation is authored for the existing island/world and narrative contracts. Twelve ordinary main scenes, four optional scenes (13–16), two staged guardians (17–18). Optional tasks never gate the final two scenes. Companion name is 水沫, consistent with the shared campaign roster.
 
 ## Authored sequence

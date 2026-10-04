@@ -1,4 +1,5 @@
 extends Node2D
+const Art = preload("res://scripts/ui/late_island_art.gd")
 const GardenSkin = preload("res://scripts/cargo/skin.gd")
 const Rules = preload("res://scripts/fractions/rules.gd")
 var definition: Dictionary = {}
@@ -7,8 +8,10 @@ var presentation_paused := false
 var celebration := false
 var font: Font
 func _ready():
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	font = GardenSkin.face()
 func label(text: String, pos: Vector2, size: int=20, color: Color=Color("e5f9ed")):
+	draw_string_outline(font,pos,text,HORIZONTAL_ALIGNMENT_LEFT,-1,size,3,Color("18333d"))
 	draw_string(font,pos,text,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)
 func _draw():
 	if definition.is_empty() or state.is_empty(): return
@@ -16,28 +19,19 @@ func _draw():
 	var rules = Rules.new(definition)
 	var b: Dictionary = rules.projection(state)
 	if b.is_empty(): return
-	draw_rect(Rect2(0,0,1280,720),Color("122e3a"))
-	for i in range(10):
-		draw_line(Vector2(0,225+i*43),Vector2(1280,235+i*43),Color("234b59"),3)
-	draw_rect(Rect2(22,202,1236,404),Color("1b4651"))
-	for x in [34,1236]:
-		draw_rect(Rect2(x,215,10,390),Color("c1b18b"))
-		draw_line(Vector2(x-4,219),Vector2(x+15,219),Color("f1dfb1"),5)
-	for i in range(15):
-		var x := float((i*193)%1260)
-		draw_circle(Vector2(x,615),24,Color("306358"))
-		draw_line(Vector2(x,625),Vector2(x+13,595),Color("73a486"),3)
-		draw_circle(Vector2(x+13,592),6,Color("e4b8c7"))
-	# Water-garden companion, feet and reflection visibly contact the stone ledge.
-	draw_set_transform(Vector2(1173,370))
-	draw_ellipse_shape()
-	draw_set_transform(Vector2.ZERO)
+	Art.background(self,"FW")
+	# Generated cast stays outside pool/piece hit targets and the shared footer.
+	var cast = "shuimo_joy" if celebration else "shuimo"
+	var foot = Vector2(1173,586) if definition.mechanism == "mosaic" else Vector2(1192,455)
+	var width = 72.0 if definition.mechanism == "mosaic" else 62.0
+	if definition.id == "FW17": cast = "floodkeeper"; foot = Vector2(1170,452); width = 126
+	elif definition.id == "FW18": cast = "lotus_guardian"; foot = Vector2(1189,464); width = 68
+	Art.sprite(self,cast,foot,width)
 	if celebration:
 		for i in range(10):
 			draw_circle(Vector2(65+i*120,590),10,Color("e8c4d7"))
 	if definition.mechanism == "mosaic":
-		draw_rect(Rect2(50,209,910,198),Color("274e55"))
-		draw_rect(Rect2(50,209,910,198),Color("6b8985"),false,3)
+		Art.panel(self,"water_panel",Rect2(50,209,910,198))
 		for grain in range(64):
 			var gx:=float(60+(grain*157)%888);var gy:=float(216+(grain*43)%181)
 			draw_line(Vector2(gx,gy),Vector2(gx+8,gy-2),Color("355e62"),1)
@@ -48,7 +42,7 @@ func _draw():
 			for tile in b.tiles:
 				if tile.owner==j: total+=int(tile.amount); count+=1
 			var x:=65+j*225
-			draw_rect(Rect2(x,427,200,63),Color("386b6f"))
+			Art.panel(self,"water_panel",Rect2(x,427,200,63))
 			draw_rect(Rect2(x,478-min(45,total*2),200,min(45,total*2)),Color("58b9bb"))
 			label("%d格 / %d格"%[total,target[1]],Vector2(x+8,453))
 			label("%s · %d片%s"%["任意整体" if target[0]<0 else "整体"+"甲乙"[target[0]],count," / "+str(definition.params.counts[j]) if definition.params.counts[j]>=0 else ""],Vector2(x+8,481),17)
@@ -79,7 +73,7 @@ func _draw():
 		for i in range(b.water.size()):
 			var x:=90+i*275
 			var capacity: int = definition.params.capacity[i] if definition.params.has("capacity") else 24
-			draw_rect(Rect2(x,280,210,160),Color("627d85"))
+			Art.panel(self,"water_panel",Rect2(x-6,274,222,172))
 			draw_rect(Rect2(x+9,288,192,143),Color("183c4c"))
 			var height:=130.0*float(b.water[i])/float(capacity)
 			draw_rect(Rect2(x+10,430-height,190,height),Color("56b8c5"))
@@ -96,15 +90,3 @@ func _draw():
 			draw_rect(Rect2(53,580,580,25),Color("173b46"))
 			label("已放水 %d / %d 拍"%[b.pulses,definition.params.max_pulses],Vector2(60,600),18)
 			if definition.mechanism=="guardian": label("守庭试炼 %d / %d"%[b.stage+1,definition.params.goals.size()],Vector2(390,600),18)
-
-func draw_ellipse_shape():
-	var lift:=160 if definition.mechanism == "mosaic" else 0
-	draw_set_transform(Vector2(1173,389+lift),0,Vector2(1.4,0.35))
-	draw_circle(Vector2.ZERO,27,Color(0.02,0.10,0.12,0.6))
-	draw_set_transform(Vector2(1173,358+lift))
-	draw_colored_polygon(PackedVector2Array([Vector2(0,-35),Vector2(-24,-7),Vector2(-28,10),Vector2(-17,28),Vector2(17,28),Vector2(28,10),Vector2(24,-7)]),Color("9edcce"))
-	draw_circle(Vector2(-9,4),3,Color("173742")); draw_circle(Vector2(9,4),3,Color("173742"))
-	draw_arc(Vector2(0,7),7,0,PI,12,Color("173742"),2)
-	draw_circle(Vector2(-19,12),4,Color("e6b9b8"));draw_circle(Vector2(19,12),4,Color("e6b9b8"))
-	draw_set_transform(Vector2.ZERO)
-	label("水沫",Vector2(1151,414+lift),19)

@@ -1,0 +1,305 @@
+{
+  "version": 1,
+  "generator": "OpenAI built-in imagegen",
+  "generated_at": "2026-10-04",
+  "style_references": [
+    "assets/source/style-master-v1.png",
+    "assets/source/workshop/assembly-room-stage-v1.png"
+  ],
+  "inspected_references": [
+    "assets/runtime/forest/village-v1.png",
+    "assets/source/market/nursery-exchange-stage-v1.png"
+  ],
+  "sources": {
+    "fractions-cast.png": {
+      "path": "assets/source/late-islands-v1/fractions-cast.png",
+      "sha256": "01684b35bfb3b91ec791ca46c0481fce2f5d0ce35b287302d9b36e87b4e7702d",
+      "bytes": 1183133
+    },
+    "fractions-garden.png": {
+      "path": "assets/source/late-islands-v1/fractions-garden.png",
+      "sha256": "dc679960fe8c3c5bcfe65153bd6a1ec8d7d5ae46dd1383c36b0425b3baa92ed1",
+      "bytes": 2861498
+    },
+    "geometry-cast.png": {
+      "path": "assets/source/late-islands-v1/geometry-cast.png",
+      "sha256": "83162dd0c3fe6161651eab8b2fcac0dfb57a816260ac32e9bdf27fde98fe5ed5",
+      "bytes": 1245939
+    },
+    "geometry-terrace.png": {
+      "path": "assets/source/late-islands-v1/geometry-terrace.png",
+      "sha256": "0340313546df8f5e8a435405dc96939d5878e648722426f94c36aeb144fbcbb6",
+      "bytes": 2707733
+    },
+    "observatory-cast.png": {
+      "path": "assets/source/late-islands-v1/observatory-cast.png",
+      "sha256": "6fdaacf9398fd84d2f6b7d81e657aedce626633425cc1dd550058c9b75bbe571",
+      "bytes": 1502412
+    },
+    "observatory-dome.png": {
+      "path": "assets/source/late-islands-v1/observatory-dome.png",
+      "sha256": "6eda3c2b5dbd4b87289b385047ad88682ce440308c630a568ac37ee826deef8e",
+      "bytes": 2659716
+    },
+    "surface-textures.png": {
+      "path": "assets/source/late-islands-v1/surface-textures.png",
+      "sha256": "c6917b5d03bdb0702f01c74c644dd7c148a50244a84c51158ac8937b7ea7e6b6",
+      "bytes": 1592512
+    }
+  },
+  "sprites": {
+    "lingjiao": {
+      "sheet": "geometry-cast.png",
+      "region": [
+        182,
+        157,
+        352,
+        414
+      ],
+      "resource": "assets/runtime/late-islands-v1/lingjiao.tres"
+    },
+    "lingjiao_joy": {
+      "sheet": "geometry-cast.png",
+      "region": [
+        733,
+        147,
+        392,
+        430
+      ],
+      "resource": "assets/runtime/late-islands-v1/lingjiao_joy.tres"
+    },
+    "mirror_guardian": {
+      "sheet": "geometry-cast.png",
+      "region": [
+        52,
+        663,
+        579,
+        505
+      ],
+      "resource": "assets/runtime/late-islands-v1/mirror_guardian.tres"
+    },
+    "valley_architect": {
+      "sheet": "geometry-cast.png",
+      "region": [
+        638,
+        640,
+        590,
+        531
+      ],
+      "resource": "assets/runtime/late-islands-v1/valley_architect.tres"
+    },
+    "shuimo": {
+      "sheet": "fractions-cast.png",
+      "region": [
+        201,
+        107,
+        248,
+        442
+      ],
+      "resource": "assets/runtime/late-islands-v1/shuimo.tres"
+    },
+    "shuimo_joy": {
+      "sheet": "fractions-cast.png",
+      "region": [
+        774,
+        91,
+        360,
+        459
+      ],
+      "resource": "assets/runtime/late-islands-v1/shuimo_joy.tres"
+    },
+    "floodkeeper": {
+      "sheet": "fractions-cast.png",
+      "region": [
+        68,
+        707,
+        600,
+        486
+      ],
+      "resource": "assets/runtime/late-islands-v1/floodkeeper.tres"
+    },
+    "lotus_guardian": {
+      "sheet": "fractions-cast.png",
+      "region": [
+        752,
+        547,
+        365,
+        672
+      ],
+      "resource": "assets/runtime/late-islands-v1/lotus_guardian.tres"
+    },
+    "jixing": {
+      "sheet": "observatory-cast.png",
+      "region": [
+        190,
+        8,
+        365,
+        700
+      ],
+      "resource": "assets/runtime/late-islands-v1/jixing.tres"
+    },
+    "star_heron": {
+      "sheet": "observatory-cast.png",
+      "region": [
+        766,
+        161,
+        346,
+        550
+      ],
+      "resource": "assets/runtime/late-islands-v1/star_heron.tres"
+    },
+    "storm_watcher": {
+      "sheet": "observatory-cast.png",
+      "region": [
+        17,
+        714,
+        688,
+        530
+      ],
+      "resource": "assets/runtime/late-islands-v1/storm_watcher.tres"
+    },
+    "star_heron_joy": {
+      "sheet": "observatory-cast.png",
+      "region": [
+        701,
+        737,
+        538,
+        510
+      ],
+      "resource": "assets/runtime/late-islands-v1/star_heron_joy.tres"
+    },
+    "wood_panel": {
+      "sheet": "surface-textures.png",
+      "region": [
+        46,
+        124,
+        434,
+        313
+      ],
+      "resource": "assets/runtime/late-islands-v1/wood_panel.tres"
+    },
+    "stone_tile": {
+      "sheet": "surface-textures.png",
+      "region": [
+        570,
+        122,
+        349,
+        314
+      ],
+      "resource": "assets/runtime/late-islands-v1/stone_tile.tres"
+    },
+    "water_panel": {
+      "sheet": "surface-textures.png",
+      "region": [
+        1007,
+        124,
+        480,
+        313
+      ],
+      "resource": "assets/runtime/late-islands-v1/water_panel.tres"
+    },
+    "moss_tile": {
+      "sheet": "surface-textures.png",
+      "region": [
+        59,
+        554,
+        363,
+        302
+      ],
+      "resource": "assets/runtime/late-islands-v1/moss_tile.tres"
+    },
+    "star_panel": {
+      "sheet": "surface-textures.png",
+      "region": [
+        517,
+        553,
+        482,
+        305
+      ],
+      "resource": "assets/runtime/late-islands-v1/star_panel.tres"
+    },
+    "blocked_tile": {
+      "sheet": "surface-textures.png",
+      "region": [
+        1089,
+        548,
+        398,
+        311
+      ],
+      "resource": "assets/runtime/late-islands-v1/blocked_tile.tres"
+    }
+  },
+  "islands": {
+    "GV": {
+      "background": "geometry-terrace.png",
+      "levels": [
+        "GV01",
+        "GV02",
+        "GV03",
+        "GV04",
+        "GV05",
+        "GV06",
+        "GV07",
+        "GV08",
+        "GV09",
+        "GV10",
+        "GV11",
+        "GV12",
+        "GV13",
+        "GV14",
+        "GV15",
+        "GV16",
+        "GV17",
+        "GV18"
+      ]
+    },
+    "FW": {
+      "background": "fractions-garden.png",
+      "levels": [
+        "FW01",
+        "FW02",
+        "FW03",
+        "FW04",
+        "FW05",
+        "FW06",
+        "FW07",
+        "FW08",
+        "FW09",
+        "FW10",
+        "FW11",
+        "FW12",
+        "FW13",
+        "FW14",
+        "FW15",
+        "FW16",
+        "FW17",
+        "FW18"
+      ]
+    },
+    "SO": {
+      "background": "observatory-dome.png",
+      "levels": [
+        "SO01",
+        "SO02",
+        "SO03",
+        "SO04",
+        "SO05",
+        "SO06",
+        "SO07",
+        "SO08",
+        "SO09",
+        "SO10",
+        "SO11",
+        "SO12",
+        "SO13",
+        "SO14",
+        "SO15",
+        "SO16",
+        "SO17",
+        "SO18"
+      ]
+    }
+  },
+  "dynamic_content": "All mathematical grids, counts, states, links, water, constraints, proofs, and solutions are engine-rendered from existing rules. Cast is discrete poses, not continuous animation.",
+  "rejected": "The first mechanisms atlas and alpha-repair attempt contained unwanted atmosphere. Neither is imported or referenced."
+}

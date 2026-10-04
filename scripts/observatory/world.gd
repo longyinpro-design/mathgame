@@ -1,4 +1,5 @@
 extends Node2D
+const Art = preload("res://scripts/ui/late_island_art.gd")
 const StarSkin = preload("res://scripts/cargo/skin.gd")
 const Rules = preload("res://scripts/observatory/rules.gd")
 const BRASS=Color("b79964")
@@ -17,9 +18,12 @@ func _process(delta: float):
 	if fingerprint!=board_fingerprint:board_fingerprint=fingerprint;view_clock=0.0
 	if definition.mechanism=="finale" and not presentation_paused and Rules.new(definition).solved(state):
 		view_clock=minf(view_clock+delta*2.0,23.0);queue_redraw()
-func _ready(): font=StarSkin.face()
+func _ready():
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	font=StarSkin.face()
 func label(t: String, at: Vector2, size: int=18, color: Color=Color("dfdfec")):
 	if font==null: font=StarSkin.face()
+	draw_string_outline(font,at,t,HORIZONTAL_ALIGNMENT_LEFT,-1,size,3,Color("122336"))
 	draw_string(font,at,t,HORIZONTAL_ALIGNMENT_LEFT,-1,size,color)
 static func shutter_rect(w: int,cell: int) -> Rect2:
 	return Rect2(185+(cell%10)*57,280+w*160+floori(cell/10.0)*54,48,44)
@@ -44,48 +48,25 @@ static func cable_rect(p: Dictionary,e: int) -> Rect2:
 	var mid=a.lerp(b,ratio)
 	return Rect2(mid-Vector2(28,14),Vector2(56,28))
 func plate(rect: Rect2):
-	draw_rect(Rect2(rect.position+Vector2(7,9),rect.size),Color("0a1120"))
-	draw_rect(rect,BRASS);draw_rect(rect.grow(-5),Color("192c45"));draw_rect(rect.grow(-10),Color("233951"))
-	for offset in [Vector2(8,8),Vector2(rect.size.x-8,8),Vector2(8,rect.size.y-8),rect.size-Vector2(8,8)]:
-		draw_circle(rect.position+offset,2,Color("ead9a1"))
-func character(at: Vector2, robe: Color):
-	draw_ellipse_shadow(at+Vector2(0,25),Vector2(25,8))
-	draw_rect(Rect2(at+Vector2(-16,-5),Vector2(32,31)),robe)
-	draw_rect(Rect2(at+Vector2(-13,-29),Vector2(26,26)),Color("e5c198"))
-	draw_rect(Rect2(at+Vector2(-16,-35),Vector2(32,11)),Color("e6d6b7"))
-	draw_rect(Rect2(at+Vector2(-6,-18),Vector2(3,4)),Color("243046"));draw_rect(Rect2(at+Vector2(5,-18),Vector2(3,4)),Color("243046"))
-	draw_rect(Rect2(at+Vector2(-13,25),Vector2(10,8)),Color("111d32"));draw_rect(Rect2(at+Vector2(4,25),Vector2(10,8)),Color("111d32"))
-func draw_ellipse_shadow(at: Vector2, dimensions: Vector2):
-	var points=PackedVector2Array()
-	for i in range(16):points.append(at+Vector2(cos(TAU*i/16)*dimensions.x,sin(TAU*i/16)*dimensions.y))
-	draw_colored_polygon(points,Color(0.02,0.04,0.09,0.65))
+	draw_rect(Rect2(rect.position+Vector2(5,6),rect.size),Color(0.04,0.07,0.12,0.5))
+	Art.panel(self,"star_panel",rect)
 func apparatus():
-	# Stepped pixel silhouettes, brass dome ribs, stone pier and telescope.
-	draw_rect(Rect2(0,0,1280,720),Color("10192e"))
-	for i in range(90):
-		var at=Vector2((i*137+41)%1280,(i*83+23)%605)
-		draw_rect(Rect2(at,Vector2(2,2)),Color("788da9"))
-	draw_circle(Vector2(1120,93),54,Color("b9cde1"));draw_circle(Vector2(1140,75),53,Color("10192e"))
-	for y in range(578,720,22):
-		for x in range(-40,1280,96):
-			draw_rect(Rect2(x+(24 if y%44==0 else 0),y,92,19),Color("29374e"))
-	for x in [25,1208]:
-		draw_rect(Rect2(x,180,42,430),Color("24334b"));draw_rect(Rect2(x+4,180,8,430),Color("60708c"))
-		draw_rect(Rect2(x-7,575,56,29),BRASS)
-	draw_arc(Vector2(640,560),587,PI,TAU,48,Color("465875"),15)
-	draw_arc(Vector2(640,560),573,PI,TAU,48,BRASS,3)
-	for x in [83,1185]:
-		draw_rect(Rect2(x,208,8,360),BRASS)
-		draw_circle(Vector2(x+4,228),8,LIGHT)
-	# Physical telescope at back right; its feet contact the stone floor.
-	draw_line(Vector2(1105,484),Vector2(1068,589),Color("6a7282"),8)
-	draw_line(Vector2(1105,484),Vector2(1145,589),Color("6a7282"),8)
-	draw_line(Vector2(1105,484),Vector2(1105,594),BRASS,6)
-	draw_line(Vector2(1068,459),Vector2(1165,391),Color("625b55"),44)
-	draw_line(Vector2(1068,453),Vector2(1165,385),BRASS,31)
-	draw_circle(Vector2(1165,385),24,Color("d6bf87"));draw_circle(Vector2(1165,385),17,Color("34718a"));draw_circle(Vector2(1161,380),7,TEAL)
-	character(Vector2(1172,561),Color("596d91"))
-	character(Vector2(1013,568),Color("ba8158"))
+	Art.background(self,"SO")
+func draw_cast():
+	var heron = "star_heron_joy" if Rules.new(definition).solved(state) else "star_heron"
+	match definition.mechanism:
+		"scale":
+			Art.sprite(self,"jixing",Vector2(1090,551),66)
+			Art.sprite(self,heron,Vector2(1190,552),62)
+		"shutters":
+			Art.sprite(self,"jixing",Vector2(979,553),82)
+			Art.sprite(self,heron,Vector2(1145,555),86)
+		"storm":
+			Art.sprite(self,"storm_watcher",Vector2(948,610),192)
+			Art.sprite(self,heron,Vector2(1216,632),45)
+		_:
+			# Route/schedule/finale boards extend to x=1210. Keep this silhouette outside.
+			Art.sprite(self,heron,Vector2(1235,634),38)
 func _draw():
 	apparatus()
 	if definition.is_empty() or state.is_empty(): return
@@ -95,6 +76,7 @@ func _draw():
 		"routes": draw_routes()
 		"schedule": draw_schedule()
 		"storm", "finale": draw_network()
+	draw_cast()
 	if Rules.new(definition).solved(state):
 		for x in [87,1189]:
 			draw_circle(Vector2(x,228),15,TEAL)

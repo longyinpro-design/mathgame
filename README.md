@@ -17,7 +17,7 @@
 - 营地与手记可查看伙伴、选择下次同行队伍、回看事实记录与六岛纪念；练习建议可跳过
 - 旧入口、旧场景与旧档案仍保留。群岛经验是独立汇总，不向森林重复发经验、木片或建设
 
-实现与验证范围见 [六岛运行说明](docs/production/archipelago/runtime.md) 和 [108 关验收清单](docs/production/archipelago/acceptance.md)。本轮实际验证环境为 Linux / Godot 4.6.3；项目既有 4.7 声明保留，不能据此声称 macOS、Godot 4.7、触屏或儿童真人体验已验收。新三岛采用引擎绘制的机制场景，未宣称与前作源像素美术同等精修。
+实现与验证范围见 [六岛运行说明](docs/production/archipelago/runtime.md) 和 [108 关验收清单](docs/production/archipelago/acceptance.md)。本轮实际验证环境为 Linux / Godot 4.6.3；项目既有 4.7 声明保留，不能据此声称 macOS、Godot 4.7、触屏或儿童真人体验已验收。后三岛已接入以原三岛风格母版为参考的 imagegen 像素场景、伙伴/首领和机关材质（7 张源图、18 个切片，覆盖 54 关）；数字、格子、水位和航线继续从真实规则状态绘制。[美术来源与边界](art/late-islands-v1/README.md) · [本轮视觉复验](docs/playtest/late-islands-v1/verification.md)。
 
 ---
 
