@@ -6,10 +6,10 @@ const Rules = preload("res://scripts/workshop/gw07_rules.gd")
 const World = preload("res://scripts/workshop/gw07_world.gd")
 const Catalog = preload("res://scripts/workshop/chapter_catalog.gd")
 const ROW_NAMES = ["压制带","冷却带"]
-const ARRIVAL = ["小岚：A、B、C、D 依次过压机和冷却机。压制各 1 拍，冷却各 2 拍。",
+var ARRIVAL = ["小岚：A、B、C、D 依次过压机和冷却机。压制各 1 拍，冷却各 2 拍。",
 	"嗒嗒：冷却机第 %d～%d 拍要检修，那一段不能用；冷却也不能停下来等，一进机就得连着做满 %d 拍。"%[Rules.MAINT_START,Rules.MAINT_END,Rules.COOL_TIME],
 	"小岚：两机之间只有一个暂存位，先来的先冷却——压机可不能当仓库。第 %d 拍前要全部做完。"%Rules.DEADLINE]
-const AFTER = ["小岚：A 冷却 1–3 是检修前唯一塞得下的完整 2 拍；B 只能等到第 5 拍才进冷却机。",
+var AFTER = ["小岚：A 冷却 1–3 是检修前唯一塞得下的完整 2 拍；B 只能等到第 5 拍才进冷却机。",
 	"嗒嗒：B 在暂存位上一等就是三拍，后面两件就得跟着往后压，不然位置不够。",
 	"小岚：冷却 5–7、7–9、9–11 一路排满，第 %d 拍正好是下限。旧仓还有块没配牌的槽板，去看看。"%Rules.DEADLINE]
 var gw_pending_feedback = ""

@@ -1,0 +1,1508 @@
+{
+  "count": 108,
+  "levels": [
+    {
+      "id": "FL01",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [],
+      "reward_id": "forest.first_clear.fl01",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "第一袋种子"
+    },
+    {
+      "id": "FL02",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL01"
+      ],
+      "reward_id": "forest.first_clear.fl02",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "石灵的三门借光"
+    },
+    {
+      "id": "FL03",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL02"
+      ],
+      "reward_id": "forest.first_clear.fl03",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "借粮之前的三座仓"
+    },
+    {
+      "id": "FL04",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL03"
+      ],
+      "reward_id": "forest.first_clear.fl04",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "三架灯的秘密"
+    },
+    {
+      "id": "FL05",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL04"
+      ],
+      "reward_id": "forest.first_clear.fl05",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "残缺的磨坊账簿"
+    },
+    {
+      "id": "FL06",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL05"
+      ],
+      "reward_id": "forest.first_clear.fl06",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "只能试一次的育苗机"
+    },
+    {
+      "id": "FL07",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL06"
+      ],
+      "reward_id": "forest.first_clear.fl07",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "磨坊的24点"
+    },
+    {
+      "id": "FL08",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL07"
+      ],
+      "reward_id": "forest.first_clear.fl08",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "不会漏信的分邮袋"
+    },
+    {
+      "id": "FL09",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL08"
+      ],
+      "reward_id": "forest.first_clear.fl09",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "落石放在哪里"
+    },
+    {
+      "id": "FL10",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL08"
+      ],
+      "reward_id": "forest.first_clear.fl10",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "互不碰面的两封信"
+    },
+    {
+      "id": "FL11",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL09",
+        "FL10"
+      ],
+      "reward_id": "forest.first_clear.fl11",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "轻装才有下一趟"
+    },
+    {
+      "id": "FL12",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL11"
+      ],
+      "reward_id": "forest.first_clear.fl12",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "守门人的三种回应"
+    },
+    {
+      "id": "FL13",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL01"
+      ],
+      "reward_id": "forest.first_clear.fl13",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": true,
+      "title": "两趟足够吗"
+    },
+    {
+      "id": "FL14",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL08"
+      ],
+      "reward_id": "forest.first_clear.fl14",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": true,
+      "title": "偶数也到不了的石径"
+    },
+    {
+      "id": "FL15",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL06"
+      ],
+      "reward_id": "forest.first_clear.fl15",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": true,
+      "title": "两次称量找出异晶"
+    },
+    {
+      "id": "FL16",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL10"
+      ],
+      "reward_id": "forest.first_clear.fl16",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": true,
+      "title": "借一道墙的花圃"
+    },
+    {
+      "id": "FL17",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL12"
+      ],
+      "reward_id": "forest.first_clear.fl17",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "风枝石灵·借力破阵"
+    },
+    {
+      "id": "FL18",
+      "implementation": "present",
+      "island": "forest",
+      "native_evidence": "campaign entry and return; original18 narrative not fully rerun",
+      "prerequisites": [
+        "FL17"
+      ],
+      "reward_id": "forest.first_clear.fl18",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/forest_release.tscn",
+      "side": false,
+      "title": "雾冠树心·唤醒春天"
+    },
+    {
+      "id": "MK01",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [],
+      "reward_id": "archipelago-MK01",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk01.tscn",
+      "side": false,
+      "title": "找回杯子的刻度"
+    },
+    {
+      "id": "MK02",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK01"
+      ],
+      "reward_id": "archipelago-MK02",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk02.tscn",
+      "side": false,
+      "title": "回礼要留下一段线"
+    },
+    {
+      "id": "MK03",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK02"
+      ],
+      "reward_id": "archipelago-MK03",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk03.tscn",
+      "side": false,
+      "title": "封箱里的重量"
+    },
+    {
+      "id": "MK04",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK03"
+      ],
+      "reward_id": "archipelago-MK04",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk04.tscn",
+      "side": false,
+      "title": "不可能兑现的收据"
+    },
+    {
+      "id": "MK05",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK04"
+      ],
+      "reward_id": "archipelago-MK05",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk05.tscn",
+      "side": false,
+      "title": "四张被雨打湿的货签"
+    },
+    {
+      "id": "MK06",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK05"
+      ],
+      "reward_id": "archipelago-MK06",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk06.tscn",
+      "side": false,
+      "title": "十根灯芯怎么凑"
+    },
+    {
+      "id": "MK07",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK06"
+      ],
+      "reward_id": "archipelago-MK07",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk07.tscn",
+      "side": false,
+      "title": "先别把东西平均分"
+    },
+    {
+      "id": "MK08",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK07"
+      ],
+      "reward_id": "archipelago-MK08",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk08.tscn",
+      "side": false,
+      "title": "多出来的三瓶油"
+    },
+    {
+      "id": "MK09",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK08"
+      ],
+      "reward_id": "archipelago-MK09",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk09.tscn",
+      "side": false,
+      "title": "不必两个人就换成"
+    },
+    {
+      "id": "MK10",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK09"
+      ],
+      "reward_id": "archipelago-MK10",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk10.tscn",
+      "side": false,
+      "title": "无论回哪封信"
+    },
+    {
+      "id": "MK11",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK10"
+      ],
+      "reward_id": "archipelago-MK11",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk11.tscn",
+      "side": false,
+      "title": "砝码也能站在货物旁"
+    },
+    {
+      "id": "MK12",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK11"
+      ],
+      "reward_id": "archipelago-MK12",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk12.tscn",
+      "side": false,
+      "title": "不一样多，也都够用"
+    },
+    {
+      "id": "MK13",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK04"
+      ],
+      "reward_id": "archipelago-MK13",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk13.tscn",
+      "side": true,
+      "title": "扣扣的旧围巾"
+    },
+    {
+      "id": "MK14",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK11"
+      ],
+      "reward_id": "archipelago-MK14",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk14.tscn",
+      "side": true,
+      "title": "三枚砝码的小摊"
+    },
+    {
+      "id": "MK15",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK09"
+      ],
+      "reward_id": "archipelago-MK15",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk15.tscn",
+      "side": true,
+      "title": "不会越换越多的铜果"
+    },
+    {
+      "id": "MK16",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK12"
+      ],
+      "reward_id": "archipelago-MK16",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk16.tscn",
+      "side": true,
+      "title": "给森林寄回一份礼物"
+    },
+    {
+      "id": "MK17",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK12"
+      ],
+      "reward_id": "archipelago-MK17",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk17.tscn",
+      "side": false,
+      "title": "铜鹭巡守 · 三次验货"
+    },
+    {
+      "id": "MK18",
+      "implementation": "present",
+      "island": "market",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "MK17"
+      ],
+      "reward_id": "archipelago-MK18",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/market_mk18.tscn",
+      "side": false,
+      "title": "万签守约兽 · 让每一盏灯都有回信"
+    },
+    {
+      "id": "GW01",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [],
+      "reward_id": "archipelago-GW01",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw01.tscn",
+      "side": false,
+      "title": "被蒸汽抹去的货单"
+    },
+    {
+      "id": "GW02",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW01"
+      ],
+      "reward_id": "archipelago-GW02",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw02.tscn",
+      "side": false,
+      "title": "留样之后，还缺多少"
+    },
+    {
+      "id": "GW03",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW02"
+      ],
+      "reward_id": "archipelago-GW03",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw03.tscn",
+      "side": false,
+      "title": "相遇了，还不能交接"
+    },
+    {
+      "id": "GW04",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW03"
+      ],
+      "reward_id": "archipelago-GW04",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw04.tscn",
+      "side": false,
+      "title": "两班船，都要赶上"
+    },
+    {
+      "id": "GW05",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW04"
+      ],
+      "reward_id": "archipelago-GW05",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw05.tscn",
+      "side": false,
+      "title": "七拍能做完吗"
+    },
+    {
+      "id": "GW06",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW05"
+      ],
+      "reward_id": "archipelago-GW06",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw06.tscn",
+      "side": false,
+      "title": "产量一样，工时不同"
+    },
+    {
+      "id": "GW07",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW06"
+      ],
+      "reward_id": "archipelago-GW07",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw07.tscn",
+      "side": false,
+      "title": "检修前，先留好位置"
+    },
+    {
+      "id": "GW08",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW07"
+      ],
+      "reward_id": "archipelago-GW08",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw08.tscn",
+      "side": false,
+      "title": "两张旧单，锁定一块槽板"
+    },
+    {
+      "id": "GW09",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW08"
+      ],
+      "reward_id": "archipelago-GW09",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw09.tscn",
+      "side": false,
+      "title": "既不漏灯，也不错站"
+    },
+    {
+      "id": "GW10",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW09"
+      ],
+      "reward_id": "archipelago-GW10",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw10.tscn",
+      "side": false,
+      "title": "最急的那单，为什么不能先开"
+    },
+    {
+      "id": "GW11",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW10"
+      ],
+      "reward_id": "archipelago-GW11",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw11.tscn",
+      "side": false,
+      "title": "两张船票，倒排到同一张台"
+    },
+    {
+      "id": "GW12",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW11"
+      ],
+      "reward_id": "archipelago-GW12",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw12.tscn",
+      "side": false,
+      "title": "两班合起来，槽数才找得到"
+    },
+    {
+      "id": "GW13",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW04"
+      ],
+      "reward_id": "archipelago-GW13",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw13.tscn",
+      "side": true,
+      "title": "两只鸟，到底叫了几次"
+    },
+    {
+      "id": "GW14",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW08"
+      ],
+      "reward_id": "archipelago-GW14",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw14.tscn",
+      "side": true,
+      "title": "第三张记录才有用"
+    },
+    {
+      "id": "GW15",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW09"
+      ],
+      "reward_id": "archipelago-GW15",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw15.tscn",
+      "side": true,
+      "title": "最早的一次观察"
+    },
+    {
+      "id": "GW16",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW12"
+      ],
+      "reward_id": "archipelago-GW16",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw16.tscn",
+      "side": true,
+      "title": "找全四种午休曲"
+    },
+    {
+      "id": "GW17",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW12"
+      ],
+      "reward_id": "archipelago-GW17",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw17.tscn",
+      "side": false,
+      "title": "巡轨兽 · 空出第一拍"
+    },
+    {
+      "id": "GW18",
+      "implementation": "present",
+      "island": "workshop",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GW17"
+      ],
+      "reward_id": "archipelago-GW18",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/workshop_gw18.tscn",
+      "side": false,
+      "title": "百臂总机 · 两种船期，一套准备"
+    },
+    {
+      "id": "GV01",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [],
+      "reward_id": "geometry.gv01",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv01.tscn",
+      "side": false,
+      "title": "转角石桥"
+    },
+    {
+      "id": "GV02",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV01"
+      ],
+      "reward_id": "geometry.gv02",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv02.tscn",
+      "side": false,
+      "title": "镜面阶梯"
+    },
+    {
+      "id": "GV03",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV02"
+      ],
+      "reward_id": "geometry.gv03",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv03.tscn",
+      "side": false,
+      "title": "双梁渡口"
+    },
+    {
+      "id": "GV04",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV03"
+      ],
+      "reward_id": "geometry.gv04",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv04.tscn",
+      "side": false,
+      "title": "三翼院落"
+    },
+    {
+      "id": "GV05",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV04"
+      ],
+      "reward_id": "geometry.gv05",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv05.tscn",
+      "side": false,
+      "title": "倒影花园"
+    },
+    {
+      "id": "GV06",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV05"
+      ],
+      "reward_id": "geometry.gv06",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv06.tscn",
+      "side": false,
+      "title": "四面风铃"
+    },
+    {
+      "id": "GV07",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV06"
+      ],
+      "reward_id": "geometry.gv07",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv07.tscn",
+      "side": false,
+      "title": "最省篱笆"
+    },
+    {
+      "id": "GV08",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV07"
+      ],
+      "reward_id": "geometry.gv08",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv08.tscn",
+      "side": false,
+      "title": "细长苗圃"
+    },
+    {
+      "id": "GV09",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV08"
+      ],
+      "reward_id": "geometry.gv09",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv09.tscn",
+      "side": false,
+      "title": "绕井梯田"
+    },
+    {
+      "id": "GV10",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV09"
+      ],
+      "reward_id": "geometry.gv10",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv10.tscn",
+      "side": false,
+      "title": "截梁搭台"
+    },
+    {
+      "id": "GV11",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV10"
+      ],
+      "reward_id": "geometry.gv11",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv11.tscn",
+      "side": false,
+      "title": "双缝码头"
+    },
+    {
+      "id": "GV12",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV11"
+      ],
+      "reward_id": "geometry.gv12",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv12.tscn",
+      "side": false,
+      "title": "留井回廊"
+    },
+    {
+      "id": "GV13",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV05"
+      ],
+      "reward_id": "geometry.gv13",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv13.tscn",
+      "side": true,
+      "title": "斜谷倒影"
+    },
+    {
+      "id": "GV14",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV08"
+      ],
+      "reward_id": "geometry.gv14",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv14.tscn",
+      "side": true,
+      "title": "回旋古井"
+    },
+    {
+      "id": "GV15",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV09"
+      ],
+      "reward_id": "geometry.gv15",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv15.tscn",
+      "side": true,
+      "title": "分开的药田"
+    },
+    {
+      "id": "GV16",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV12"
+      ],
+      "reward_id": "geometry.gv16",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv16.tscn",
+      "side": true,
+      "title": "四亭合院"
+    },
+    {
+      "id": "GV17",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV12"
+      ],
+      "reward_id": "geometry.gv17",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv17.tscn",
+      "side": false,
+      "title": "镜岭守护者"
+    },
+    {
+      "id": "GV18",
+      "implementation": "present",
+      "island": "geometry",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "GV17"
+      ],
+      "reward_id": "geometry.gv18",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/geometry_gv18.tscn",
+      "side": false,
+      "title": "山谷建筑师"
+    },
+    {
+      "id": "FW01",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [],
+      "reward_id": "reward_FW01",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw01.tscn",
+      "side": false,
+      "title": "荷叶上的一半"
+    },
+    {
+      "id": "FW02",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW01"
+      ],
+      "reward_id": "reward_FW02",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw02.tscn",
+      "side": false,
+      "title": "三畦同饮"
+    },
+    {
+      "id": "FW03",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW02"
+      ],
+      "reward_id": "reward_FW03",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw03.tscn",
+      "side": false,
+      "title": "大小池的半边"
+    },
+    {
+      "id": "FW04",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW03"
+      ],
+      "reward_id": "reward_FW04",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw04.tscn",
+      "side": false,
+      "title": "四分之三的荷台"
+    },
+    {
+      "id": "FW05",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW04"
+      ],
+      "reward_id": "reward_FW05",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw05.tscn",
+      "side": false,
+      "title": "绕过睡莲的细流"
+    },
+    {
+      "id": "FW06",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW05"
+      ],
+      "reward_id": "reward_FW06",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw06.tscn",
+      "side": false,
+      "title": "两种花的同一拍"
+    },
+    {
+      "id": "FW07",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW06"
+      ],
+      "reward_id": "reward_FW07",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw07.tscn",
+      "side": false,
+      "title": "借出一半之前"
+    },
+    {
+      "id": "FW08",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW07"
+      ],
+      "reward_id": "reward_FW08",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw08.tscn",
+      "side": false,
+      "title": "两次相赠的旧约"
+    },
+    {
+      "id": "FW09",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW08"
+      ],
+      "reward_id": "reward_FW09",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw09.tscn",
+      "side": false,
+      "title": "窄池轮流接水"
+    },
+    {
+      "id": "FW10",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW09"
+      ],
+      "reward_id": "reward_FW10",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw10.tscn",
+      "side": false,
+      "title": "回流渠不浪费"
+    },
+    {
+      "id": "FW11",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW10"
+      ],
+      "reward_id": "reward_FW11",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw11.tscn",
+      "side": false,
+      "title": "余水再分的账页"
+    },
+    {
+      "id": "FW12",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW11"
+      ],
+      "reward_id": "reward_FW12",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw12.tscn",
+      "side": false,
+      "title": "环庭的四处刻线"
+    },
+    {
+      "id": "FW13",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW02"
+      ],
+      "reward_id": "reward_FW13",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw13.tscn",
+      "side": true,
+      "title": "双叶不同的拼法"
+    },
+    {
+      "id": "FW14",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW04"
+      ],
+      "reward_id": "reward_FW14",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw14.tscn",
+      "side": true,
+      "title": "碎瓷莲瓣修复"
+    },
+    {
+      "id": "FW15",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW09"
+      ],
+      "reward_id": "reward_FW15",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw15.tscn",
+      "side": true,
+      "title": "三拍赶上晨露"
+    },
+    {
+      "id": "FW16",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW11"
+      ],
+      "reward_id": "reward_FW16",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw16.tscn",
+      "side": true,
+      "title": "并排的两幅水纹"
+    },
+    {
+      "id": "FW17",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW12"
+      ],
+      "reward_id": "reward_FW17",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw17.tscn",
+      "side": false,
+      "title": "守潮者的换闸"
+    },
+    {
+      "id": "FW18",
+      "implementation": "present",
+      "island": "fractions",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "FW17"
+      ],
+      "reward_id": "reward_FW18",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/fractions_fw18.tscn",
+      "side": false,
+      "title": "让六岛花庭回应"
+    },
+    {
+      "id": "SO01",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [],
+      "reward_id": "reward_SO01",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so01.tscn",
+      "side": false,
+      "title": "双倍北斗"
+    },
+    {
+      "id": "SO02",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO01"
+      ],
+      "reward_id": "reward_SO02",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so02.tscn",
+      "side": false,
+      "title": "搬家的观测基点"
+    },
+    {
+      "id": "SO03",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO02"
+      ],
+      "reward_id": "reward_SO03",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so03.tscn",
+      "side": false,
+      "title": "口袋里的南十字"
+    },
+    {
+      "id": "SO04",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO03"
+      ],
+      "reward_id": "reward_SO04",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so04.tscn",
+      "side": false,
+      "title": "晨光百叶"
+    },
+    {
+      "id": "SO05",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO04"
+      ],
+      "reward_id": "reward_SO05",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so05.tscn",
+      "side": false,
+      "title": "两窗同亮度"
+    },
+    {
+      "id": "SO06",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO05"
+      ],
+      "reward_id": "reward_SO06",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so06.tscn",
+      "side": false,
+      "title": "暴风后的余窗"
+    },
+    {
+      "id": "SO07",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO06"
+      ],
+      "reward_id": "reward_SO07",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so07.tscn",
+      "side": false,
+      "title": "先看哪两面镜"
+    },
+    {
+      "id": "SO08",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO07"
+      ],
+      "reward_id": "reward_SO08",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so08.tscn",
+      "side": false,
+      "title": "避开串光的镜链"
+    },
+    {
+      "id": "SO09",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO08"
+      ],
+      "reward_id": "reward_SO09",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so09.tscn",
+      "side": false,
+      "title": "中继站的邮路"
+    },
+    {
+      "id": "SO10",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO09"
+      ],
+      "reward_id": "reward_SO10",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so10.tscn",
+      "side": false,
+      "title": "一座泊位三封信"
+    },
+    {
+      "id": "SO11",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO10"
+      ],
+      "reward_id": "reward_SO11",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so11.tscn",
+      "side": false,
+      "title": "两轨交叉的灯影"
+    },
+    {
+      "id": "SO12",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO11"
+      ],
+      "reward_id": "reward_SO12",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so12.tscn",
+      "side": false,
+      "title": "慢船也能赶上"
+    },
+    {
+      "id": "SO13",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO03"
+      ],
+      "reward_id": "reward_SO13",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so13.tscn",
+      "side": true,
+      "title": "离轴风筝星座"
+    },
+    {
+      "id": "SO14",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO06"
+      ],
+      "reward_id": "reward_SO14",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so14.tscn",
+      "side": true,
+      "title": "少动几片百叶"
+    },
+    {
+      "id": "SO15",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO09"
+      ],
+      "reward_id": "reward_SO15",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so15.tscn",
+      "side": true,
+      "title": "每封信都过灯塔"
+    },
+    {
+      "id": "SO16",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO12"
+      ],
+      "reward_id": "reward_SO16",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so16.tscn",
+      "side": true,
+      "title": "最紧凑的夜班"
+    },
+    {
+      "id": "SO17",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO12"
+      ],
+      "reward_id": "reward_SO17",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so17.tscn",
+      "side": false,
+      "title": "星风守望者"
+    },
+    {
+      "id": "SO18",
+      "implementation": "present",
+      "island": "observatory",
+      "native_evidence": "each level actual input at1280x720 and960x540",
+      "prerequisites": [
+        "SO17"
+      ],
+      "reward_id": "reward_SO18",
+      "rule_evidence": "actual action completion validated",
+      "scene": "res://game/observatory_so18.tscn",
+      "side": false,
+      "title": "六岛归航"
+    }
+  ],
+  "main": 84,
+  "optional": 24
+}

@@ -1,6 +1,27 @@
 # 像素数学：数字群岛
 
-当前可玩版本：**v0.7.0 森林来信 · 表现精修版**。从第一袋种子出发，修复村仓与磨坊、整理邮路、结识苔团和折羽，接住石灵的变招，唤醒雾冠树心。
+## 六岛完整内容开发版 · v0.8.0
+
+默认入口已改为六岛航路：双击 **启动数字群岛.command**，或在 Godot 中打开项目按 F5。也可运行 `godot --path . --scene game/archipelago.tscn`。
+
+六岛共 **108 个关卡入口**：森林 FL01–18、集市 MK01–18、工坊 GW01–18、几何山谷 GV01–18、分数水庭 FW01–18、星穹观测台 SO01–18。每岛 14 个主线关和 4 个可选支线，支线不阻挡下一座岛。默认「继续故事」按真实前置衔接；已完成关仍可回访和重玩。
+
+新三岛包括实际拼接／旋转／镜像／割补、等分与不同整体的水量、开闸与逆推分配、缩放星图／百叶百分数／有序路线／排班／网络修复，以及六场独立综合首领。关卡从玩家实际操作的几何、水量、路线与时间状态判定，不是填完选项就自动过关。
+
+群岛手记使用独立 `user://profiles/archipelago-v1/save-v1.json`：保存新三岛的冻结参数、进行中机关、手动对白、完成证据、首次奖励、最多两位同行伙伴、观察签使用与每次完成事实。重玩会留下新的练习记录，不重复首通奖励。森林／集市／工坊原档继续归原关卡管理，群岛只读取经过校验的完成证据；旧森林档若未保存棋盘，只保留经过整档验证的历史完成来源，不冒充独立解答或掌握证明。
+
+- 保存失败停在原状态，并重试同一个候选；损坏／未知版本保留原文件
+- 机关支持撤销、提示、确认重摆、暂停、返回与恢复；操作不设思考倒计时
+- 营地与手记可查看伙伴、选择下次同行队伍、回看事实记录与六岛纪念；练习建议可跳过
+- 旧入口、旧场景与旧档案仍保留。群岛经验是独立汇总，不向森林重复发经验、木片或建设
+
+实现与验证范围见 [六岛运行说明](docs/production/archipelago/runtime.md) 和 [108 关验收清单](docs/production/archipelago/acceptance.md)。本轮实际验证环境为 Linux / Godot 4.6.3；项目既有 4.7 声明保留，不能据此声称 macOS、Godot 4.7、触屏或儿童真人体验已验收。新三岛采用引擎绘制的机制场景，未宣称与前作源像素美术同等精修。
+
+---
+
+## 已有章节与历史验证说明
+
+原森林章节版本：**v0.7.0 森林来信 · 表现精修版**。从第一袋种子出发，修复村仓与磨坊、整理邮路、结识苔团和折羽，接住石灵的变招，唤醒雾冠树心。
 
 本章包含 **18个主支线关卡、五个探索地区、三位伙伴、两位同行队伍、阿橙一次成长和三项营地建设**。解开每关的机关即可通关；两场首领采用实际战斗机制。游戏离线运行，提示与失败不减少首次奖励。本轮为表现精修：羊皮纸/黄铜界面皮肤、24点改成磨坊能量台（齿轮与能量表盘）、光晶与符石道具化、地区可戳的风味热点、过关后的灯光留存，关卡规则与存档未变。
 
@@ -63,9 +84,9 @@
 
 2026-09-21 十八关玩法复核后修掉三处：MK03 第三级提示的换箱算术改为算得通的「3 个蓝箱加 2 斤」；MK02 走死那一格（把线全换成 6 根灯芯）多给一枚只在走死时出现的「回本关开头」；MK17 的死局判定从「这一站交得出去」改成「剩下每一站都还办得成」，随之把两处回退措辞如实化。断言与证据见这三关的契约与 `verification.json`（mk02 71+110、mk03 174+118、mk17 314+212）。
 
-## 齿轮工坊 · 第三岛 GW01–GW07
+## 齿轮工坊 · 第三岛 GW01–GW18 与工坊航图
 
-第三岛（齿轮工坊）已实现前七关，每关一个独立入口与独立存档（`user://profiles/workshop-gwNN-1/save-v1.json`）。双击 `启动齿轮工坊GWNN样板.command` 或从 `game/workshop_gwNN.tscn` 进关。
+第三岛（齿轮工坊）18 关已实现。双击 [启动齿轮工坊岛.command](启动齿轮工坊岛.command) 进入工坊航图，按前置解锁、继续主线或重玩；4 条支线不阻挡主线。也可继续使用各关的独立入口 `启动齿轮工坊GWNN样板.command`。关卡档由 [章节目录](scripts/workshop/chapter_catalog.gd) 定义，GW01 使用 `workshop-gw01-3`，其余使用 `workshop-gwNN-1`。
 
 | 关卡 | 这一幕要办成的事 | 契约 / 验证 |
 | --- | --- | --- |
@@ -76,10 +97,23 @@
 | GW05 七拍能做完吗 | 排两条工序带，七拍内做完三件工具 | [契约](docs/production/workshop_gw05_sample.md) · [验证](docs/playtest/workshop-gw05/verification.json) |
 | GW06 产量一样，工时不同 | 选炉次少、换模也少的产量组合，八拍内做出 31 枚扣环 | [契约](docs/production/workshop_gw06_sample.md) · [验证](docs/playtest/workshop-gw06/verification.json) |
 | GW07 检修前，先留好位置 | 检修前留好暂存位，第 11 拍完成全部四件 | [契约](docs/production/workshop_gw07_sample.md) · [验证](docs/playtest/workshop-gw07/verification.json) |
+| GW08 两张旧单，锁定一块槽板 | 用两张旧记录锁定一块槽板的槽数 | [契约](docs/production/workshop_gw08_sample.md) · [验证](docs/playtest/workshop-gw08/verification.json) |
+| GW09 既不漏灯，也不错站 | 找既不漏灯、第 3 站又停在 9 号灯的步长 | [契约](docs/production/workshop_gw09_sample.md) · [验证](docs/playtest/workshop-gw09/verification.json) |
+| GW10 最急的那单，为什么不能先开 | 把到料时间算进去，排出全不逾期的顺序 | [契约](docs/production/workshop_gw10_sample.md) · [验证](docs/playtest/workshop-gw10/verification.json) |
+| GW11 两张船票，倒排到同一张台 | 两张船票倒排到同一张装配台 | [契约](docs/production/workshop_gw11_sample.md) · [验证](docs/playtest/workshop-gw11/verification.json) |
+| GW12 两班合起来，槽数才找得到 | 先看两班总账，再还原每班交了多少满托 | [契约](docs/production/workshop_gw12_sample.md) · [验证](docs/playtest/workshop-gw12/verification.json) |
+| GW13 两只鸟，到底叫了几次 | 数清听到叫声的时刻与独鸣的时刻 | [契约](docs/production/workshop_gw13_sample.md) · [验证](docs/playtest/workshop-gw13/verification.json) |
+| GW14 第三张记录才有用 | 用第三张记录排除候选 | [契约](docs/production/workshop_gw14_sample.md) · [验证](docs/playtest/workshop-gw14/verification.json) |
+| GW15 最早的一次观察 | 选最早的一次观察，分清三种周期 | [契约](docs/production/workshop_gw15_sample.md) · [验证](docs/playtest/workshop-gw15/verification.json) |
+| GW16 找全四种午休曲 | 找全四种互不相同的午休铃句 | [契约](docs/production/workshop_gw16_sample.md) · [验证](docs/playtest/workshop-gw16/verification.json) |
+| GW17 巡轨兽 · 空出第一拍 | 给四辆车排出唯一一张完整时刻表 | [契约](docs/production/workshop_gw17_sample.md) · [验证](docs/playtest/workshop-gw17/verification.json) |
+| GW18 百臂总机 · 两种船期，一套准备 | 一套计划应付早晚两班，第 10 拍开船 | [契约](docs/production/workshop_gw18_sample.md) · [验证](docs/playtest/workshop-gw18/verification.json) |
 
-七关共用 `level_host.gd` 的宿主：事务存档、撤销、四档主动提示、暂停/跳过失焦、坏档保护与中途恢复一致；数量、时间格、刻度、指针与货物归属全部由引擎绘制，母版只提供场景与造型。GW02～GW07 的思考方法依次是还原总量、周期重合、调整起点、最早时刻下限、数量分类与有限空间留位。
+十八关通过 `workshop_host.gd` 复用 `level_host.gd` 的宿主：事务存档、撤销、四档主动提示、暂停/跳过失焦、坏档保护与中途恢复一致；数量、时间格、刻度、指针与货物归属全部由引擎绘制，母版只提供场景与造型。GW02～GW07 的思考方法依次是还原总量、周期重合、调整起点、最早时刻下限、数量分类与有限空间留位。
 
-复验：`python3 tests/workshop/run_checks.py`（逐关无头规则 + 真实 macOS 窗口，1280×720 与 960×540），也可只跑指定几关，例如 `python3 tests/workshop/run_checks.py GW05 GW06`。GW08–GW18 与齿轮工坊航图尚未实现。
+复验：`python3 tests/workshop/run_checks.py`（逐关无头规则 + 真实 macOS 窗口，1280×720 与 960×540），也可只跑指定几关，例如 `python3 tests/workshop/run_checks.py GW05 GW06`。工坊航图另验：`python3 tests/workshop/run_hub_checks.py`；无显示环境可用 `--headless`，只验证规则与往返逻辑，不代表画面已验收。
+
+航图用独立 `workshop-chapter-v1` 章节档，只读取通过各关规则校验的完成证据；关中可返回，完成后重玩不会丢失已记住的完成记录。坏档保留原文件，保存失败可重试。本次不新增跨岛入口。见 [工坊航图契约](docs/production/workshop_chapter_hub.md)。新增功能本轮验证平台为 Linux / Godot 4.6.3，原项目 Godot 4.7 与 macOS 尚需另验。
 
 ## 开始游戏
 
@@ -143,4 +177,4 @@ python3 tests/forest/run_checks.py --windows
 
 [正式制作契约](docs/production/index.md) · [美术资源记录](art/forest_release_assets.json) · [字体与许可](assets/fonts/README.md)
 
-当前目录没有Git仓库，因此没有提交记录；未发布或部署。
+本项目已纳入 Git；当前工坊航图改动仅在本地分支，未发布或部署。

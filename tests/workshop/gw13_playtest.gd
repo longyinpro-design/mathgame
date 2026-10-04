@@ -144,6 +144,7 @@ func run() -> void:
 		await click("deliver"); check(game.modal and game.state == saved,"claim save failure preserves the record")
 		game.repository.fail_at = ""; await click("retry")
 		check(game.state.stage == "delivery","retry installs the claim exactly once")
+		game.paused = true # Keep the manual skip target stable while software rendering captures.
 		await capture(prefix+"04-delivery")
 		await click("skip"); check(game.state.stage == "aftermath" and game.state.beat == 0,"result stops for dialogue")
 		await create_timer(0.1).timeout; check(game.state.beat == 0,"story never auto-advances")

@@ -1,0 +1,74 @@
+{
+  "GV01": {
+    "solutions": 1
+  },
+  "GV02": {
+    "solutions": 1
+  },
+  "GV03": {
+    "solutions": 4
+  },
+  "GV04": {
+    "solutions": 12
+  },
+  "GV05": {
+    "closure_area": 5
+  },
+  "GV06": {
+    "closure_area": 6
+  },
+  "GV07": {
+    "solutions": 12,
+    "global_minimum": 10
+  },
+  "GV08": {
+    "solutions": 340
+  },
+  "GV09": {
+    "solutions": 4
+  },
+  "GV10": {
+    "solutions": 2
+  },
+  "GV11": {
+    "solutions": 18
+  },
+  "GV12": {
+    "solutions": 48
+  },
+  "GV13": {
+    "closure_area": 5
+  },
+  "GV14": {
+    "closure_area": 5
+  },
+  "GV15": {
+    "solutions": 1632
+  },
+  "GV16": {
+    "solutions": 16
+  },
+  "GV17": {
+    "shield_solutions": [
+      1,
+      1
+    ]
+  },
+  "GV18": {
+    "foundation_solutions": 340,
+    "all_derived_rock_branches": [
+      [
+        3,
+        0
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        0
+      ]
+    ]
+  }
+}

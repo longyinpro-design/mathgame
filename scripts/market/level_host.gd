@@ -5,6 +5,7 @@ extends Control
 # shortfalls() 与玩家动作函数按关卡需要出现。
 # configure() 只能给 save_path 一类字段填默认值：实窗测试会在加入场景树前先写入自己的
 # /tmp 路径，子类若无条件覆盖就会读写玩家真实存档。
+const Archipelago = preload("res://scripts/archipelago/bridge.gd")
 const Repository = preload("res://scripts/persistence/save_repository.gd")
 const UIStyle = preload("res://scripts/cargo/skin.gd")
 const Bridge = preload("res://scripts/market/market_bridge.gd")
@@ -53,6 +54,7 @@ func _ready() -> void:
 	if consumes_origin():
 		origin = Bridge.origin; Bridge.origin = ""
 	configure()
+	save_path = Archipelago.legacy_path(level_id,save_path)
 	state = rules.fresh()
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	repository.path = save_path
@@ -69,6 +71,7 @@ func _ready() -> void:
 	get_window().theme = UIStyle.tooltip_theme()
 	refresh()
 	if read.status == "protected": show_protected()
+	Archipelago.attach_legacy(self,"workshop" if level_id.begins_with("GW") else "market")
 
 func _exit_tree() -> void:
 	if is_instance_valid(get_window()): get_window().theme = window_theme

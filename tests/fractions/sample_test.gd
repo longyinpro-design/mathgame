@@ -1,0 +1,16 @@
+extends SceneTree
+const Catalog = preload("res://scripts/fractions/catalog.gd")
+const Rules = preload("res://scripts/fractions/rules.gd")
+func _init():
+	var r = Rules.new(Catalog.definition("FW01"))
+	var s = r.fresh()
+	var before = s.duplicate(true)
+	s = r.apply(s,{"type":"split","tile":0,"parts":2})
+	assert(before == r.fresh())
+	s = r.apply(s,{"type":"place","tile":0,"owner":0})
+	s = r.apply(s,{"type":"place","tile":1,"owner":1})
+	assert(r.solved(s))
+	assert(not r.validate({"actions":[],"solved":true}))
+	assert(r.apply(s,{"type":"place","tile":0,"owner":2}).is_empty())
+	print("FW01 SAMPLE PASS")
+	quit()

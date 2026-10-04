@@ -1,0 +1,732 @@
+{
+  "FW01": [
+    {
+      "type": "split",
+      "tile": 0,
+      "parts": 2
+    },
+    {
+      "type": "place",
+      "tile": 0,
+      "owner": 0
+    },
+    {
+      "type": "place",
+      "tile": 1,
+      "owner": 1
+    }
+  ],
+  "FW02": [
+    {
+      "type": "place",
+      "tile": 0,
+      "owner": 0
+    },
+    {
+      "type": "place",
+      "tile": 1,
+      "owner": 0
+    },
+    {
+      "type": "place",
+      "tile": 2,
+      "owner": 1
+    },
+    {
+      "type": "place",
+      "tile": 3,
+      "owner": 1
+    },
+    {
+      "type": "place",
+      "tile": 4,
+      "owner": 2
+    },
+    {
+      "type": "place",
+      "tile": 5,
+      "owner": 2
+    }
+  ],
+  "FW03": [
+    {
+      "type": "place",
+      "tile": 0,
+      "owner": 0
+    },
+    {
+      "type": "place",
+      "tile": 1,
+      "owner": 0
+    },
+    {
+      "type": "place",
+      "tile": 2,
+      "owner": 1
+    },
+    {
+      "type": "place",
+      "tile": 3,
+      "owner": 1
+    }
+  ],
+  "FW04": [
+    {
+      "type": "place",
+      "tile": 0,
+      "owner": 0
+    },
+    {
+      "type": "place",
+      "tile": 1,
+      "owner": 0
+    },
+    {
+      "type": "place",
+      "tile": 2,
+      "owner": 1
+    },
+    {
+      "type": "place",
+      "tile": 3,
+      "owner": 1
+    }
+  ],
+  "FW05": [
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    }
+  ],
+  "FW06": [
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    }
+  ],
+  "FW07": [
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 1
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 1
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 1
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 1
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 1
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 1
+    },
+    {
+      "type": "release"
+    }
+  ],
+  "FW08": [
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 1
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 1
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 1
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 2
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 2
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 2
+    },
+    {
+      "type": "release"
+    }
+  ],
+  "FW09": [
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 2
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 2
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 2
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 2
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    }
+  ],
+  "FW10": [
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 2
+    },
+    {
+      "type": "gate",
+      "edge": 3
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 2
+    },
+    {
+      "type": "gate",
+      "edge": 3
+    }
+  ],
+  "FW11": [
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 1
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 1
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 2
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 2
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 2
+    },
+    {
+      "type": "shift",
+      "source": 0,
+      "target": 2
+    },
+    {
+      "type": "release"
+    }
+  ],
+  "FW12": [
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "gate",
+      "edge": 2
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "gate",
+      "edge": 2
+    }
+  ],
+  "FW13": [
+    {
+      "type": "place",
+      "tile": 0,
+      "owner": 0
+    },
+    {
+      "type": "place",
+      "tile": 1,
+      "owner": 1
+    },
+    {
+      "type": "place",
+      "tile": 2,
+      "owner": 1
+    },
+    {
+      "type": "place",
+      "tile": 3,
+      "owner": 1
+    }
+  ],
+  "FW14": [
+    {
+      "type": "split",
+      "tile": 0,
+      "parts": 3
+    },
+    {
+      "type": "split",
+      "tile": 0,
+      "parts": 3
+    },
+    {
+      "type": "place",
+      "tile": 0,
+      "owner": 0
+    },
+    {
+      "type": "place",
+      "tile": 1,
+      "owner": 0
+    },
+    {
+      "type": "place",
+      "tile": 2,
+      "owner": 0
+    },
+    {
+      "type": "place",
+      "tile": 3,
+      "owner": 1
+    },
+    {
+      "type": "place",
+      "tile": 4,
+      "owner": 1
+    },
+    {
+      "type": "place",
+      "tile": 5,
+      "owner": 1
+    }
+  ],
+  "FW15": [
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "gate",
+      "edge": 2
+    },
+    {
+      "type": "gate",
+      "edge": 3
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 2
+    },
+    {
+      "type": "gate",
+      "edge": 3
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "gate",
+      "edge": 2
+    },
+    {
+      "type": "gate",
+      "edge": 3
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "gate",
+      "edge": 2
+    },
+    {
+      "type": "gate",
+      "edge": 3
+    }
+  ],
+  "FW16": [
+    {
+      "type": "split",
+      "tile": 0,
+      "parts": 2
+    },
+    {
+      "type": "split",
+      "tile": 0,
+      "parts": 2
+    },
+    {
+      "type": "place",
+      "tile": 0,
+      "owner": 0
+    },
+    {
+      "type": "place",
+      "tile": 1,
+      "owner": 1
+    },
+    {
+      "type": "place",
+      "tile": 2,
+      "owner": 2
+    },
+    {
+      "type": "place",
+      "tile": 3,
+      "owner": 3
+    }
+  ],
+  "FW17": [
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "checkpoint"
+    },
+    {
+      "type": "gate",
+      "edge": 3
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 3
+    }
+  ],
+  "FW18": [
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 0
+    },
+    {
+      "type": "gate",
+      "edge": 1
+    },
+    {
+      "type": "checkpoint"
+    },
+    {
+      "type": "gate",
+      "edge": 4
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 4
+    },
+    {
+      "type": "gate",
+      "edge": 4
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 4
+    },
+    {
+      "type": "checkpoint"
+    },
+    {
+      "type": "gate",
+      "edge": 3
+    },
+    {
+      "type": "pulse"
+    },
+    {
+      "type": "gate",
+      "edge": 3
+    }
+  ]
+}

@@ -1,8 +1,12 @@
 extends "res://scripts/market/level_host.gd"
 # 齿轮工坊共用宿主：存档事务、撤销、提示与演出生命周期继续复用集市宿主，
-# 只把章专属的几处收口在这里——章节名换成工坊、不消费千灯航图的 Bridge.origin、
+# 章专属行为收口在这里：工坊独立往返桥，不消费千灯航图的 Bridge.origin、
 # 提醒署上嗒嗒的名字，并在世界之上、按钮之下挂一个常驻的小岚。
 # GW02 起的新关卡直接 extends 本文件，不要再逐关复制 _ready()/_process()。
+const WorkshopBridge = preload("res://scripts/workshop/workshop_bridge.gd")
+const WorkshopCatalog = preload("res://scripts/workshop/chapter_catalog.gd")
+const WorkshopProgress = preload("res://scripts/workshop/chapter_progress.gd")
+var navigating = false
 const Companion = preload("res://scripts/workshop/companion.gd")
 const Chime = preload("res://scripts/workshop/chime.gd")
 var companion: Node2D
@@ -20,6 +24,11 @@ func companion_foot() -> Vector2: return Vector2(110,620)
 func companion_scale() -> float: return 1.0
 
 func _ready() -> void:
+	origin = WorkshopBridge.origin
+	WorkshopBridge.origin = ""
+	# Configure once to resolve this scene's identity before applying explicit test paths.
+	configure()
+	if WorkshopBridge.level_paths.has(level_id): save_path = WorkshopBridge.level_paths[level_id]
 	super()
 	companion = Companion.new()
 	companion.foot = companion_foot()
@@ -86,3 +95,42 @@ func chime_scale(steps: int, per_beat: float = 0.28) -> void:
 	chime_stop()
 	for index in range(steps):
 		chime_at(index*per_beat,587.33*pow(2.0,float(index)/float(maxi(steps,1))))
+
+# Every workshop scene can leave even during dialogue or animation. The pending
+# save modal blocks navigation, so only committed state can be left behind.
+func refresh() -> void:
+	super()
+	add_workshop_navigation()
+
+func add_workshop_navigation() -> void:
+	if origin != "workshop_hub": return
+	add_button("back_hub","返回工坊航图",Rect2(24,98,200,46),go_hub).disabled = modal or navigating
+
+func go_hub() -> void:
+	if modal or navigating or origin != "workshop_hub": return
+	navigating = true
+	chime_stop()
+	var result = get_tree().change_scene_to_file(WorkshopCatalog.ISLAND_SCENE)
+	if result != OK:
+		navigating = false
+		message = "暂时无法返回航图，已保存的现场仍保留。"
+		refresh()
+
+# A completed level may be replayed before returning to the hub. Persist its
+# completion first, otherwise resetting its local save would lose that evidence.
+func restart() -> void:
+	if origin == "workshop_hub" and state.stage == "complete":
+		var progress = WorkshopProgress.new()
+		if not WorkshopBridge.progress_path.is_empty(): progress.path = WorkshopBridge.progress_path
+		progress.level_paths = WorkshopBridge.level_paths.duplicate()
+		var status = progress.load_record()
+		if status == "protected":
+			show_modal("工坊进度记录无法读取，原文件已保留。\n先返回航图处理记录，再重新体验本关。")
+			add_button("close_restart_error","留在现场",Rect2(660,410,226,50),close_modal,true,overlay).grab_focus()
+			return
+		progress.settle()
+		if not progress.error.is_empty():
+			show_modal(progress.error + "\n本关通关现场尚未重置。")
+			add_button("retry_restart","重试保存并重玩",Rect2(660,410,226,50),restart,true,overlay).grab_focus()
+			return
+	super()

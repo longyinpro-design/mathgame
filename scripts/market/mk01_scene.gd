@@ -1,4 +1,5 @@
 extends Control
+const Archipelago = preload("res://scripts/archipelago/bridge.gd")
 const Rules = preload("res://scripts/market/mk01_rules.gd")
 const World = preload("res://scripts/market/mk01_world.gd")
 const Repository = preload("res://scripts/persistence/save_repository.gd")
@@ -48,6 +49,7 @@ func _ready() -> void:
 	from_camp = entry == "camp"; entry = ""
 	from_hub = Bridge.origin == "hub"
 	if from_hub: Bridge.origin = ""
+	save_path = Archipelago.legacy_path("MK01",save_path)
 	repository.path = save_path
 	var read = repository.read_profile(Rules.validate)
 	if read.status == "loaded": state = read.profile
@@ -60,6 +62,7 @@ func _ready() -> void:
 	get_window().theme = UIStyle.tooltip_theme()
 	refresh()
 	if read.status == "protected": show_protected()
+	Archipelago.attach_legacy(self,"market")
 
 func _exit_tree() -> void:
 	if is_instance_valid(get_window()): get_window().theme = window_theme

@@ -11,8 +11,8 @@ config_version=5
 [application]
 
 config/name="像素数学：数字群岛"
-run/main_scene="res://game/forest_release.tscn"
-config/version="0.6.0"
+run/main_scene="res://game/archipelago.tscn"
+config/version="0.8.0"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [display]

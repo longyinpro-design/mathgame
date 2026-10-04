@@ -1,4 +1,5 @@
 extends Control
+const Archipelago = preload("res://scripts/archipelago/bridge.gd")
 const Pages = preload("res://scripts/ui/forest_pages.gd")
 const Session = preload("res://scripts/core/game_session.gd")
 const UIStyle = preload("res://scripts/cargo/skin.gd")
@@ -81,6 +82,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE; theme = UIStyle.make()
 	story_stage.finished.connect(func():
 		if page == "story": refresh())
+	save_path = Archipelago.legacy_path("FL01",save_path)
 	session.open(save_path)
 	if MarketSample.entry == "return":
 		# Back from the market dock: the crossing was already watched, so open at the camp.
@@ -89,6 +91,11 @@ func _ready() -> void:
 		page = "story"
 		if Story.scene(session.profile.story.node).kind == "puzzle": resume_story()
 	refresh()
+	Archipelago.attach_legacy(self,"forest")
+	if Archipelago.enabled and Archipelago.session != null:
+		var wanted = Archipelago.session.profile.get("active","")
+		if wanted.begins_with("FL") and (wanted in Session.Flow.SIDES or wanted in session.profile.get("progress",{}).get("completed_levels",[])):
+			call_deferred("story_excursion",wanted)
 
 func text(value: String, rect: Rect2, size_px: int = 20, paper: bool = false, parent: Node = null) -> Label:
 	var label = UIStyle.text(ui if parent == null else parent,value,rect,20,UIStyle.DARK if paper else UIStyle.INK)

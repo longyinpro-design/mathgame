@@ -1,0 +1,1436 @@
+[
+  {
+    "id": "SO01",
+    "island": "observatory",
+    "title": "双倍北斗",
+    "act": 1,
+    "side": false,
+    "prerequisites": [],
+    "concept_ids": [
+      "scale_correspondence",
+      "reference_origin"
+    ],
+    "mechanism": "scale",
+    "params": {
+      "source": [
+        [
+          1,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "source_origin": [
+        0,
+        0
+      ],
+      "origin": [
+        0,
+        0
+      ],
+      "num": 2,
+      "den": 1
+    },
+    "goal": "保持星点编号对应，从金色基点起把横纵距离按2:1缩放。",
+    "instructions": "两图每格都是1尺。旧基点[0, 0]，新基点[0, 0]。先选星点，再点右盘交点；每一个方向都按2:1缩放。",
+    "intro": [
+      "霁星：小星图要放大，才够穹顶接住信号。",
+      "霁星：基点变了，量距离的方法仍要一致。"
+    ],
+    "outro": [
+      "星线和接收架重合，远处的航标亮了。",
+      "阿橙：每个对应点都找到了自己的位置。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO01",
+      "experience": 20,
+      "keepsake": "双倍星针"
+    },
+    "scene": "res://game/observatory_so01.tscn"
+  },
+  {
+    "id": "SO02",
+    "island": "observatory",
+    "title": "搬家的观测基点",
+    "act": 1,
+    "side": false,
+    "prerequisites": [
+      "SO01"
+    ],
+    "concept_ids": [
+      "scale_correspondence",
+      "reference_origin"
+    ],
+    "mechanism": "scale",
+    "params": {
+      "source": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "source_origin": [
+        1,
+        1
+      ],
+      "origin": [
+        3,
+        2
+      ],
+      "num": 2,
+      "den": 1
+    },
+    "goal": "保持星点编号对应，从金色基点起把横纵距离按2:1缩放。",
+    "instructions": "两图每格都是1尺。旧基点[1, 1]，新基点[3, 2]。先选星点，再点右盘交点；每一个方向都按2:1缩放。",
+    "intro": [
+      "海风吹歪旧底座，新接收架搬到了星盘中央。",
+      "霁星：基点变了，量距离的方法仍要一致。"
+    ],
+    "outro": [
+      "星线和接收架重合，远处的航标亮了。",
+      "阿橙：每个对应点都找到了自己的位置。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO02",
+      "experience": 20,
+      "keepsake": "迁台铜尺"
+    },
+    "scene": "res://game/observatory_so02.tscn"
+  },
+  {
+    "id": "SO03",
+    "island": "observatory",
+    "title": "口袋里的南十字",
+    "act": 2,
+    "side": false,
+    "prerequisites": [
+      "SO02"
+    ],
+    "concept_ids": [
+      "scale_correspondence",
+      "reference_origin"
+    ],
+    "mechanism": "scale",
+    "params": {
+      "source": [
+        [
+          0,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          6,
+          6
+        ]
+      ],
+      "source_origin": [
+        0,
+        0
+      ],
+      "origin": [
+        1,
+        1
+      ],
+      "num": 1,
+      "den": 2
+    },
+    "goal": "保持星点编号对应，从金色基点起把横纵距离按1:2缩放。",
+    "instructions": "两图每格都是1尺。旧基点[0, 0]，新基点[1, 1]。先选星点，再点右盘交点；每一个方向都按1:2缩放。",
+    "intro": [
+      "小信使需要一张能装进望远镜匣的缩小星图。",
+      "霁星：基点变了，量距离的方法仍要一致。"
+    ],
+    "outro": [
+      "星线和接收架重合，远处的航标亮了。",
+      "阿橙：每个对应点都找到了自己的位置。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO03",
+      "experience": 20,
+      "keepsake": "半尺星匣"
+    },
+    "scene": "res://game/observatory_so03.tscn"
+  },
+  {
+    "id": "SO04",
+    "island": "observatory",
+    "title": "晨光百叶",
+    "act": 2,
+    "side": false,
+    "prerequisites": [
+      "SO03"
+    ],
+    "concept_ids": [
+      "percent_whole"
+    ],
+    "mechanism": "shutters",
+    "params": {
+      "sizes": [
+        20
+      ],
+      "blocked": [
+        []
+      ],
+      "initial": [
+        []
+      ],
+      "targets": [
+        25
+      ],
+      "basis": [
+        "all"
+      ],
+      "contiguous": false,
+      "min_changes": -1
+    },
+    "goal": "打开整扇20格镜窗的25%。",
+    "instructions": "点击格子开闭百叶。整体固定为全部20格；25%是整扇窗的四分之一。",
+    "intro": [
+      "穹顶太亮，第一束晨光需要经过百叶。",
+      "星鹭：先说清百分数是哪个整体的。我一直守着这扇窗。"
+    ],
+    "outro": [
+      "恰好的晨光落在星图上。",
+      "星鹭收拢照亮的羽毛：我也想陪你们把每座岛的灯接回来。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO04",
+      "experience": 20,
+      "keepsake": "晨光碎片"
+    },
+    "scene": "res://game/observatory_so04.tscn"
+  },
+  {
+    "id": "SO05",
+    "island": "observatory",
+    "title": "两窗同亮度",
+    "act": 3,
+    "side": false,
+    "prerequisites": [
+      "SO04"
+    ],
+    "concept_ids": [
+      "percent_whole",
+      "compare_wholes"
+    ],
+    "mechanism": "shutters",
+    "params": {
+      "sizes": [
+        12,
+        20
+      ],
+      "blocked": [
+        [],
+        []
+      ],
+      "initial": [
+        [],
+        []
+      ],
+      "targets": [
+        50,
+        50
+      ],
+      "basis": [
+        "all",
+        "all"
+      ],
+      "contiguous": false,
+      "min_changes": -1
+    },
+    "goal": "两扇窗各打开自己整体的50%。",
+    "instructions": "上窗整体12格，下窗整体20格。每扇都开放50%，不要求开放格数相同。",
+    "intro": [
+      "南北两面镜窗大小不同，亮度比例却要相同。",
+      "阿橙：同样一半，并不一定是同样几格。"
+    ],
+    "outro": [
+      "两束光都达到各自一半。",
+      "霁星把两张不同尺寸的镜片一起装上。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO05",
+      "experience": 20,
+      "keepsake": "双窗银框"
+    },
+    "scene": "res://game/observatory_so05.tscn"
+  },
+  {
+    "id": "SO06",
+    "island": "observatory",
+    "title": "暴风后的余窗",
+    "act": 3,
+    "side": false,
+    "prerequisites": [
+      "SO05"
+    ],
+    "concept_ids": [
+      "percent_changed_whole"
+    ],
+    "mechanism": "shutters",
+    "params": {
+      "sizes": [
+        16
+      ],
+      "blocked": [
+        [
+          0,
+          1,
+          2,
+          3
+        ]
+      ],
+      "initial": [
+        []
+      ],
+      "targets": [
+        50
+      ],
+      "basis": [
+        "remaining"
+      ],
+      "contiguous": false,
+      "min_changes": -1
+    },
+    "goal": "打开剩余完好镜窗的50%。",
+    "instructions": "原有16格，带裂纹的4格损坏不能开。此次整体是剩余12格；开放其中50%。",
+    "intro": [
+      "昨夜风暴损坏四格镜片，维修员留下了新的调光说明。",
+      "霁星：这一次，百分数的整体已经改变。"
+    ],
+    "outro": [
+      "六格完好镜片把维修灯照亮。",
+      "大家从损坏处架起安全的临时支撑。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO06",
+      "experience": 20,
+      "keepsake": "风后镜片"
+    },
+    "scene": "res://game/observatory_so06.tscn"
+  },
+  {
+    "id": "SO07",
+    "island": "observatory",
+    "title": "先看哪两面镜",
+    "act": 4,
+    "side": false,
+    "prerequisites": [
+      "SO06"
+    ],
+    "concept_ids": [
+      "ordered_counting",
+      "systematic_routes"
+    ],
+    "mechanism": "routes",
+    "params": {
+      "nodes": [
+        "东",
+        "南",
+        "西"
+      ],
+      "edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          1
+        ]
+      ],
+      "starts": [
+        0,
+        1,
+        2
+      ],
+      "ends": [
+        0,
+        1,
+        2
+      ],
+      "length": 2,
+      "required": []
+    },
+    "goal": "用观测镜/站点接出并收藏全部合法顺序，不重复、不遗漏。",
+    "instructions": "箭头只可顺向。起点：东,南,西；终点：东,南,西。每条恰好经过2个点。每点每条最多一次。点击节点接线，按“收藏此路”；可清空重画。",
+    "intro": [
+      "三面镜每次选两面依次观测；先东后南与先南后东不同。",
+      "折羽：按第一步分组，才能知道哪一种还没看过。"
+    ],
+    "outro": [
+      "所有合法路线都被真正接线记录下来。",
+      "折羽按玩家整理的目录发送观测信。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO07",
+      "experience": 20,
+      "keepsake": "双镜目录"
+    },
+    "scene": "res://game/observatory_so07.tscn"
+  },
+  {
+    "id": "SO08",
+    "island": "observatory",
+    "title": "避开串光的镜链",
+    "act": 4,
+    "side": false,
+    "prerequisites": [
+      "SO07"
+    ],
+    "concept_ids": [
+      "ordered_counting",
+      "systematic_routes"
+    ],
+    "mechanism": "routes",
+    "params": {
+      "nodes": [
+        "红",
+        "蓝",
+        "银",
+        "金"
+      ],
+      "edges": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          3,
+          2
+        ]
+      ],
+      "starts": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "ends": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "length": 3,
+      "required": []
+    },
+    "goal": "用观测镜/站点接出并收藏全部合法顺序，不重复、不遗漏。",
+    "instructions": "箭头只可顺向。起点：红,蓝,银,金；终点：红,蓝,银,金。每条恰好经过3个点。每点每条最多一次。点击节点接线，按“收藏此路”；可清空重画。",
+    "intro": [
+      "红镜与蓝镜不能连续使用；需要找全三镜顺序。",
+      "折羽：按第一步分组，才能知道哪一种还没看过。"
+    ],
+    "outro": [
+      "所有合法路线都被真正接线记录下来。",
+      "折羽按玩家整理的目录发送观测信。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO08",
+      "experience": 20,
+      "keepsake": "防串光镜链"
+    },
+    "scene": "res://game/observatory_so08.tscn"
+  },
+  {
+    "id": "SO09",
+    "island": "observatory",
+    "title": "中继站的邮路",
+    "act": 5,
+    "side": false,
+    "prerequisites": [
+      "SO08"
+    ],
+    "concept_ids": [
+      "ordered_counting",
+      "systematic_routes"
+    ],
+    "mechanism": "routes",
+    "params": {
+      "nodes": [
+        "台",
+        "北",
+        "南",
+        "桥",
+        "港"
+      ],
+      "edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          1,
+          4
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "starts": [
+        0
+      ],
+      "ends": [
+        4
+      ],
+      "length": 0,
+      "required": []
+    },
+    "goal": "用观测镜/站点接出并收藏全部合法顺序，不重复、不遗漏。",
+    "instructions": "箭头只可顺向。起点：台；终点：港。到终点即结束。每点每条最多一次。点击节点接线，按“收藏此路”；可清空重画。",
+    "intro": [
+      "星信要从观测台送到港口，每个中继站只有指定方向。",
+      "折羽：按第一步分组，才能知道哪一种还没看过。"
+    ],
+    "outro": [
+      "所有合法路线都被真正接线记录下来。",
+      "折羽按玩家整理的目录发送观测信。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO09",
+      "experience": 20,
+      "keepsake": "中继邮章"
+    },
+    "scene": "res://game/observatory_so09.tscn"
+  },
+  {
+    "id": "SO10",
+    "island": "observatory",
+    "title": "一座泊位三封信",
+    "act": 5,
+    "side": false,
+    "prerequisites": [
+      "SO09"
+    ],
+    "concept_ids": [
+      "temporal_constraints",
+      "strategy_optimization"
+    ],
+    "mechanism": "schedule",
+    "params": {
+      "jobs": [
+        {
+          "name": "种子",
+          "release": 0,
+          "deadline": 4,
+          "durations": [
+            2
+          ],
+          "costs": [
+            2
+          ]
+        },
+        {
+          "name": "镜片",
+          "release": 1,
+          "deadline": 7,
+          "durations": [
+            3
+          ],
+          "costs": [
+            3
+          ]
+        },
+        {
+          "name": "急信",
+          "release": 4,
+          "deadline": 8,
+          "durations": [
+            1
+          ],
+          "costs": [
+            1
+          ]
+        }
+      ],
+      "tracks": 1,
+      "horizon": 9,
+      "cross": [],
+      "max_cost": -1,
+      "max_end": -1
+    },
+    "goal": "为三艘船安排不重叠的发射窗口。",
+    "instructions": "先选船，再点轨道时间格安排出发。r=最早出发，d=最晚到达。\n船从出发到到达占用轨道，同轨不能重叠。",
+    "intro": [
+      "单泊位上三艘船等着发射，各自有到港期限。",
+      "霁星：一艘船能走，还要给下一艘留出位置。"
+    ],
+    "outro": [
+      "货船按照玩家安排的时刻逐一离港。",
+      "港口回灯确认所有货物都按时抵达。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO10",
+      "experience": 20,
+      "keepsake": "泊位时刻牌"
+    },
+    "scene": "res://game/observatory_so10.tscn"
+  },
+  {
+    "id": "SO11",
+    "island": "observatory",
+    "title": "两轨交叉的灯影",
+    "act": 6,
+    "side": false,
+    "prerequisites": [
+      "SO10"
+    ],
+    "concept_ids": [
+      "temporal_constraints",
+      "strategy_optimization"
+    ],
+    "mechanism": "schedule",
+    "params": {
+      "jobs": [
+        {
+          "name": "木材",
+          "release": 0,
+          "deadline": 7,
+          "durations": [
+            3,
+            3
+          ],
+          "costs": [
+            2,
+            2
+          ]
+        },
+        {
+          "name": "齿轮",
+          "release": 0,
+          "deadline": 7,
+          "durations": [
+            3,
+            3
+          ],
+          "costs": [
+            2,
+            2
+          ]
+        },
+        {
+          "name": "水罐",
+          "release": 1,
+          "deadline": 8,
+          "durations": [
+            2,
+            2
+          ],
+          "costs": [
+            1,
+            1
+          ]
+        }
+      ],
+      "tracks": 2,
+      "horizon": 9,
+      "cross": [
+        1,
+        1
+      ],
+      "max_cost": -1,
+      "max_end": -1
+    },
+    "goal": "安排三船；同轨不能重叠，不同轨的交叉点经过时刻不能相同。",
+    "instructions": "先选船，再点轨道时间格安排出发。r=最早出发，d=最晚到达。\n船从出发到到达占用轨道，同轨不能重叠。两轨都在离港后1时经过交叉点，不可同时经过。",
+    "intro": [
+      "两条天空轨道在离港后一时交叉，不能让两艘船同时经过。",
+      "霁星：一艘船能走，还要给下一艘留出位置。"
+    ],
+    "outro": [
+      "货船按照玩家安排的时刻逐一离港。",
+      "港口回灯确认所有货物都按时抵达。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO11",
+      "experience": 20,
+      "keepsake": "交叉航灯"
+    },
+    "scene": "res://game/observatory_so11.tscn"
+  },
+  {
+    "id": "SO12",
+    "island": "observatory",
+    "title": "慢船也能赶上",
+    "act": 6,
+    "side": false,
+    "prerequisites": [
+      "SO11"
+    ],
+    "concept_ids": [
+      "temporal_constraints",
+      "strategy_optimization"
+    ],
+    "mechanism": "schedule",
+    "params": {
+      "jobs": [
+        {
+          "name": "种子",
+          "release": 0,
+          "deadline": 5,
+          "durations": [
+            2,
+            3
+          ],
+          "costs": [
+            4,
+            1
+          ]
+        },
+        {
+          "name": "镜片",
+          "release": 0,
+          "deadline": 7,
+          "durations": [
+            2,
+            4
+          ],
+          "costs": [
+            5,
+            2
+          ]
+        },
+        {
+          "name": "药草",
+          "release": 3,
+          "deadline": 10,
+          "durations": [
+            2,
+            3
+          ],
+          "costs": [
+            4,
+            1
+          ]
+        }
+      ],
+      "tracks": 2,
+      "horizon": 11,
+      "cross": [],
+      "max_cost": 4,
+      "max_end": -1
+    },
+    "goal": "三船按时到达，总耗晶不超过4（可达到的最小值）。",
+    "instructions": "先选船，再点轨道时间格安排出发。r=最早出发，d=最晚到达。\n船从出发到到达占用轨道，同轨不能重叠。总耗晶≤4（最少）。",
+    "intro": [
+      "快轨耗晶多，慢轨省晶；修好航路还要留下照明能源。",
+      "霁星：一艘船能走，还要给下一艘留出位置。"
+    ],
+    "outro": [
+      "货船按照玩家安排的时刻逐一离港。",
+      "港口回灯确认所有货物都按时抵达。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO12",
+      "experience": 20,
+      "keepsake": "节能星晶"
+    },
+    "scene": "res://game/observatory_so12.tscn"
+  },
+  {
+    "id": "SO13",
+    "island": "observatory",
+    "title": "离轴风筝星座",
+    "act": 6,
+    "side": true,
+    "prerequisites": [
+      "SO03"
+    ],
+    "concept_ids": [
+      "scale_correspondence",
+      "reference_origin"
+    ],
+    "mechanism": "scale",
+    "params": {
+      "source": [
+        [
+          2,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          4,
+          4
+        ]
+      ],
+      "source_origin": [
+        2,
+        2
+      ],
+      "origin": [
+        4,
+        3
+      ],
+      "num": 1,
+      "den": 1
+    },
+    "goal": "保持星点编号对应，从金色基点起把横纵距离按1:1缩放。",
+    "instructions": "两图每格都是1尺。旧基点[2, 2]，新基点[4, 3]。先选星点，再点右盘交点；每一个方向都按1:1缩放。",
+    "intro": [
+      "可选：观测员想把完整星座平移到风筝旁，不改变大小。",
+      "霁星：基点变了，量距离的方法仍要一致。"
+    ],
+    "outro": [
+      "星线和接收架重合，远处的航标亮了。",
+      "阿橙：每个对应点都找到了自己的位置。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO13",
+      "experience": 20,
+      "keepsake": "风筝星坠"
+    },
+    "scene": "res://game/observatory_so13.tscn"
+  },
+  {
+    "id": "SO14",
+    "island": "observatory",
+    "title": "少动几片百叶",
+    "act": 6,
+    "side": true,
+    "prerequisites": [
+      "SO06"
+    ],
+    "concept_ids": [
+      "percent_whole",
+      "minimum_changes"
+    ],
+    "mechanism": "shutters",
+    "params": {
+      "sizes": [
+        10
+      ],
+      "blocked": [
+        []
+      ],
+      "initial": [
+        [
+          0,
+          2,
+          4,
+          6,
+          8
+        ]
+      ],
+      "targets": [
+        40
+      ],
+      "basis": [
+        "all"
+      ],
+      "contiguous": true,
+      "min_changes": 5
+    },
+    "goal": "开放整窗40%，亮格必须相连，且只改变5格的开闭状态。",
+    "instructions": "整体10格，初始亮格0、2、4、6、8。最后4个亮格必须连续。以与初态不同的格数计操作改动，不计试验次数；5是最少改动。",
+    "intro": [
+      "可选：旧百叶的齿轮很脆，需要用最少改动留下连续一束光。",
+      "阿橙：不只看亮几格，也要看它们在哪里。"
+    ],
+    "outro": [
+      "连在一起的光照进镜筒，旧齿轮安然无恙。",
+      "维修员把没有用掉的润滑油留给下一座窗。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO14",
+      "experience": 20,
+      "keepsake": "百叶齿轮"
+    },
+    "scene": "res://game/observatory_so14.tscn"
+  },
+  {
+    "id": "SO15",
+    "island": "observatory",
+    "title": "每封信都过灯塔",
+    "act": 6,
+    "side": true,
+    "prerequisites": [
+      "SO09"
+    ],
+    "concept_ids": [
+      "ordered_counting",
+      "systematic_routes"
+    ],
+    "mechanism": "routes",
+    "params": {
+      "nodes": [
+        "台",
+        "北",
+        "南",
+        "塔",
+        "港"
+      ],
+      "edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "starts": [
+        0
+      ],
+      "ends": [
+        4
+      ],
+      "length": 0,
+      "required": [
+        3
+      ]
+    },
+    "goal": "用观测镜/站点接出并收藏全部合法顺序，不重复、不遗漏。",
+    "instructions": "箭头只可顺向。起点：台；终点：港。到终点即结束。每点每条最多一次。必须经过塔。点击节点接线，按“收藏此路”；可清空重画。",
+    "intro": [
+      "可选：补充目录只收经过灯塔的邮路，绕过灯塔的不能算。",
+      "折羽：按第一步分组，才能知道哪一种还没看过。"
+    ],
+    "outro": [
+      "所有合法路线都被真正接线记录下来。",
+      "折羽按玩家整理的目录发送观测信。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO15",
+      "experience": 20,
+      "keepsake": "灯塔回邮"
+    },
+    "scene": "res://game/observatory_so15.tscn"
+  },
+  {
+    "id": "SO16",
+    "island": "observatory",
+    "title": "最紧凑的夜班",
+    "act": 6,
+    "side": true,
+    "prerequisites": [
+      "SO12"
+    ],
+    "concept_ids": [
+      "temporal_constraints",
+      "strategy_optimization"
+    ],
+    "mechanism": "schedule",
+    "params": {
+      "jobs": [
+        {
+          "name": "帆布",
+          "release": 0,
+          "deadline": 8,
+          "durations": [
+            3,
+            3
+          ],
+          "costs": [
+            1,
+            1
+          ]
+        },
+        {
+          "name": "铜环",
+          "release": 0,
+          "deadline": 8,
+          "durations": [
+            2,
+            2
+          ],
+          "costs": [
+            1,
+            1
+          ]
+        },
+        {
+          "name": "灯油",
+          "release": 0,
+          "deadline": 8,
+          "durations": [
+            2,
+            2
+          ],
+          "costs": [
+            1,
+            1
+          ]
+        },
+        {
+          "name": "星针",
+          "release": 1,
+          "deadline": 8,
+          "durations": [
+            1,
+            1
+          ],
+          "costs": [
+            1,
+            1
+          ]
+        }
+      ],
+      "tracks": 2,
+      "horizon": 9,
+      "cross": [],
+      "max_cost": -1,
+      "max_end": 4
+    },
+    "goal": "四船全部在4时前到达，两轨都不能重叠。",
+    "instructions": "先选船，再点轨道时间格安排出发。r=最早出发，d=最晚到达。\n船从出发到到达占用轨道，同轨不能重叠。所有船须在4时前到达（最短完工）。",
+    "intro": [
+      "可选：两轨总工作量8时，要在4时内收工，才能看见流星。",
+      "霁星：一艘船能走，还要给下一艘留出位置。"
+    ],
+    "outro": [
+      "货船按照玩家安排的时刻逐一离港。",
+      "港口回灯确认所有货物都按时抵达。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO16",
+      "experience": 20,
+      "keepsake": "夜班流星"
+    },
+    "scene": "res://game/observatory_so16.tscn"
+  },
+  {
+    "id": "SO17",
+    "island": "observatory",
+    "title": "星风守望者",
+    "act": 6,
+    "side": false,
+    "prerequisites": [
+      "SO12"
+    ],
+    "concept_ids": [
+      "network_resilience",
+      "contingency_planning"
+    ],
+    "mechanism": "storm",
+    "params": {
+      "nodes": [
+        "台",
+        "北塔",
+        "南塔",
+        "海塔"
+      ],
+      "edges": [
+        [
+          0,
+          1,
+          2,
+          1
+        ],
+        [
+          1,
+          2,
+          2,
+          1
+        ],
+        [
+          2,
+          3,
+          2,
+          1
+        ],
+        [
+          3,
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          3,
+          2
+        ],
+        [
+          1,
+          3,
+          3,
+          2
+        ]
+      ],
+      "budget": 10,
+      "repair_limit": 1
+    },
+    "goal": "先搭抗风网络，断线后重接，使任意两塔最多经2条线互通。",
+    "instructions": "先装线：总费≤10晶，任断一条仍须四塔连通。点“迎接星风”，最小编号已装线会断开。\n断线不可再用。风后仍≤10晶；最多加1条原来未装的线，可拆旧线。\n最终四塔连通，且任意两塔最多走2段。线标为“编号·费用/航时”。",
+    "intro": [
+      "守望者：你们的航图能承受一次意外吗？",
+      "霁星：先给每座塔留下另一条路，星风会检验实际连线。",
+      "阿橙：风来以后，再看留下来的线能怎样互相帮助。"
+    ],
+    "outro": [
+      "星风沿真实断口掠过，余下的线仍把四座塔连在一起。",
+      "守望者放开最后的星锁：带着这样的准备，去接回六座岛吧。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO17",
+      "experience": 40,
+      "keepsake": "守望星环"
+    },
+    "scene": "res://game/observatory_so17.tscn"
+  },
+  {
+    "id": "SO18",
+    "island": "observatory",
+    "title": "六岛归航",
+    "act": 6,
+    "side": false,
+    "prerequisites": [
+      "SO17"
+    ],
+    "concept_ids": [
+      "network_budget",
+      "temporal_constraints",
+      "cross_island_planning"
+    ],
+    "mechanism": "finale",
+    "params": {
+      "nodes": [
+        "星台",
+        "森林",
+        "集市",
+        "工坊",
+        "山谷",
+        "水庭"
+      ],
+      "edges": [
+        [
+          0,
+          1,
+          2,
+          2
+        ],
+        [
+          0,
+          2,
+          2,
+          2
+        ],
+        [
+          0,
+          3,
+          2,
+          2
+        ],
+        [
+          0,
+          4,
+          2,
+          2
+        ],
+        [
+          0,
+          5,
+          2,
+          2
+        ],
+        [
+          1,
+          2,
+          1,
+          1
+        ],
+        [
+          2,
+          3,
+          1,
+          1
+        ],
+        [
+          3,
+          4,
+          1,
+          1
+        ],
+        [
+          4,
+          5,
+          1,
+          1
+        ],
+        [
+          5,
+          1,
+          1,
+          1
+        ]
+      ],
+      "budget": 8,
+      "horizon": 22,
+      "jobs": [
+        {
+          "name": "星台灯油",
+          "release": 0,
+          "deadline": 22,
+          "target": 0
+        },
+        {
+          "name": "森林种子",
+          "release": 0,
+          "deadline": 22,
+          "target": 1
+        },
+        {
+          "name": "集市镜片",
+          "release": 0,
+          "deadline": 22,
+          "target": 2
+        },
+        {
+          "name": "工坊齿轮",
+          "release": 0,
+          "deadline": 22,
+          "target": 3
+        },
+        {
+          "name": "山谷铜架",
+          "release": 0,
+          "deadline": 22,
+          "target": 4
+        },
+        {
+          "name": "水庭水罐",
+          "release": 0,
+          "deadline": 22,
+          "target": 5
+        }
+      ],
+      "max_end": 22
+    },
+    "goal": "用8晶以内接通六岛，再安排六船沿实际航线于22时内到达。",
+    "instructions": "点击线缆接通六岛，总费≤8晶；线标为费用/航时。船走当前网络的最短航线，本地船用1时。\n先选船，再点时格出发；只有一条总通道，所有船航行时段不得重叠，22时前到达。\n改线会改变真实航程。试航按你建的网络和时刻表运行。",
+    "intro": [
+      "六座岛的灯都望向星台，等着最后一次联合发船。",
+      "折羽：种子、镜片、齿轮、铜架和水罐，终于能走同一张航图。",
+      "霁星：请亲手把岛连起来，再让每艘船在能走的时间出发。"
+    ],
+    "outro": [
+      "六艘船沿玩家实际接出的航线依次出发，每座岛收到自己的物资。",
+      "森林种下新芽，集市点起灯，工坊转动；山谷与水庭在海上相望。",
+      "阿橙：我们不是把答案交给星空，是让大家真的又见面了。"
+    ],
+    "hints": [
+      "观察现场不变的条件",
+      "把条件分开检查",
+      "看当前未满足的条件",
+      "尝试一个可核实的下一步"
+    ],
+    "reward": {
+      "id": "reward_SO18",
+      "experience": 40,
+      "keepsake": "六岛同心航图"
+    },
+    "scene": "res://game/observatory_so18.tscn"
+  }
+]

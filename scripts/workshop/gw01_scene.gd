@@ -86,6 +86,7 @@ func refresh() -> void:
 	add_button("journal","回看与发现",Rect2(520,650,168,50),journal).disabled = transient > 0
 	if state.stage == "complete":
 		sign_text("倒着想：接收时变两倍，还原时就取一半。",Rect2(276,535,754,54),20)
+	add_workshop_navigation()
 	if modal:
 		for b in buttons.values(): b.disabled = true
 

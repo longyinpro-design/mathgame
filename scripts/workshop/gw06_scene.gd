@@ -4,10 +4,10 @@ extends "res://scripts/workshop/workshop_host.gd"
 const Rules = preload("res://scripts/workshop/gw06_rules.gd")
 const World = preload("res://scripts/workshop/gw06_world.gd")
 const Catalog = preload("res://scripts/workshop/chapter_catalog.gd")
-const ARRIVAL = ["小岚：要正好 %d 枚扣环。小模每炉出 %d 枚，大模每炉出 %d 枚，都得整炉加工，不能丢。"%[Rules.NEED,Rules.SMALL,Rules.LARGE],
+var ARRIVAL = ["小岚：要正好 %d 枚扣环。小模每炉出 %d 枚，大模每炉出 %d 枚，都得整炉加工，不能丢。"%[Rules.NEED,Rules.SMALL,Rules.LARGE],
 	"嗒嗒：每开一炉占 1 拍；要是下一炉要换模，还得另花 1 拍——头一炉装模不用花。",
 	"小岚：第 %d 拍一过就得交货。开几炉、怎么排，都归你定。"%Rules.DEADLINE]
-const AFTER = ["小岚：凑 %d 枚只有两种组合——小 7 炉大 2 炉，或者小 2 炉大 5 炉。"%Rules.NEED,
+var AFTER = ["小岚：凑 %d 枚只有两种组合——小 7 炉大 2 炉，或者小 2 炉大 5 炉。"%Rules.NEED,
 	"嗒嗒：9 炉那一种，光加工就要 9 拍，还没算换模，早就超过 %d 拍了。"%Rules.DEADLINE,
 	"小岚：7 炉加工 7 拍，只剩 1 拍，只够换一次模——同类的炉次得排在一起。冷却机还得检修，先留位置。"]
 var gw_pending_feedback = ""

@@ -1,0 +1,56 @@
+[
+  {
+    "name": "session",
+    "returncode": 0,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "name": "restore-ui",
+    "returncode": 0,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "name": "end-to-end",
+    "returncode": 0,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "name": "geometry-rules",
+    "returncode": 0,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "name": "fractions-rules",
+    "returncode": 0,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "name": "observatory-rules",
+    "returncode": 0,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "name": "observatory-boundaries",
+    "returncode": 0,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "name": "observatory-voyage",
+    "returncode": 0,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "name": "campaign-headless",
+    "returncode": 0,
+    "passed": true,
+    "errors": []
+  }
+]

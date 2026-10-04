@@ -1,4 +1,5 @@
 extends Control
+const Archipelago = preload("res://scripts/archipelago/bridge.gd")
 # 千灯集市航图：18 张关卡卡片、逐关点亮的灯火，以及进入关卡的唯一入口。
 # 这里只写章节进度；每一关的现场状态仍由各自的存档负责。
 const Catalog = preload("res://scripts/market/chapter_catalog.gd")
@@ -40,6 +41,8 @@ func _ready() -> void:
 	get_window().theme = UIStyle.tooltip_theme()
 	refresh()
 	if save_note == "protected": show_protected()
+
+	Archipelago.attach_legacy(self,"market")
 
 func _exit_tree() -> void:
 	if is_instance_valid(get_window()): get_window().theme = window_theme

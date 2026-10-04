@@ -5,10 +5,10 @@ extends "res://scripts/workshop/workshop_host.gd"
 const Rules = preload("res://scripts/workshop/gw11_rules.gd")
 const World = preload("res://scripts/workshop/gw11_world.gd")
 const Catalog = preload("res://scripts/workshop/chapter_catalog.gd")
-const ARRIVAL = ["小岚：两批材料都在第 %d 拍送到。A 批的船票钉死在第 %d 拍开船；B 批有两张票，第 13 拍和第 14 拍，得先定一张。"%[Rules.ARRIVAL_BEAT,Rules.A_LOAD],
+var ARRIVAL = ["小岚：两批材料都在第 %d 拍送到。A 批的船票钉死在第 %d 拍开船；B 批有两张票，第 13 拍和第 14 拍，得先定一张。"%[Rules.ARRIVAL_BEAT,Rules.A_LOAD],
 	"嗒嗒：A 批装配 %d 拍、冷却 %d 拍、装船 %d 拍；B 批装配 %d 拍、冷却 %d 拍、装船 %d 拍。三段都得首尾相接，中间不能等。"%[Rules.ASSEMBLY_TIME[0],Rules.COOL_TIME[0],Rules.LOAD_TIME,Rules.ASSEMBLY_TIME[1],Rules.COOL_TIME[1],Rules.LOAD_TIME],
 	"小岚：装配台只有一张，一次一批；冷却架能放两批；吊机一次吊一批。先选票，再从船票往回倒着排。"]
-const AFTER = ["小岚：从各自的船票往回倒：A 冷却 9–12、装配 7–9；B 走第 14 拍，冷却 12–14、装配 9–12。",
+var AFTER = ["小岚：从各自的船票往回倒：A 冷却 9–12、装配 7–9；B 走第 14 拍，冷却 12–14、装配 9–12。",
 	"嗒嗒：B 要是选第 13 拍，装配就得排 8–11，正好压在 A 的 7–9 上——单批都没错，合起来才撞车。",
 	"小岚：弥师傅说，这次等待是有依据的：材料第 %d 拍到，两批才都从第 7 拍以后动手。两班的交接册也得合起来对。"%Rules.ARRIVAL_BEAT]
 # 左下角是船期牌与当前拍读数，右下角留给嗒嗒；小岚站在最右边缘。
