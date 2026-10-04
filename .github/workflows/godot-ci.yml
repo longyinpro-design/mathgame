@@ -1,0 +1,61 @@
+name: Godot CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: godot-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  headless:
+    name: Godot 4.6.3 / Linux headless
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - name: Check out the triggering revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install the pinned official Godot build
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-results "$RUNNER_TEMP/godot"
+          exec > >(tee ci-results/install.log) 2>&1
+          archive="$RUNNER_TEMP/godot/Godot_v4.6.3-stable_linux.x86_64.zip"
+          curl --fail --location --retry 3 --connect-timeout 30 --max-time 300 \
+            https://github.com/godotengine/godot-builds/releases/download/4.6.3-stable/Godot_v4.6.3-stable_linux.x86_64.zip \
+            --output "$archive"
+          echo "d0bc2113065e481c9c2c2b2c37daa4e8be3fe9e27f0ab9ab0b6096e9a37907f3  $archive" | sha256sum --check --strict
+          unzip -q "$archive" -d "$RUNNER_TEMP/godot"
+          mv "$RUNNER_TEMP/godot/Godot_v4.6.3-stable_linux.x86_64" "$RUNNER_TEMP/godot/godot"
+          chmod +x "$RUNNER_TEMP/godot/godot"
+          "$RUNNER_TEMP/godot/godot" --version
+          echo "$RUNNER_TEMP/godot" >> "$GITHUB_PATH"
+          echo "GODOT=$RUNNER_TEMP/godot/godot" >> "$GITHUB_ENV"
+
+      - name: Validate the CI runner
+        run: python3 -m unittest discover -s tests/ci -v
+
+      - name: Import clean-checkout resources and scripts
+        run: python3 tools/ci/run_checks.py --import-only
+
+      - name: Test six-island rules, levels, progression, and saves
+        run: python3 tools/ci/run_checks.py
+
+      - name: Keep reports and failure logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: godot-ci-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ci-results/
+          if-no-files-found: warn
+          retention-days: 7

@@ -2,6 +2,8 @@
 
 ## 六岛完整内容开发版 · v0.8.0
 
+自动检查：[GitHub Actions](https://github.com/longyinpro-design/mathgame/actions) · [CI 覆盖范围、失败日志与本地复现](docs/ci.md)
+
 默认入口已改为六岛航路：双击 **启动数字群岛.command**，或在 Godot 中打开项目按 F5。也可运行 `godot --path . --scene game/archipelago.tscn`。
 
 六岛共 **108 个关卡入口**：森林 FL01–18、集市 MK01–18、工坊 GW01–18、几何山谷 GV01–18、分数水庭 FW01–18、星穹观测台 SO01–18。每岛 14 个主线关和 4 个可选支线，支线不阻挡下一座岛。默认「继续故事」按真实前置衔接；已完成关仍可回访和重玩。
